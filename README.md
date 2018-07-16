@@ -6,7 +6,7 @@ JavaScript/Node.js implementation of http://cloudevents.io/
 ## Usage
 
 ```js
-const CE = require('cloudevent.js')()
+const CEClass = require('cloudevent.js')()
 
 // create some sample intances ...
 const ceEmpty = new CEClass() // create a not valid CloudEvent instance (for the validator)
