@@ -1,3 +1,27 @@
+# mac files
+.DS_Store
+
+# dotenv environment variables file
+.env
+
+# IDE/editors
+.vscode
+.cache
+.metadata
+.settings
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Optional eslint cache
+.eslintcache
+
+# Yarn Integrity file
+.yarn-integrity
+
 # Logs
 logs
 *.log
@@ -29,33 +53,41 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
+# Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
 # Dependency directories
 node_modules/
 jspm_packages/
 
-# TypeScript v1 declaration files
+# Typescript v1 declaration files
 typings/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
 
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
-.yarn-integrity
+# vim swap files
+*.swp
 
-# dotenv environment variables file
-.env
+# lock files
+yarn.lock
+package-lock.json
 
-# next.js build output
-.next
+# common files to not commit
+*~*
+*.bak
+Thumbs.db
+*.db
+*.zip
+*.tar
+*.tar.gz
+
+# temporary/work/output folders
+_old/
+# bin/
+build/
+dist/
+out/
+private/
+temp/
+tmp/
