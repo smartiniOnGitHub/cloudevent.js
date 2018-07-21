@@ -15,10 +15,34 @@
  */
 'use strict'
 
+/**
+ * CloudEvent:
+ * this module exports some useful definition and utility related to CloudEvents.
+ */
+
 const validators = require('./validators') // get validators from here
 
+/**
+ * Create a new instance of a CloudEvent object.
+ * Must be called with the 'new' operator to return the new object instance.
+ *
+ * @see https://github.com/cloudevents/spec/blob/master/json-format.md
+ *
+ * @param {string} eventID the ID of the event (unique), mandatory
+ * @param {string} eventType the type of the event (usually), mandatory
+ * @param {object | Map | Set} data the real event data
+ * @param {object} [{
+ *   {string} cloudEventsVersion default '0.1',
+ *   {string} eventTypeVersion optional,
+ *   {uri} source default '/',
+ *   {timestamp} eventTime = new Date(),
+ *   {object} extensions optional but if given must contain at least 1 property (key/value),
+ *   {string} contentType default 'application/json',
+ *   {uri} schemaURL optional,
+ *   {boolean} strict default false
+ * }] optional attributes of the event; some has default values chosen here
+ */
 class CloudEvent {
-  // TODO: debug even using obj.toSource() utility function ...
   constructor (eventID, eventType, data, {
     cloudEventsVersion = '0.1',
     eventTypeVersion,
@@ -30,7 +54,8 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    // TODO: try to log data using toSource, with something like: (x !== null) ? x.toSource() : 'null', but handle even undefined values ... or maybe add an utility function for this (like dumpSource and maybe even dumpSourceOrElse), and call here ... but cleanup of previous commented line later ... wip
+    // TODO: try to log data using toSource, with something like: (x !== null) ? x.toSource() : 'null', but handle even undefined values ... or maybe add an utility function for this (like dumpSource and maybe even dumpSourceOrElse), and call here ... but cleanup of previous commented line later ... ok
+    console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     if (strict === true) {
       if (!eventID || !eventType) {
         throw new Error('Unable to create CloudEvent instance, mandatory field missing')
@@ -52,10 +77,49 @@ class CloudEvent {
     this.strict = strict // could be useful ...
   }
 
+  /**
+   * Utility function that return a dump of the given object.
+   *
+   * @static
+   * @param {object | Map | Set} obj the object to dump
+   * @param {string} name the name to assign in the returned string
+   * @returns string, the dump of the object or a message when obj is undefined/null/not an object
+   * @memberof CloudEvent
+   */
+  static dumpObject (obj, name) {
+    if (validators.isUndefined(obj)) {
+      return `${name}: undefined`
+    } else if (validators.isNull(obj)) {
+      return `${name}: null`
+    } else if (!validators.isObjectOrCollection(obj)) {
+      return `${name}: '${obj.toString()}'`
+    } else {
+      return `${name}: ${obj.toSource()}'`
+    }
+  }
+
+  /**
+   * Return the MIME Type for a CloudEvent
+   *
+   * @static
+   * @returns a string with the value
+   * @memberof CloudEvent
+   */
   static mediaType () {
     return 'application/cloudevents+json'
   }
 
+  /**
+   * Validate the given CloudEvent.
+   *
+   * @static
+   * @param {object} event the CloudEvent to validate
+   * @param {object} [{
+   *   {boolean} strict default false, to validate it in a more strict way
+   * }] options, optional
+   * @returns an array of (non null) validation errors, or at least an empty array
+   * @memberof CloudEvent
+   */
   static validateEvent (event, { strict = false } = {}) {
     // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
     if (validators.isUndefinedOrNull(event)) {
@@ -115,6 +179,17 @@ class CloudEvent {
     return ve.filter((i) => i)
   }
 
+  /**
+   * Tell the given CloudEvent, if it's valid.
+   *
+   * @static
+   * @param {object} event the CloudEvent to validate
+   * @param {object} [{
+   *   {boolean} strict default false, to check its validation in a more strict way
+   * }] options, optional
+   * @returns true if valid, otherwise false
+   * @memberof CloudEvent
+   */
   static isValidEvent (event, { strict = false } = {}) {
     // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
     const validationErrors = CloudEvent.validateEvent(event, { strict })
@@ -123,16 +198,32 @@ class CloudEvent {
     return (size === 0)
   }
 
-  // TODO: add other methods, but remove the event argument in this case ... better, check how to define these functions static, then call them in methods with this ... ok, then test all them
+  /**
+   * Validate the current CloudEvent.
+   *
+   * @param {object} [{
+   *   {boolean} strict default false, to validate it in a more strict way
+   * }] options, optional
+   * @returns an array of (non null) validation errors, or at least an empty array
+   * @memberof CloudEvent
+   */
   validate ({ strict = false } = {}) {
     return CloudEvent.validateEvent(this, { strict })
   }
 
+  /**
+   * Tell the current CloudEvent, if it's valid.
+   *
+   * @param {object} [{
+   *   {boolean} strict default false, to check its validation in a more strict way
+   * }] options, optional
+   * @returns true if valid, otherwise false
+   * @memberof CloudEvent
+   */
   isValid ({ strict = false } = {}) {
     return CloudEvent.isValid(this, { strict })
   }
 }
-// TODO: chek if add methods validate and isValid even as static methods (to work on a given event) ... ok
 
 // TODO: here in strict mode verify even if it would be gpod to check for the right instanceof type, but ensure it works even when using inheritance ... wip
 

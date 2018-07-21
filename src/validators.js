@@ -15,11 +15,20 @@
  */
 'use strict'
 
-// this module exports some useful generic functions for the validation of objects
-
-// TODO: add doc ... wip
+/**
+ * Validators:
+ * this module exports some useful generic functions for the validation of objects.
+ */
 
 const url = require('url')
+
+module.exports.isUndefined = function (arg) {
+  return (arg === undefined)
+}
+
+module.exports.isNull = function (arg) {
+  return (arg === null)
+}
 
 module.exports.isUndefinedOrNull = function (arg) {
   return (arg === undefined || arg === null)

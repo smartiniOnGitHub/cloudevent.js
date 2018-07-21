@@ -21,7 +21,7 @@ const test = require('tap').test
 test('ensure the CloudEvent class is exported by the library', (t) => {
   t.plan(4)
 
-  const CEClass = require('../') // reference the library
+  const CEClass = require('../src/') // reference the library
 
   // optional, using some standard Node.js assert statements, as a sample
   assert(CEClass !== null)
