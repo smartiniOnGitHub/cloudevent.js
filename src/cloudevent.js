@@ -35,7 +35,7 @@ class CloudEvent {
    * Create a new instance of a CloudEvent object.
    * @param {!string} eventID the ID of the event (unique), mandatory
    * @param {!string} eventType the type of the event (usually), mandatory
-   * @param {!(object|Map|Set)} data the real event data
+   * @param {(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
    *        cloudEventsVersion (string, default '0.1'),
    *        eventTypeVersion (string) optional,
@@ -45,6 +45,7 @@ class CloudEvent {
    *        contentType (string, default 'application/json') tell how the data attribute must be encoded,
    *        schemaURL (uri) optional,
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
+   * @throws {Error} if strict is true and eventID or eventType is undefined or null
    */
   constructor (eventID, eventType, data, {
     cloudEventsVersion = '0.1',
@@ -57,7 +58,7 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    // console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     if (strict === true) {
       if (!eventID || !eventType) {
         throw new Error('Unable to create CloudEvent instance, mandatory field missing')
@@ -170,10 +171,11 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @return {boolean} true if strict, otherwise false
+   * @throws {Error} if event if undefined or null
    */
   static isStrict (event) {
     if (validators.isUndefinedOrNull(event)) {
-      return [new Error('CloudEvent undefined or null')]
+      throw new Error('CloudEvent undefined or null')
     }
     if (validators.isDefinedAndNotNull(event.extensions)) {
       return event.extensions.strict
@@ -258,10 +260,8 @@ class CloudEvent {
    * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, { strict = false } = {}) {
-    // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
     const validationErrors = CloudEvent.validateEvent(event, { strict })
     const size = validators.getSize(validationErrors)
-    // console.log(`DEBUG - isValid: validationErrors = ${validationErrors}, size = ${size}`)
     return (size === 0)
   }
 
