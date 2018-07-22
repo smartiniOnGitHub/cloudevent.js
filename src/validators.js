@@ -27,7 +27,7 @@ const url = require('url')
 /**
  * Tell if the given ergument is undefined.
  * @param {*} arg the object to check
- * @returns {boolean} true if undefined, false otherwise
+ * @return {boolean} true if undefined, false otherwise
  */
 module.exports.isUndefined = function (arg) {
   return (arg === undefined)
@@ -36,7 +36,7 @@ module.exports.isUndefined = function (arg) {
 /**
  * Tell if the given ergument is null.
  * @param {*} arg the object to check
- * @returns {boolean} true if null, false otherwise
+ * @return {boolean} true if null, false otherwise
  */
 module.exports.isNull = function (arg) {
   return (arg === null)
@@ -45,7 +45,7 @@ module.exports.isNull = function (arg) {
 /**
  * Tell if the given ergument is undefined or null.
  * @param {*} arg the object to check
- * @returns {boolean} true if undefined or null, false otherwise
+ * @return {boolean} true if undefined or null, false otherwise
  */
 module.exports.isUndefinedOrNull = function (arg) {
   return (arg === undefined || arg === null)
@@ -54,7 +54,7 @@ module.exports.isUndefinedOrNull = function (arg) {
 /**
  * Tell if the given ergument is defined and not null.
  * @param {*} arg the object to check
- * @returns {boolean} true if defined and not null, false otherwise
+ * @return {boolean} true if defined and not null, false otherwise
  */
 module.exports.isDefinedAndNotNull = function (arg) {
   return (arg !== undefined && arg !== null)

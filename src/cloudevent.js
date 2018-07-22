@@ -33,9 +33,9 @@ const validators = require('./validators') // get validators from here
 class CloudEvent {
   /**
    * Create a new instance of a CloudEvent object.
-   * @param {string} eventID the ID of the event (unique), mandatory
-   * @param {string} eventType the type of the event (usually), mandatory
-   * @param {object | Map | Set} data the real event data
+   * @param {!string} eventID the ID of the event (unique), mandatory
+   * @param {!string} eventType the type of the event (usually), mandatory
+   * @param {!(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
    *        cloudEventsVersion (string, default '0.1'),
    *        eventTypeVersion (string) optional,
@@ -78,7 +78,7 @@ class CloudEvent {
     this.eventType = eventType
     /**
      * The real event data.
-     * @type {object | Map | Set}
+     * @type {object|Map|Set}
      * @private
      */
     this.data = data
@@ -126,32 +126,31 @@ class CloudEvent {
      */
     this.source = source
 
-    /**
-     * Validation more strict, optional.
-     * @type {boolean}
-     * @private
-     */
-    this.strict = strict // could be useful ...
+    // add strict to extensions, but only when defined
+    if (strict === true) {
+      this.extensions = extensions || {}
+      this.extensions.strict = strict
+    }
   }
 
   /**
    * Utility function that return a dump of the given object.
    *
    * @static
-   * @param {object | Map | Set} obj the object to dump
+   * @param {(object|Map|Set)} obj the object to dump
    * @param {string} name the name to assign in the returned string
-   * @returns {string} the dump of the object or a message when obj is undefined/null/not an object
-   * @memberof CloudEvent
+   * @return {string} the dump of the object or a message when obj is undefined/null/not an object
    */
   static dumpObject (obj, name) {
+    const n = name || 'noname'
     if (validators.isUndefined(obj)) {
-      return `${name}: undefined`
+      return `${n}: undefined`
     } else if (validators.isNull(obj)) {
-      return `${name}: null`
+      return `${n}: null`
     } else if (!validators.isObjectOrCollection(obj)) {
-      return `${name}: '${obj.toString()}'`
+      return `${n}: '${obj.toString()}'`
     } else {
-      return `${name}: ${JSON.stringify(obj)}`
+      return `${n}: ${JSON.stringify(obj)}`
     }
   }
 
@@ -159,21 +158,37 @@ class CloudEvent {
    * Return the MIME Type for a CloudEvent
    *
    * @static
-   * @returns {string} the value
-   * @memberof CloudEvent
+   * @return {string} the value
    */
   static mediaType () {
     return 'application/cloudevents+json'
   }
 
   /**
+   * Tell if the object has the strict flag enabled.
+   *
+   * @static
+   * @param {!object} event the CloudEvent to validate
+   * @return {boolean} true if strict, otherwise false
+   */
+  static isStrict (event) {
+    if (validators.isUndefinedOrNull(event)) {
+      return [new Error('CloudEvent undefined or null')]
+    }
+    if (validators.isDefinedAndNotNull(event.extensions)) {
+      return event.extensions.strict
+    } else {
+      return false
+    }
+  }
+
+  /**
    * Validate the given CloudEvent.
    *
    * @static
-   * @param {object} event the CloudEvent to validate
+   * @param {!object} event the CloudEvent to validate
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
-   * @returns {array} an array of (non null) validation errors, or at least an empty array
-   * @memberof CloudEvent
+   * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   static validateEvent (event, { strict = false } = {}) {
     // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
@@ -210,7 +225,7 @@ class CloudEvent {
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
-    if (strict === true || event.strict === true) {
+    if (strict === true || CloudEvent.isStrict(event) === true) {
       ve.push(validators.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
       if (validators.isDefinedAndNotNull(event.data)) {
         ve.push(validators.ensureIsObjectOrCollectionNotString(event.data, 'data'))
@@ -238,10 +253,9 @@ class CloudEvent {
    * Tell the given CloudEvent, if it's valid.
    *
    * @static
-   * @param {object} event the CloudEvent to validate
+   * @param {!object} event the CloudEvent to validate
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
-   * @returns {boolean} true if valid, otherwise false
-   * @memberof CloudEvent
+   * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, { strict = false } = {}) {
     // console.log(`DEBUG - cloudEvent details: eventID = ${event.eventID}, eventType = ${event.eventType}, data = ${event.data}, ..., strict = ${event.strict}`)
@@ -255,8 +269,7 @@ class CloudEvent {
    * Validate the current CloudEvent.
    *
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
-   * @returns {array} an array of (non null) validation errors, or at least an empty array
-   * @memberof CloudEvent
+   * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   validate ({ strict = false } = {}) {
     return CloudEvent.validateEvent(this, { strict })
@@ -266,11 +279,19 @@ class CloudEvent {
    * Tell the current CloudEvent, if it's valid.
    *
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
-   * @returns {boolean} true if valid, otherwise false
-   * @memberof CloudEvent
+   * @return {boolean} true if valid, otherwise false
    */
   isValid ({ strict = false } = {}) {
     return CloudEvent.isValid(this, { strict })
+  }
+
+  /**
+   * Getter method to tell if the object has the strict flag enabled.
+   *
+   * @type {boolean}
+   */
+  get isStrict () {
+    return CloudEvent.isStrict(this)
   }
 }
 
