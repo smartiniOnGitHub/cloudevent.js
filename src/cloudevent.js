@@ -58,7 +58,8 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    // console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    // TODO: re-comment previous debug line ... wip
     if (strict === true) {
       if (!eventID || !eventType) {
         throw new Error('Unable to create CloudEvent instance, mandatory field missing')
