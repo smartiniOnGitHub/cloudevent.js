@@ -26,14 +26,13 @@
 const validators = require('./validators') // get validators from here
 
 /**
- * Create a new instance of a CloudEvent object.
- * Must be called with the 'new' operator to return the new object instance.
+ * CloudEvent implementation.
  *
  * @see https://github.com/cloudevents/spec/blob/master/json-format.md
  */
 class CloudEvent {
   /**
-   * Creates a instance of CloudEvent.
+   * Create a new instance of a CloudEvent object.
    * @param {string} eventID the ID of the event (unique), mandatory
    * @param {string} eventType the type of the event (usually), mandatory
    * @param {object | Map | Set} data the real event data
@@ -58,7 +57,6 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    // TODO: try to log data using toSource, with something like: (x !== null) ? x.toSource() : 'null', but handle even undefined values ... or maybe add an utility function for this (like dumpSource and maybe even dumpSourceOrElse), and call here ... but cleanup of previous commented line later ... ok
     console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     if (strict === true) {
       if (!eventID || !eventType) {
