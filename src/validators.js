@@ -22,18 +22,40 @@
 
 const url = require('url')
 
+// TODO: export as class with only static methods, then re-enable ESDoc comments ... wip
+
+/**
+ * Tell if the given ergument is undefined.
+ * @param {*} arg the object to check
+ * @returns {boolean} true if undefined, false otherwise
+ */
 module.exports.isUndefined = function (arg) {
   return (arg === undefined)
 }
 
+/**
+ * Tell if the given ergument is null.
+ * @param {*} arg the object to check
+ * @returns {boolean} true if null, false otherwise
+ */
 module.exports.isNull = function (arg) {
   return (arg === null)
 }
 
+/**
+ * Tell if the given ergument is undefined or null.
+ * @param {*} arg the object to check
+ * @returns {boolean} true if undefined or null, false otherwise
+ */
 module.exports.isUndefinedOrNull = function (arg) {
   return (arg === undefined || arg === null)
 }
 
+/**
+ * Tell if the given ergument is defined and not null.
+ * @param {*} arg the object to check
+ * @returns {boolean} true if defined and not null, false otherwise
+ */
 module.exports.isDefinedAndNotNull = function (arg) {
   return (arg !== undefined && arg !== null)
 }

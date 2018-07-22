@@ -15,6 +15,9 @@
  */
 'use strict'
 
+/**
+ * Get a reference to cloudevent class definition.
+ */
 const cloudEventDefinition = require('./cloudevent') // get CloudEvent definition and related utilities
 
 module.exports = cloudEventDefinition

@@ -18,6 +18,7 @@
 const assert = require('assert')
 const test = require('tap').test
 
+/** @test {CloudEvent} */
 test('ensure the CloudEvent class is exported by the library', (t) => {
   t.plan(4)
 
