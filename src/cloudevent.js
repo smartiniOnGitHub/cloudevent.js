@@ -151,7 +151,6 @@ class CloudEvent {
     } else if (!validators.isObjectOrCollection(obj)) {
       return `${name}: '${obj.toString()}'`
     } else {
-      // return `${name}: ${obj.toSource()}` // no because it's defined only in Firefox
       return `${name}: ${JSON.stringify(obj)}`
     }
   }
