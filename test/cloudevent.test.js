@@ -156,4 +156,194 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
 })
 
+/** create some common options, for better reuse in tests */
+const ceCommonOptions = {
+  cloudEventsVersion: '0.0.0',
+  eventTypeVersion: '1.0.0',
+  source: '/test',
+  eventTime: new Date(),
+  extensions: { 'exampleExtension': 'value' },
+  contentType: 'application/json',
+  schemaURL: 'http://my-schema.localhost.localdomain',
+  strict: false
+}
+/** create some common options with strict flag enabled, for better reuse in tests */
+const ceCommonOptionsStrict = {
+  cloudEventsVersion: '0.0.0',
+  eventTypeVersion: '1.0.0',
+  source: '/test',
+  eventTime: new Date(),
+  extensions: { 'exampleExtension': 'value' },
+  contentType: 'application/json',
+  schemaURL: 'http://my-schema.localhost.localdomain',
+  strict: true
+}
+/** create some common data from an object, for better reuse in tests */
+const ceCommonData = { 'hello': 'world' }
+/** create some common data from a Map, for better reuse in tests */
+const ceMapData = new Map() // empty Map
+// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
+ceMapData.set('key-1', 'value 1')
+ceMapData.set('key-2', 'value 2')
+
+/** @test {CloudEvent} */
+test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
+  t.plan(13)
+  const CEClass = require('../src/') // reference the library
+  t.ok(CEClass)
+
+  // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+  const ceFull1 = new CEClass('1/full',
+    'org.fastify.plugins.cloudevents.testevent',
+    ceCommonData,
+    ceCommonOptions
+  )
+  t.ok(ceFull1)
+  t.ok(CEClass.isValidEvent(ceFull1))
+  t.ok(CEClass.isValidEvent(ceFull1, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFull1), [])
+  t.strictSame(CEClass.validateEvent(ceFull1).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+
+  // create another instance with all fields equals: expected success ...
+  const ceFull1Clone = new CEClass('1/full', // should be '2/full/no-strict' ...
+    'org.fastify.plugins.cloudevents.testevent',
+    ceCommonData,
+    ceCommonOptions
+  )
+  t.ok(ceFull1Clone)
+  t.ok(CEClass.isValidEvent(ceFull1Clone))
+  t.ok(CEClass.isValidEvent(ceFull1Clone, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFull1Clone), [])
+  t.strictSame(CEClass.validateEvent(ceFull1Clone).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+
+  // then ensure they are different objects ...
+  assert(ceFull1 !== ceFull1Clone) // they must be different object references
+  t.same(ceFull1, ceFull1Clone)
+  t.strictSame(ceFull1, ceFull1Clone)
+})
+
+/** @test {CloudEvent} */
+test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
+  t.plan(41)
+  const CEClass = require('../src/') // reference the library
+  t.ok(CEClass)
+
+  // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+  const ceFullDataUndefined = new CEClass('1/full/undefined-data/no-strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    undefined, // data
+    ceCommonOptions
+  )
+  assert(ceFullDataUndefined !== null)
+  t.ok(ceFullDataUndefined)
+  t.ok(CEClass.isValidEvent(ceFullDataUndefined))
+  t.ok(CEClass.isValidEvent(ceFullDataUndefined, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFullDataUndefined), [])
+  t.strictSame(CEClass.validateEvent(ceFullDataUndefined, { strict: false }).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+  // the same with with strict mode enabled ...
+  const ceFullDataUndefinedStrict = new CEClass('1/full/undefined-data/strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    undefined, // data
+    ceCommonOptionsStrict
+  )
+  assert(ceFullDataUndefinedStrict !== null)
+  t.ok(ceFullDataUndefinedStrict)
+  t.ok(CEClass.isValidEvent(ceFullDataUndefinedStrict))
+  t.ok(CEClass.isValidEvent(ceFullDataUndefinedStrict, { strict: true }))
+  t.strictSame(CEClass.validateEvent(ceFullDataUndefinedStrict), [])
+  t.strictSame(CEClass.validateEvent(ceFullDataUndefinedStrict, { strict: true }).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+
+  // create an instance with null data attribute, but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+  const ceFullDataNull = new CEClass('1/full/null-data/no-strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    null, // data
+    ceCommonOptions
+  )
+  assert(ceFullDataNull !== null)
+  t.ok(ceFullDataNull)
+  t.ok(CEClass.isValidEvent(ceFullDataNull))
+  t.ok(CEClass.isValidEvent(ceFullDataNull, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFullDataNull), [])
+  t.strictSame(CEClass.validateEvent(ceFullDataNull, { strict: false }).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+  // the same with with strict mode enabled ...
+  const ceFullDataNullStrict = new CEClass('1/full/null-data/strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    null, // data
+    ceCommonOptionsStrict
+  )
+  assert(ceFullDataNullStrict !== null)
+  t.ok(ceFullDataNullStrict)
+  t.ok(CEClass.isValidEvent(ceFullDataNullStrict))
+  t.ok(CEClass.isValidEvent(ceFullDataNullStrict, { strict: true }))
+  t.strictSame(CEClass.validateEvent(ceFullDataNullStrict), [])
+  t.strictSame(CEClass.validateEvent(ceFullDataNullStrict, { strict: true }).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+
+  // create an instance with null data attribute, but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+  const ceFullDataString = new CEClass('1/full/string-data/no-strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    'data as a string, bad here', // data
+    ceCommonOptions
+  )
+  assert(ceFullDataString !== null)
+  t.ok(ceFullDataString)
+  // data type errors handled only in strict mode currently ...
+  t.ok(CEClass.isValidEvent(ceFullDataString))
+  t.ok(CEClass.isValidEvent(ceFullDataString, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFullDataString), [])
+  t.strictSame(CEClass.validateEvent(ceFullDataString, { strict: false }).length, 0)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+  // the same with with strict mode enabled ...
+  const ceFullDataStringStrict = new CEClass('1/full/string-data/strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    'data as a string, bad here', // data
+    ceCommonOptionsStrict
+  )
+  assert(ceFullDataStringStrict !== null)
+  t.ok(ceFullDataStringStrict)
+  // data type errors handled only in strict mode currently ...
+  t.ok(!CEClass.isValidEvent(ceFullDataStringStrict))
+  t.ok(!CEClass.isValidEvent(ceFullDataStringStrict, { strict: true }))
+  t.strictSame(CEClass.validateEvent(ceFullDataStringStrict).length, 1)
+  t.strictSame(CEClass.validateEvent(ceFullDataStringStrict, { strict: true }).length, 1)
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+
+  // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+  const ceFullDataMap = new CEClass('1/full/map-data/no-strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    ceMapData, // data
+    ceCommonOptions
+  )
+  assert(ceFullDataMap !== null)
+  t.ok(ceFullDataMap)
+  t.ok(CEClass.isValidEvent(ceFullDataMap))
+  t.ok(CEClass.isValidEvent(ceFullDataMap, { strict: false }))
+  t.strictSame(CEClass.validateEvent(ceFullDataMap), []) // data type errors handled only in strict mode currently ...
+  t.strictSame(CEClass.validateEvent(ceFullDataMap, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+  // the same with with strict mode enabled ...
+  const ceFullDataMapStrict = new CEClass('1/full/map-data/strict',
+    'org.fastify.plugins.cloudevents.testevent',
+    ceMapData, // data
+    ceCommonOptionsStrict
+  )
+  assert(ceFullDataMapStrict !== null)
+  t.ok(ceFullDataMapStrict)
+  t.ok(CEClass.isValidEvent(ceFullDataMapStrict))
+  t.ok(CEClass.isValidEvent(ceFullDataMapStrict, { strict: true }))
+  t.strictSame(CEClass.validateEvent(ceFullDataMapStrict).length, 0) // data type errors handled only in strict mode currently ...
+  t.strictSame(CEClass.validateEvent(ceFullDataMapStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+  // TODO: the same but using normal instance methods, to ensure they works good ... wip
+})
+
 // TODO: add more tests ...
