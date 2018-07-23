@@ -58,8 +58,7 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    // console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
-    console.log(`DEBUG - ${this.constructor.dumpObject(eventID, 'eventID')}, ${this.constructor.dumpObject(eventType, 'eventType')}, ${this.constructor.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    // console.log(`DEBUG - ${this.constructor.dumpObject(eventID, 'eventID')}, ${this.constructor.dumpObject(eventType, 'eventType')}, ${this.constructor.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     // TODO: re-comment previous debug line ... wip
     if (strict === true) {
       if (!eventID || !eventType) {
