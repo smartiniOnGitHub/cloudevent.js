@@ -58,7 +58,8 @@ class CloudEvent {
     strict = false } = {}
   ) {
     // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    // console.log(`DEBUG - ${CloudEvent.dumpObject(eventID, 'eventID')}, ${CloudEvent.dumpObject(eventType, 'eventType')}, ${CloudEvent.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
+    console.log(`DEBUG - ${this.constructor.dumpObject(eventID, 'eventID')}, ${this.constructor.dumpObject(eventType, 'eventType')}, ${this.constructor.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     // TODO: re-comment previous debug line ... wip
     if (strict === true) {
       if (!eventID || !eventType) {
@@ -174,7 +175,7 @@ class CloudEvent {
    * @return {boolean} true if strict, otherwise false
    * @throws {Error} if event if undefined or null
    */
-  static isStrict (event) {
+  static isStrictEvent (event) {
     if (validators.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
@@ -228,7 +229,7 @@ class CloudEvent {
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
-    if (strict === true || CloudEvent.isStrict(event) === true) {
+    if (strict === true || CloudEvent.isStrictEvent(event) === true) {
       ve.push(validators.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
       if (validators.isDefinedAndNotNull(event.data)) {
         ve.push(validators.ensureIsObjectOrCollectionNotString(event.data, 'data'))
@@ -273,7 +274,7 @@ class CloudEvent {
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   validate ({ strict = false } = {}) {
-    return CloudEvent.validateEvent(this, { strict })
+    return this.constructor.validateEvent(this, { strict })
   }
 
   /**
@@ -283,7 +284,7 @@ class CloudEvent {
    * @return {boolean} true if valid, otherwise false
    */
   isValid ({ strict = false } = {}) {
-    return CloudEvent.isValid(this, { strict })
+    return this.constructor.isValidEvent(this, { strict })
   }
 
   /**
@@ -292,7 +293,7 @@ class CloudEvent {
    * @type {boolean}
    */
   get isStrict () {
-    return CloudEvent.isStrict(this)
+    return this.constructor.isStrictEvent(this)
   }
 }
 
