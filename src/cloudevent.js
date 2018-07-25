@@ -21,9 +21,9 @@
  */
 
 /**
- * Get a reference to cloudevent validator functions.
+ * Get a reference to cloudevent validator class.
  */
-const validators = require('./validators') // get validators from here
+const V = require('./validator') // get validator from here
 
 /**
  * CloudEvent implementation.
@@ -144,11 +144,11 @@ class CloudEvent {
    */
   static dumpObject (obj, name) {
     const n = name || 'noname'
-    if (validators.isUndefined(obj)) {
+    if (V.isUndefined(obj)) {
       return `${n}: undefined`
-    } else if (validators.isNull(obj)) {
+    } else if (V.isNull(obj)) {
       return `${n}: null`
-    } else if (!validators.isObjectOrCollection(obj)) {
+    } else if (!V.isObjectOrCollection(obj)) {
       return `${n}: '${obj.toString()}'`
     } else {
       return `${n}: ${JSON.stringify(obj)}`
@@ -174,10 +174,10 @@ class CloudEvent {
    * @throws {Error} if event if undefined or null
    */
   static isStrictEvent (event) {
-    if (validators.isUndefinedOrNull(event)) {
+    if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
-    if (validators.isDefinedAndNotNull(event.extensions)) {
+    if (V.isDefinedAndNotNull(event.extensions)) {
       return event.extensions.strict
     } else {
       return false
@@ -194,58 +194,58 @@ class CloudEvent {
    */
   static validateEvent (event, { strict = false } = {}) {
     // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
-    if (validators.isUndefinedOrNull(event)) {
+    if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
     let ve = [] // validation errors
 
     // standard validation
-    ve.push(validators.ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
-    ve.push(validators.ensureIsStringNotEmpty(event.eventID, 'eventID'))
-    ve.push(validators.ensureIsStringNotEmpty(event.eventType, 'eventType'))
+    ve.push(V.ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
+    ve.push(V.ensureIsStringNotEmpty(event.eventID, 'eventID'))
+    ve.push(V.ensureIsStringNotEmpty(event.eventType, 'eventType'))
     // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (validators.isDefinedAndNotNull(event.data)) {
-    // ve.push(validators.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+    // if (V.isDefinedAndNotNull(event.data)) {
+    // ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
     // }
-    if (validators.isDefinedAndNotNull(event.eventTypeVersion)) {
-      ve.push(validators.ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion'))
+    if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
+      ve.push(V.ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion'))
     }
     // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (validators.isDefinedAndNotNull(event.source)) {
-    // ve.push(validators.ensureIsStringNotEmpty(event.source, 'source')) // keep commented here ... ok
+    // if (V.isDefinedAndNotNull(event.source)) {
+    // ve.push(V.ensureIsStringNotEmpty(event.source, 'source')) // keep commented here ... ok
     // }
     // no check here because I assign a default value, and I check in strict mode ... ok
-    // ve.push(validators.ensureIsDateValid(event.eventTime, 'eventTime'))
+    // ve.push(V.ensureIsDateValid(event.eventTime, 'eventTime'))
     // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (validators.isDefinedAndNotNull(event.extensions)) {
-    //   ve.push(validators.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
+    // if (V.isDefinedAndNotNull(event.extensions)) {
+    //   ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
     // }
     // no check here because I assign a default value, and I check in strict mode ... ok
     // ve.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
-    if (validators.isDefinedAndNotNull(event.schemaURL)) {
-      ve.push(validators.ensureIsStringNotEmpty(event.schemaURL, 'schemaURL'))
+    if (V.isDefinedAndNotNull(event.schemaURL)) {
+      ve.push(V.ensureIsStringNotEmpty(event.schemaURL, 'schemaURL'))
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
-      ve.push(validators.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
-      if (validators.isDefinedAndNotNull(event.data)) {
-        ve.push(validators.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+      ve.push(V.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
+      if (V.isDefinedAndNotNull(event.data)) {
+        ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
       }
-      if (validators.isDefinedAndNotNull(event.eventTypeVersion)) {
-        ve.push(validators.ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
+      if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
+        ve.push(V.ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
       }
-      ve.push(validators.ensureIsURI(event.source, 'source'))
-      if (validators.isDefinedAndNotNull(event.extensions)) {
-        ve.push(validators.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
-        const extensionsSize = validators.getSize(event.extensions)
+      ve.push(V.ensureIsURI(event.source, 'source'))
+      if (V.isDefinedAndNotNull(event.extensions)) {
+        ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
+        const extensionsSize = V.getSize(event.extensions)
         if (extensionsSize < 1) {
           ve.push(new Error(`The object 'extensions' must contain at least 1 property`))
         }
       }
-      ve.push(validators.ensureIsDatePast(event.eventTime, 'eventTime'))
-      ve.push(validators.ensureIsStringNotEmpty(event.contentType, 'contentType'))
-      ve.push(validators.ensureIsURI(event.schemaURL, 'schemaURL'))
+      ve.push(V.ensureIsDatePast(event.eventTime, 'eventTime'))
+      ve.push(V.ensureIsStringNotEmpty(event.contentType, 'contentType'))
+      ve.push(V.ensureIsURI(event.schemaURL, 'schemaURL'))
     }
 
     return ve.filter((i) => i)
@@ -254,6 +254,8 @@ class CloudEvent {
   /**
    * Tell the given CloudEvent, if it's valid.
    *
+   * See {@link CloudEvent.validateEvent}.
+   *
    * @static
    * @param {!object} event the CloudEvent to validate
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
@@ -261,12 +263,14 @@ class CloudEvent {
    */
   static isValidEvent (event, { strict = false } = {}) {
     const validationErrors = CloudEvent.validateEvent(event, { strict })
-    const size = validators.getSize(validationErrors)
+    const size = V.getSize(validationErrors)
     return (size === 0)
   }
 
   /**
    * Validate the current CloudEvent.
+   *
+   * See {@link CloudEvent.validateEvent}.
    *
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
@@ -278,6 +282,8 @@ class CloudEvent {
   /**
    * Tell the current CloudEvent, if it's valid.
    *
+   * See {@link CloudEvent.isValidEvent}.
+   *
    * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
    * @return {boolean} true if valid, otherwise false
    */
@@ -287,6 +293,8 @@ class CloudEvent {
 
   /**
    * Getter method to tell if the object has the strict flag enabled.
+   *
+   * See {@link CloudEvent.isStrictEvent}.
    *
    * @type {boolean}
    */
