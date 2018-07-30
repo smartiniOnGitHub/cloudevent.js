@@ -22,7 +22,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure the Validator class (not exported by the library) works good', (t) => {
-  t.plan(2)
+  t.plan(4)
   const V = require('../src/validator') // direct reference to the library
   t.ok(V)
   t.strictEqual(typeof V, 'function')
@@ -30,7 +30,13 @@ test('ensure the Validator class (not exported by the library) works good', (t) 
   // optional, using some standard Node.js assert statements, as a sample
   assert(V !== null)
   assert.strictEqual(typeof V, 'function')
-  assert(new V() instanceof V)
+  // assert(new V() instanceof V) // no more allowed
+
+  t.ok(V.isFunction(V.isClass))
+  t.throws(function () {
+    const v = new V()
+    assert(v === null) // never executed
+  }, Error, 'Expected exception when creating a Validator instance')
 })
 
 /** create some classes, for better reuse in following tests */

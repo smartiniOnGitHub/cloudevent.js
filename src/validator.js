@@ -29,7 +29,24 @@ const url = require('url')
  * see it as an Utility/Companion class.
  */
 class Validator {
-  // TODO: check if/how to prevent instancing it ... wip
+  /**
+   * Create a new instance of a Validator object.
+   * @throws {Error} because instancing not allowed for this class
+   */
+  constructor () {
+    throw new Error(`Instancing not allowed for this class`)
+  }
+
+  /**
+   * Gives a string valued property that is used in the creation of the default string description of an object.
+   *
+   * See {@link Symbol.toStringTag}.
+   *
+   * @return {string} a string representation of the object type
+   */
+  get [Symbol.toStringTag] () {
+    return 'Validator'
+  }
 
   /**
    * Tell if the given ergument is undefined.
