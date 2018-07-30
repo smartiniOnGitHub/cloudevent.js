@@ -101,7 +101,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   )
   t.ok(ceMinimal)
   // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-  console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+  // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
   t.ok(CEClass.isValidEvent(ceMinimal))
   t.strictSame(CEClass.validateEvent(ceMinimal), [])
   // t.strictSame(CEClass.validateEvent(ceEmpty), []) // temp, to see the error during development ...
@@ -402,5 +402,3 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.strictSame(ceFullDataMapStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
   t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
 })
-
-// TODO: add more tests ...

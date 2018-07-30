@@ -170,6 +170,18 @@ class Validator {
   }
 
   /**
+   * Tell if the given ergument is an instance of the given class reference.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {object} classReference the class that should be implemented/extended
+   * @return {boolean} true if it's an instance (or extends) that class, false otherwise
+   */
+  static isClass (arg, classReference) {
+    return (arg instanceof classReference)
+  }
+
+  /**
    * Tell if the given ergument is a function.
    *
    * @static
@@ -286,6 +298,35 @@ class Validator {
         // console.error(e)
         return false
       }
+    }
+  }
+
+  /**
+   * Ensure that the given ergument is an instance of the given class reference.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {object} classReference the class that should be implemented/extended
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
+   */
+  static ensureIsClass (arg, classReference, name) {
+    if (!Validator.isClass(arg, classReference)) {
+      return new TypeError(`The argument '${name}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given ergument is a function.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
+   */
+  static ensureIsFunction (arg, name) {
+    if (!Validator.isFunction(arg)) {
+      return new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
     }
   }
 

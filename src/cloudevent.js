@@ -228,6 +228,7 @@ class CloudEvent {
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
+      ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
       if (V.isDefinedAndNotNull(event.data)) {
         ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
@@ -302,7 +303,5 @@ class CloudEvent {
     return this.constructor.isStrictEvent(this)
   }
 }
-
-// TODO: here in strict mode verify even if it would be gpod to check for the right instanceof type, but ensure it works even when using inheritance ... wip
 
 module.exports = CloudEvent
