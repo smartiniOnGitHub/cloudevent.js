@@ -302,6 +302,33 @@ class CloudEvent {
   get isStrict () {
     return this.constructor.isStrictEvent(this)
   }
+
+  /**
+   * Override the usual toString method.
+   *
+   * See {@link Object.toString}.
+   *
+   * @return {string} a string representation for object instance
+   */
+  toString () {
+    return `CloudEvent[cloudEventsVersion=${this.cloudEventsVersion},
+      eventID=this.constructor.dumpObject(eventID, 'eventID')},
+      eventType=this.constructor.dumpObject(eventType, 'eventType')},
+      data=this.constructor.dumpObject(data, 'data')},
+      ...
+    ]`
+  }
+
+  /**
+   * Gives a string valued property that is used in the creation of the default string description of an object.
+   *
+   * See {@link Symbol.toStringTag}.
+   *
+   * @return {string} a string representation of the object type
+   */
+  get [Symbol.toStringTag] () {
+    return 'CloudEvent'
+  }
 }
 
 module.exports = CloudEvent
