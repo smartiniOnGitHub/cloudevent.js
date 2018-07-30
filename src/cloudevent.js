@@ -311,12 +311,7 @@ class CloudEvent {
    * @return {string} a string representation for object instance
    */
   toString () {
-    return `CloudEvent[cloudEventsVersion=${this.cloudEventsVersion},
-      eventID=this.constructor.dumpObject(eventID, 'eventID')},
-      eventType=this.constructor.dumpObject(eventType, 'eventType')},
-      data=this.constructor.dumpObject(data, 'data')},
-      ...
-    ]`
+    return `CloudEvent[cloudEventsVersion: ${this.cloudEventsVersion}, ${this.constructor.dumpObject(this.eventID, 'eventID')}, ${this.constructor.dumpObject(this.eventType, 'eventType')}, ${this.constructor.dumpObject(this.data, 'data')}, ...]`
   }
 
   /**

@@ -102,6 +102,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   t.ok(ceMinimal)
   // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
   // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+  console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of ots toString method ...
   t.ok(CEClass.isValidEvent(ceMinimal))
   t.strictSame(CEClass.validateEvent(ceMinimal), [])
   // t.strictSame(CEClass.validateEvent(ceEmpty), []) // temp, to see the error during development ...
