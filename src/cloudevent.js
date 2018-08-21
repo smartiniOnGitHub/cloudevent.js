@@ -129,7 +129,7 @@ class CloudEvent {
 
     // add strict to extensions, but only when defined
     if (strict === true) {
-      this.extensions = extensions || {}
+      this.extensions = this.extensions || {}
       this.extensions.strict = strict
     }
   }
@@ -178,7 +178,7 @@ class CloudEvent {
       throw new Error('CloudEvent undefined or null')
     }
     if (V.isDefinedAndNotNull(event.extensions)) {
-      return event.extensions.strict
+      return event.extensions.strict === true
     } else {
       return false
     }
