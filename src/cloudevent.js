@@ -110,10 +110,11 @@ class CloudEvent {
     this.eventTypeVersion = eventTypeVersion
     /**
      * Extensions defined for the event.
+     * Copy the original object to avoid changing objects that could be shared.
      * @type {object}
      * @private
      */
-    this.extensions = extensions
+    this.extensions = {...extensions}
     /**
      * The URL of schema for the event, if any.
      * @type {uri}

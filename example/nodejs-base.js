@@ -70,7 +70,7 @@ const ceFullStrict = new CloudEvent('2/full-strict',
 )
 assert(ceFullStrict !== null)
 assert(ceFullStrict.isStrict)
-// assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
+assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
