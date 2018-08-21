@@ -1,6 +1,6 @@
 # cloudevent.js
 
-JavaScript/Node.js implementation of http://cloudevents.io/
+JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
 
 ## Usage
@@ -53,6 +53,8 @@ Node.js 8.11.x or later.
 
 
 ## Note
+
+You can find Code Documentation for the API of the library [here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
