@@ -79,10 +79,11 @@ class CloudEvent {
     this.eventType = eventType
     /**
      * The real event data.
+     * Copy the original object to avoid changing objects that could be shared.
      * @type {object|Map|Set}
      * @private
      */
-    this.data = data
+    this.data = { ...data }
 
     /**
      * The CloudEvent specification version.
@@ -98,10 +99,11 @@ class CloudEvent {
     this.contentType = contentType
     /**
      * The event timestamp.
+     * Copy the original object to avoid changing objects that could be shared.
      * @type {timestamp}
      * @private
      */
-    this.eventTime = eventTime
+    this.eventTime = new Date(eventTime.valueOf())
     /**
      * The event version.
      * @type {string}
@@ -114,7 +116,7 @@ class CloudEvent {
      * @type {object}
      * @private
      */
-    this.extensions = {...extensions}
+    this.extensions = { ...extensions }
     /**
      * The URL of schema for the event, if any.
      * @type {uri}

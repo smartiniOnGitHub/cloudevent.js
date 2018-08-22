@@ -38,7 +38,7 @@ const ceCommonOptions = {
   schemaURL: 'http://my-schema.localhost.localdomain',
   strict: false // same as default
 }
-const ceCommonOptionsStrict = {...ceCommonOptions, strict: true }
+const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 // create some instances with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
 // note that null values are not handled by default values, only undefined values ...
 const ceFull = new CloudEvent('1/full',
