@@ -71,6 +71,7 @@ const ceFullStrict = new CloudEvent('2/full-strict',
 assert(ceFullStrict !== null)
 assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
+assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
@@ -78,7 +79,25 @@ assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
 assert(ceMinimal.isValid())
 assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
-// TODO: other validations, even from static methods ...
+// the same, but using static method
+assert(!CloudEvent.isValidEvent(ceEmpty))
+assert(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict))
+assert(CloudEvent.isValidEvent(ceMinimal))
+assert(CloudEvent.isValidEvent(ceFull))
+assert(CloudEvent.isValidEvent(ceFullStrict))
+assert(CloudEvent.validateEvent(ceEmpty).length > 0)
+assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length > 0)
+assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
+assert(CloudEvent.validateEvent(ceMinimal).length === 0)
+assert(CloudEvent.validateEvent(ceFull).length === 0)
+assert(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+assert(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrict).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+// some diagnostic info
+console.log(`Validation output for ceEmpty, default strict mode is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
+console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
 // TODO: ...
