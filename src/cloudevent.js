@@ -84,6 +84,10 @@ class CloudEvent {
      * @private
      */
     this.data = { ...data }
+    // handle an edge case: if the given data is a String, I need to clone in a different way ...
+    if (V.isString(data)) {
+      this.data = data.slice()
+    }
 
     /**
      * The CloudEvent specification version.

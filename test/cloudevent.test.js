@@ -331,18 +331,18 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.ok(ceFullDataString)
   // data type errors handled only in strict mode currently ...
   t.ok(CloudEvent.isValidEvent(ceFullDataString))
-  t.ok(CloudEvent.isValidEvent(ceFullDataString, { strict: false }))
-  t.ok(CloudEvent.isValidEvent(ceFullDataString, { strict: true }))
+  t.ok(CloudEvent.isValidEvent(ceFullDataString, { strict: false })) // good the same
+  t.ok(!CloudEvent.isValidEvent(ceFullDataString, { strict: true })) // bad here (right)
   t.strictSame(CloudEvent.validateEvent(ceFullDataString), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: false }).length, 0)
-  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: true }).length, 0)
+  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: false }).length, 0) // good the same
+  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: true }).length, 1) // bad here (right)
   // the same but using normal instance methods, to ensure they works good ...
   t.ok(ceFullDataString.isValid())
   t.ok(ceFullDataString.isValid({ strict: false }))
-  t.ok(ceFullDataString.isValid({ strict: true }))
+  t.ok(!ceFullDataString.isValid({ strict: true }))
   t.strictSame(ceFullDataString.validate(), [])
   t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
-  t.strictSame(ceFullDataString.validate({ strict: true }).length, 0)
+  t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
   // the same with with strict mode enabled ...
   const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
     'org.github.smartiniOnGitHub.cloudeventjs.testevent',
@@ -352,6 +352,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   assert(ceFullDataStringStrict !== null)
   t.ok(ceFullDataStringStrict)
   // data type errors handled only in strict mode currently ...
+  // note that in the following lines even if I force 'strict: false' he won't be used because already set in the object instance ...
   t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict))
   t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: true }))
   t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: false }))
