@@ -200,7 +200,6 @@ class CloudEvent {
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   static validateEvent (event, { strict = false } = {}) {
-    // console.log(`DEBUG - cloudEvent = ${event}, { strict = ${strict}, ... }`)
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
@@ -273,6 +272,37 @@ class CloudEvent {
     const validationErrors = CloudEvent.validateEvent(event, { strict })
     const size = V.getSize(validationErrors)
     return (size === 0)
+  }
+
+  /**
+   * Serialize the given CloudEvent in JSON format.
+   *
+   * @param {!object} event the CloudEvent to serialize
+   * @return {string} the serialized event, as a string
+   */
+  static serializeEvent (event) {
+    // console.log(`DEBUG - ${CloudEvent.dumpObject(event, 'event')}`)
+    if (V.isUndefinedOrNull(event)) {
+      throw new Error('CloudEvent undefined or null')
+    }
+    if (event.contentType !== 'application/json') {
+      throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
+    }
+
+    const serialized = JSON.stringify(event)
+    // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
+    return serialized
+  }
+
+  /**
+   * Serialize the current CloudEvent.
+   *
+   * See {@link CloudEvent.serializeeEvent}.
+   *
+   * @return {string} the serialized event, as a string
+   */
+  serialize () {
+    return this.constructor.serializeEvent(this)
   }
 
   /**
