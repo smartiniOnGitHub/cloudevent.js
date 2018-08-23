@@ -21,7 +21,7 @@ const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, u
 
 // create some sample minimal instances, good even for validation ...
 const ceMinimal = new CloudEvent('1', // eventID
-  'org.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+  'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
   {} // data (empty) // optional, but useful the same in this sample usage
 )
 assert(ceMinimal !== null)
@@ -42,14 +42,14 @@ const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 // create some instances with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
 // note that null values are not handled by default values, only undefined values ...
 const ceFull = new CloudEvent('1/full',
-  'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
   { 'hello': 'world' }, // data
   ceCommonOptions
 )
 assert(ceFull !== null)
 assert(!ceFull.isStrict)
 const ceFullStrict = new CloudEvent('2/full-strict',
-  'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
   { 'hello': 'world' }, // data
   ceCommonOptionsStrict // use common options, but set strict mode to true
 )
@@ -85,9 +85,17 @@ console.log(`Validation output for ceEmpty, default strict mode is: size: ${Clou
 console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
-// TODO: ...
+const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+assert(ceFullSerializedStatic !== null)
+const ceFullSerialized = ceFull.serialize()
+assert(ceFullSerialized !== null)
+assert(ceFullSerializedStatic === ceFullSerialized)
+// some diagnostic info
+console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
 
 // etc ...
+
+// end of script
 ```
 
 Look into the [example](./example/) folder for more sample scripts that uses the library (inline but it's the same using it from npm registry).
