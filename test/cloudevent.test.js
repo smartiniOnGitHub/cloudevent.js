@@ -96,7 +96,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
   // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
   const ceMinimal = new CloudEvent('1', // eventID
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
     {} // data (empty) // optional, but useful the same in this sample usage
   )
   t.ok(ceMinimal)
@@ -113,7 +113,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   t.strictSame(ceMinimal.validate(), [])
   t.strictSame(ceMinimal.validate().length, 0) // simplify comparison of results, check only the  number of expected errors ...
   const ceMinimal2 = new CloudEvent('2', // eventID
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
     {} // data (empty) // optional, but useful the same in this sample usage
   )
   t.ok(ceMinimal2)
@@ -204,7 +204,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFull1 = new CloudEvent('1/full',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     ceCommonData,
     ceCommonOptions
   )
@@ -221,7 +221,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 
   // create another instance with all fields equals: expected success ...
   const ceFull1Clone = new CloudEvent('1/full', // should be '2/full/no-strict' ...
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     ceCommonData,
     ceCommonOptions
   )
@@ -251,7 +251,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFullDataUndefined = new CloudEvent('1/full/undefined-data/no-strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     undefined, // data
     ceCommonOptions
   )
@@ -268,7 +268,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.strictSame(ceFullDataUndefined.validate({ strict: false }).length, 0)
   // the same with with strict mode enabled ...
   const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     undefined, // data
     ceCommonOptionsStrict
   )
@@ -287,7 +287,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   // create an instance with null data attribute, but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFullDataNull = new CloudEvent('1/full/null-data/no-strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     null, // data
     ceCommonOptions
   )
@@ -304,7 +304,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
   // the same with with strict mode enabled ...
   const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     null, // data
     ceCommonOptionsStrict
   )
@@ -323,7 +323,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   // create an instance with null data attribute, but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFullDataString = new CloudEvent('1/full/string-data/no-strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     'data as a string, bad here', // data
     ceCommonOptions
   )
@@ -345,7 +345,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
   // the same with with strict mode enabled ...
   const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     'data as a string, bad here', // data
     ceCommonOptionsStrict
   )
@@ -370,7 +370,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFullDataMap = new CloudEvent('1/full/map-data/no-strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     ceMapData, // data
     ceCommonOptions
   )
@@ -387,7 +387,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
   t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
   // the same with with strict mode enabled ...
   const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
     ceMapData, // data
     ceCommonOptionsStrict
   )

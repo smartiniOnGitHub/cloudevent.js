@@ -59,7 +59,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
   // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
   const ceMinimal = new CEClass('1', // eventID
-    'org.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
     {} // data (empty) // optional, but useful the same in this sample usage
   )
   t.ok(ceMinimal)
