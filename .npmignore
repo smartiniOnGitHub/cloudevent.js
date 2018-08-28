@@ -18,7 +18,7 @@ temp/
 scripts/
 src/
 test/
-example/
+# example/
 
 .env
 .babelrc
