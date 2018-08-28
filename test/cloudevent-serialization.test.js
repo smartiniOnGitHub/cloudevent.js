@@ -41,8 +41,9 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 })
 
 /** create some common options, for better reuse in tests */
+const commonEventTime = new Date()
 const ceCommonOptions = {
-  cloudEventsVersion: '0.0.0',
+  cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
   eventTime: new Date(),
@@ -63,7 +64,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(12)
+  t.plan(18)
 
   const CloudEvent = require('../src/') // reference the library
   // t.ok(CloudEvent)
@@ -92,29 +93,22 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.ok(ceFullSerialized)
   assert(ceFullSerializedStatic === ceFullSerialized)
   t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+  const ceSerialize = CloudEvent.serializeEvent
+  assert(ceSerialize !== null)
+  t.ok(ceSerialize)
+  const ceFullSerializedFunction = ceSerialize(ceFull)
+  t.ok(ceFullSerializedFunction)
+  t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
+  t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-  /*
-  // TODO: enable and update/fix ... wip
-  const ceFullSerialized = ceSerialize(ceFull)
-  t.ok(ceFullSerialized)
-  const ceFullSerializedComparison = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
+  const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
   t.strictSame(ceFullSerialized, ceFullSerializedComparison)
   const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
   ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
   t.same(ceFull, ceFullDeserialized)
-  const ceFullEnhanced = {...ceFull, ...{otherAttribute: 'sample value'}}
-  const ceFullSerializedCustom1 = ceSerialize(ceFullEnhanced, { schema: { additionalProperties: false } }) // override the schema, additional properties disabled (default)
-  t.ok(ceFullSerializedCustom1)
-  const ceFullSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullSerializedCustom1, ceFullSerializedCustomComparison1)
-  const ceFullSerializedCustom2 = ceSerialize(ceFullEnhanced, { schema: { additionalProperties: true } }) // override the schema, additional properties enabled
-  t.ok(ceFullSerializedCustom2)
-  const ceFullSerializedCustomComparison2 = `{"otherAttribute":"sample value","cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value"},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullSerializedCustom2, ceFullSerializedCustomComparison2)
-  const ceFullSerializedCustom3 = ceSerialize(ceFullEnhanced, { schema: { properties: { data: { type: 'object', additionalProperties: false, properties: { hello: { type: 'string' }, year: { type: 'number' } } } }, additionalProperties: true } }) // override the schema, with a fixed set of nested attributes for data
-  t.ok(ceFullSerializedCustom3)
-  const ceFullSerializedCustomComparison3 = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value","data":{"hello":"world","year":2018}}`
-  t.strictSame(ceFullSerializedCustom3, ceFullSerializedCustomComparison3)
+
+  /*
+  // TODO: enable and update/fix ... wip
   // the same with with strict mode enabled ...
   const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
     'com.github.smartiniOnGitHub.cloudeventjs.testevent',
@@ -134,19 +128,6 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
   ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
   t.same(ceFullStrict, ceFullStrictDeserialized)
-  const ceFullStrictEnhanced = { ...ceFullStrict, ...{ otherAttribute: 'sample value' } }
-  const ceFullStrictSerializedCustom1 = ceSerialize(ceFullStrictEnhanced, { schema: { additionalProperties: false } }) // override the schema, additional properties disabled (default)
-  t.ok(ceFullStrictSerializedCustom1)
-  const ceFullStrictSerializedCustomComparison1 = `{"cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullStrictSerializedCustom1, ceFullStrictSerializedCustomComparison1)
-  const ceFullStrictSerializedCustom2 = ceSerialize(ceFullStrictEnhanced, { schema: { additionalProperties: true } }) // override the schema, additional properties enabled
-  t.ok(ceFullStrictSerializedCustom2)
-  const ceFullStrictSerializedCustomComparison2 = `{"otherAttribute":"sample value","cloudEventsVersion":"0.1.0","eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"eventTypeVersion":"1.0.0","source":"/test","eventTime":"${commonEventTime.toISOString()}","extensions":{"exampleExtension":"value","strict":true},"contentType":"application/json","schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullStrictSerializedCustom2, ceFullStrictSerializedCustomComparison2)
-  const ceFullStrictSerializedCustom3 = ceSerialize(ceFullStrictEnhanced, { schema: { properties: { data: { type: 'object', additionalProperties: false, properties: { hello: { type: 'string' }, year: { type: 'number' } } } }, additionalProperties: true } }) // override the schema, with a fixed set of nested attributes for data
-  t.ok(ceFullStrictSerializedCustom3)
-  const ceFullStrictSerializedCustomComparison3 = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test","otherAttribute":"sample value","data":{"hello":"world","year":2018}}`
-  t.strictSame(ceFullStrictSerializedCustom3, ceFullStrictSerializedCustomComparison3)
    */
 })
 
