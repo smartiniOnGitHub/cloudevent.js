@@ -145,4 +145,30 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.same(ceFullStrict, ceFullStrictDeserialized)
 })
 
-// TODO: add a test for a CloudEvent with a non default contentType, to ensure it won't be serialized (in the current version) ... wip
+// TODO: this is a limit if the current implementation, and will be resolved soon ... wip
+/** @test {CloudEvent} */
+test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
+  t.plan(4)
+
+  const CloudEvent = require('../src/') // reference the library
+  t.ok(CloudEvent)
+
+  // create an instance with non default contentType (other options default): expected success ...
+  // but when I try to serialize it, expect to have an error raised ...
+  const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+    ceCommonData, // data
+    {
+      contentType: 'application/xml'
+    }
+  )
+  assert(ceFullOtherContentType !== null)
+  t.ok(ceFullOtherContentType)
+  t.ok(ceFullOtherContentType.isValid())
+  // const ceFullStrictSerialized = ceFullOtherContentType.serialize()
+  // t.ok(ceFullStrictSerialized)
+  t.throws(function () {
+    const ceFullStrictSerialized = ceFullOtherContentType.serialize()
+    assert(ceFullStrictSerialized === null) // never executed
+  }, Error, 'Expected exception when serializing the current CloudEvent instance')
+})
