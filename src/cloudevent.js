@@ -84,8 +84,7 @@ class CloudEvent {
      * @type {(object|Map|Set)}
      * @private
      */
-    this.data = data
-    // this.data = { ...data }
+    this.data = { ...data }
     if (V.isString(data)) {
       // handle an edge case: if the given data is a String, I need to clone in a different way ...
       this.data = data.slice()
@@ -122,8 +121,7 @@ class CloudEvent {
      * @type {object}
      * @private
      */
-    this.extensions = extensions
-    // this.extensions = { ...extensions }
+    this.extensions = { ...extensions }
     /**
      * The URL of schema for the event, if any.
      * @type {uri}
