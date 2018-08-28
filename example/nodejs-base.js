@@ -42,7 +42,7 @@ const ceMinimal = new CloudEvent('1', // eventID
 assert(ceMinimal !== null)
 
 // create some instance with all attributes ...
-// could be useful to define some common attributes
+// define some common attributes
 const ceCommonOptions = {
   cloudEventsVersion: '0.0.0',
   eventTypeVersion: '1.0.0',
@@ -73,6 +73,7 @@ assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 
+// validate/check if valid instances (optional)
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
 assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
@@ -108,6 +109,6 @@ assert(ceFullSerializedStatic === ceFullSerialized)
 // some diagnostic info
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
 
-// etc ...
+// then use (send/store/etc) serialized instances ...
 
 // end of script
