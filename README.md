@@ -1,7 +1,7 @@
 # cloudevent.js
 
-  [![NPM Version][https://img.shields.io/npm/v/cloudevent.js.svg?style=flat]](https://npmjs.org/package/cloudevent.js/)
-  [![NPM Downloads][https://img.shields.io/npm/dm/cloudevent.js.svg?style=flat]](https://npmjs.org/package/cloudevent.js/)
+  [![NPM Version](https://img.shields.io/npm/v/cloudevent.js.svg?style=flat)](https://npmjs.org/package/cloudevent.js/)
+  [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.js.svg?style=flat)](https://npmjs.org/package/cloudevent.js/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/cloudevent.js/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/cloudevent.js/?branch=master)
 
