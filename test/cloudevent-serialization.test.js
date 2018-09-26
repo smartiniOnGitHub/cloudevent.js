@@ -46,7 +46,7 @@ const ceCommonOptions = {
   cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
-  eventTime: new Date(),
+  eventTime: commonEventTime,
   extensions: { 'exampleExtension': 'value' },
   contentType: 'application/json',
   schemaURL: 'http://my-schema.localhost.localdomain',
