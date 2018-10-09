@@ -37,7 +37,6 @@ class CloudEvent {
    * @param {!string} eventType the type of the event (usually), mandatory
    * @param {(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
-   *        cloudEventsVersion (string, default '0.1'),
    *        eventTypeVersion (string) optional,
    *        source (uri, default '/'),
    *        eventTime (timestamp, default now),
@@ -48,7 +47,6 @@ class CloudEvent {
    * @throws {Error} if strict is true and eventID or eventType is undefined or null
    */
   constructor (eventID, eventType, data, {
-    cloudEventsVersion = '0.1',
     eventTypeVersion,
     source = '/',
     eventTime = new Date(),
@@ -95,7 +93,7 @@ class CloudEvent {
      * @type {string}
      * @private
      */
-    this.cloudEventsVersion = cloudEventsVersion
+    this.cloudEventsVersion = this.constructor.version()
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
@@ -164,6 +162,16 @@ class CloudEvent {
   }
 
   /**
+   * Return the version of the CloudEvent Specification implemented here
+   *
+   * @static
+   * @return {string} the value
+   */
+  static version () {
+    return '0.1'
+  }
+
+  /**
    * Return the MIME Type for a CloudEvent
    *
    * @static
@@ -207,28 +215,14 @@ class CloudEvent {
     let ve = [] // validation errors
 
     // standard validation
-    ve.push(V.ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion'))
+    // note that some properties are not checked here because I assign a default value, and I check them in strict mode, like:
+    // data, source, eventTime, extensions, contentType ...
+    // ve.push(V.ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion')) // no more a public attribute
     ve.push(V.ensureIsStringNotEmpty(event.eventID, 'eventID'))
     ve.push(V.ensureIsStringNotEmpty(event.eventType, 'eventType'))
-    // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (V.isDefinedAndNotNull(event.data)) {
-    // ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
-    // }
     if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
       ve.push(V.ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion'))
     }
-    // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (V.isDefinedAndNotNull(event.source)) {
-    // ve.push(V.ensureIsStringNotEmpty(event.source, 'source')) // keep commented here ... ok
-    // }
-    // no check here because I assign a default value, and I check in strict mode ... ok
-    // ve.push(V.ensureIsDateValid(event.eventTime, 'eventTime'))
-    // no check here because I assign a default value, and I check in strict mode ... ok
-    // if (V.isDefinedAndNotNull(event.extensions)) {
-    //   ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
-    // }
-    // no check here because I assign a default value, and I check in strict mode ... ok
-    // ve.push(ensureIsStringNotEmpty(event.contentType, 'contentType'))
     if (V.isDefinedAndNotNull(event.schemaURL)) {
       ve.push(V.ensureIsStringNotEmpty(event.schemaURL, 'schemaURL'))
     }
@@ -277,6 +271,7 @@ class CloudEvent {
 
   /**
    * Serialize the given CloudEvent in JSON format.
+   * Note that here standard serialization to JSON is used (no additional libraries).
    *
    * @param {!object} event the CloudEvent to serialize
    * @return {string} the serialized event, as a string
@@ -339,6 +334,40 @@ class CloudEvent {
    */
   get isStrict () {
     return this.constructor.isStrictEvent(this)
+  }
+
+  /**
+   * Getter method to return JSON Schema for a CloudEvent.
+   *
+   * See JSON Schema.
+   *
+   * @type {object}
+   */
+  get schema () {
+    // define a schema for serializing a CloudEvent object to JSON
+    // note that properties not in the schema will be ignored
+    // (in json output) by some json serialization libraries, if additionalProperties is false
+    return {
+      title: 'CloudEvent Schema with required fields',
+      type: 'object',
+      properties: {
+        cloudEventsVersion: { type: 'string' },
+        eventID: { type: 'string' },
+        eventType: { type: 'string' },
+        // data: { type: 'object' },
+        eventTypeVersion: { type: 'string' },
+        source: { type: 'string' },
+        eventTime: { type: 'string' },
+        // extensions: { type: 'object' },
+        contentType: { type: 'string' },
+        // TODO: use if/then/else on contentType ... wip
+        schemaURL: { type: 'string' }
+      },
+      required: ['cloudEventsVersion', 'eventID', 'eventType',
+        'source', 'contentType'
+      ],
+      additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
+    }
   }
 
   /**

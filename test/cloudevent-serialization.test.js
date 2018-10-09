@@ -43,7 +43,6 @@ test('ensure decorator functions (exposed by the plugin) exists', (t) => {
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
-  cloudEventsVersion: '0.1.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
   eventTime: commonEventTime,
@@ -101,7 +100,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
   t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-  const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
+  const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
   t.strictSame(ceFullSerialized, ceFullSerializedComparison)
   const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
   ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -138,7 +137,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
   t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-  const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1.0","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
+  const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain","source":"/test"}`
   t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
   const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
   ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object

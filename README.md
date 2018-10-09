@@ -45,7 +45,6 @@ const ceMinimal = new CloudEvent('1', // eventID
 // create some instance with all attributes ...
 // define some common attributes
 const ceCommonOptions = {
-  cloudEventsVersion: '0.0.0',
   eventTypeVersion: '1.0.0',
   source: '/test',
   eventTime: new Date(),

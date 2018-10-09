@@ -1,6 +1,6 @@
 {
   "name": "cloudevent.js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
