@@ -21,6 +21,8 @@
 
 const assert = require('assert')
 
+console.log(`Sample script: start execution ...\n`)
+
 // get a reference to cloudevent class definition
 // const CloudEvent = require('cloudevent.js') // from published module
 const CloudEvent = require('../src/') // from local path
@@ -29,14 +31,15 @@ assert(CloudEvent !== null)
 // create some sample instances but without mandatory fields (for validation) ...
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
 assert(ceEmpty !== null)
-const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, { strict: false }) // expected success
+const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false }) // expected success
 assert(ceMinimalMandatoryUndefinedNoStrict !== null)
-// const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, { strict: true }) // expected failure
+// const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true }) // expected failure
 // assert(ceMinimalMandatoryUndefinedStrict == null) // no, ReferenceError: ceMinimalMandatoryUndefinedStrict is not defined
 
 // create some sample minimal instances, good even for validation ...
 const ceMinimal = new CloudEvent('1', // eventID
   'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+  '/', // source
   {} // data (empty) // optional, but useful the same in this sample usage
 )
 assert(ceMinimal !== null)
@@ -45,7 +48,6 @@ assert(ceMinimal !== null)
 // define some common attributes
 const ceCommonOptions = {
   eventTypeVersion: '1.0.0',
-  source: '/test',
   eventTime: new Date(),
   extensions: { 'exampleExtension': 'value' },
   contentType: 'application/json',
@@ -57,14 +59,16 @@ const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 // note that null values are not handled by default values, only undefined values ...
 const ceFull = new CloudEvent('1/full',
   'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  { 'hello': 'world' }, // data
+  '/test',
+  { 'hello': 'world', year: 2018 }, // data
   ceCommonOptions
 )
 assert(ceFull !== null)
 assert(!ceFull.isStrict)
 const ceFullStrict = new CloudEvent('2/full-strict',
   'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  { 'hello': 'world' }, // data
+  '/test',
+  { 'hello': 'world', year: 2018 }, // data
   ceCommonOptionsStrict // use common options, but set strict mode to true
 )
 assert(ceFullStrict !== null)
@@ -110,4 +114,5 @@ console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
 
 // then use (send/store/etc) serialized instances ...
 
+console.log(`\nSample script: end execution.`)
 // end of script

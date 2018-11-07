@@ -35,10 +35,10 @@ class CloudEvent {
    * Create a new instance of a CloudEvent object.
    * @param {!string} eventID the ID of the event (unique), mandatory
    * @param {!string} eventType the type of the event (usually), mandatory
+   * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
    * @param {(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
    *        eventTypeVersion (string) optional,
-   *        source (uri, default '/'),
    *        eventTime (timestamp, default now),
    *        extensions (object) optional but if given must contain at least 1 property (key/value),
    *        contentType (string, default 'application/json') tell how the data attribute must be encoded,
@@ -46,19 +46,16 @@ class CloudEvent {
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
    * @throws {Error} if strict is true and eventID or eventType is undefined or null
    */
-  constructor (eventID, eventType, data, {
+  constructor (eventID, eventType, source, data, {
     eventTypeVersion,
-    source = '/',
     eventTime = new Date(),
     extensions,
     contentType = 'application/json',
     schemaURL,
     strict = false } = {}
   ) {
-    // console.log(`DEBUG - eventID = ${eventID}, eventType = ${eventType}, data = ${data}, { strict = ${strict}, ... }`)
-    // console.log(`DEBUG - ${this.constructor.dumpObject(eventID, 'eventID')}, ${this.constructor.dumpObject(eventType, 'eventType')}, ${this.constructor.dumpObject(data, 'data')}, { strict = ${strict}, ... }`)
     if (strict === true) {
-      if (!eventID || !eventType) {
+      if (!eventID || !eventType || !source) {
         throw new Error('Unable to create CloudEvent instance, mandatory field missing')
       }
     }
@@ -75,6 +72,12 @@ class CloudEvent {
      * @private
      */
     this.eventType = eventType
+    /**
+     * The source URI of the event.
+     * @type {uri}
+     * @private
+     */
+    this.source = source
     /**
      * The real event data.
      * Usually it's an object, but could be even a Map or a Set.
@@ -126,12 +129,6 @@ class CloudEvent {
      * @private
      */
     this.schemaURL = schemaURL
-    /**
-     * The source URI of the event.
-     * @type {string}
-     * @private
-     */
-    this.source = source
 
     // add strict to extensions, but only when defined
     if (strict === true) {
@@ -216,10 +213,11 @@ class CloudEvent {
 
     // standard validation
     // note that some properties are not checked here because I assign a default value, and I check them in strict mode, like:
-    // data, source, eventTime, extensions, contentType ...
+    // data, eventTime, extensions, contentType ...
     // ve.push(V.ensureIsStringNotEmpty(event.cloudEventsVersion, 'cloudEventsVersion')) // no more a public attribute
     ve.push(V.ensureIsStringNotEmpty(event.eventID, 'eventID'))
     ve.push(V.ensureIsStringNotEmpty(event.eventType, 'eventType'))
+    ve.push(V.ensureIsStringNotEmpty(event.source, 'source'))
     if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
       ve.push(V.ensureIsStringNotEmpty(event.eventTypeVersion, 'eventTypeVersion'))
     }
@@ -277,7 +275,6 @@ class CloudEvent {
    * @return {string} the serialized event, as a string
    */
   static serializeEvent (event) {
-    // console.log(`DEBUG - ${CloudEvent.dumpObject(event, 'event')}`)
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
@@ -286,7 +283,6 @@ class CloudEvent {
     }
 
     const serialized = JSON.stringify(event)
-    // console.log(`DEBUG - serialize: serialized = '${serialized}'`)
     return serialized
   }
 
