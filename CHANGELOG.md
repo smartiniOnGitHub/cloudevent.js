@@ -6,7 +6,7 @@ Summary Changelog:
 - Add Badges in the README for simpler download/identify from NPM web site
 - Remove cloudEventsVersion attribute from constructor (it's defined in the implementation, as a read-only private property); so the change in release number
 - Move source attribute from constructor options to a constructor property (for simpler set/override) and remove its default value; so the change in release number
-- Add JSON Schema for CloudEvent, related to current attributes (so it makes sense to expose here, even if used by other serializing libraries)
+- Add JSON Schema for CloudEvent, related to current attributes (so it makes sense to expose here, even if used only by other serializing libraries)
 
 ## [0.1.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.1.0) (2018-08-28)
 Summary Changelog:

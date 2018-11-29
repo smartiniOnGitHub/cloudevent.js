@@ -122,7 +122,7 @@ Look into the [example](./example/) folder for more sample scripts that uses the
 
 ## Requirements
 
-Node.js 8.12.x or later.
+Node.js 8.14.x or later.
 
 
 ## Note
@@ -133,6 +133,15 @@ That attribute when set will be put in the 'extensions' standard attribute of a 
 You can find Code Documentation for the API of the library [here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
+
+
+## Contributing
+
+1. Fork it ( https://github.com/smartiniOnGitHub/cloudevent.js/fork )
+2. Create your feature branch (git checkout -b my-new-feature)
+3. Commit your changes (git commit -am 'Add some feature')
+4. Push to the branch (git push origin my-new-feature)
+5. Create a new Pull Request
 
 
 ## License
