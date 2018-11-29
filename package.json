@@ -17,11 +17,11 @@
     "esdoc-node": "^1.0.3",
     "simple-get": "^3.0.3",
     "standard": "^12.0.1",
-    "tap": "^12.0.1"
+    "tap": "^12.1.0"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.12.0"
+    "node": ">=8.14.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
