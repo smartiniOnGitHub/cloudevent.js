@@ -100,10 +100,12 @@ assert(CloudEvent.validateEvent(ceFullStrict).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
 // some diagnostic info
-console.log(`Validation output for ceEmpty, default strict mode is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
-console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
+console.log(`Some expected validation errors:`)
+console.log(`Validation output for ceEmpty (default strict mode) is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
+console.log(`Validation output for ceEmpty (force strict mode to true) is: size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
+console.log(`Some serialization examples:`)
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 assert(ceFullSerializedStatic !== null)
 const ceFullSerialized = ceFull.serialize()
