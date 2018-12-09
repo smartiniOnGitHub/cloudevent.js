@@ -134,6 +134,10 @@ You can find Code Documentation for the API of the library [here](https://smarti
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
+The package name 'cloudevent.js' will change just after the '0.2.0' release 
+to the simpler 'cloudevent' (published the same as '0.2.0' release),
+so it will be easier to get it at npm.
+
 
 ## Contributing
 
