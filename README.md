@@ -1,7 +1,7 @@
 # cloudevent.js
 
-  [![NPM Version](https://img.shields.io/npm/v/cloudevent.js.svg?style=flat)](https://npmjs.org/package/cloudevent.js/)
-  [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.js.svg?style=flat)](https://npmjs.org/package/cloudevent.js/)
+  [![NPM Version](https://img.shields.io/npm/v/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
+  [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/cloudevent.js/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/cloudevent.js/?branch=master)
 
@@ -25,7 +25,7 @@ Get a reference to the library:
 ```js
 // Node.js example
 
-const CloudEvent = require('cloudevent.js')
+const CloudEvent = require('cloudevent')
 ```
 
 create some sample CloudEvent instances:
@@ -127,14 +127,14 @@ Node.js 8.14.x or later.
 
 ## Note
 
-Note that in this implementation there is even the ability to validate CloudEvent instances in a stricter way, by setting to true the attribute 'strict' in options in costructor options; or specify it during validation.
+Note that in this implementation there is even the ability to validate CloudEvent instances in a stricter way, by setting to true the attribute 'strict' in options in constructor options; or specify it during validation.
 That attribute when set will be put in the 'extensions' standard attribute of a CloudEvent.
 
 You can find Code Documentation for the API of the library [here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
-The package name 'cloudevent.js' will change just after the '0.2.0' release 
+The package name 'cloudevent.js' is changed just after the '0.2.0' release 
 to the simpler 'cloudevent' (published the same as '0.2.0' release),
 so it will be easier to get it at npm.
 
