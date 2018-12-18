@@ -173,3 +173,32 @@ test('serialize a CloudEvent instance with a non default contentType, expect err
     assert(ceFullStrictSerialized === null) // never executed
   }, Error, 'Expected exception when serializing the current CloudEvent instance')
 })
+
+/** @test {CloudEvent} */
+test('ensure the JSON Schema for a CloudEvent (static and for a normal instance) is available', (t) => {
+  t.plan(6)
+
+  const CloudEvent = require('../src/') // reference the library
+  t.ok(CloudEvent)
+
+  // get JSON Schema from a static method
+  const jsonSchemaStatic = CloudEvent.getJSONSchema()
+  assert(jsonSchemaStatic !== null)
+  t.ok(jsonSchemaStatic)
+  t.strictEqual(typeof jsonSchemaStatic, 'object')
+
+  // create a sample CloudEvent instance ...
+  const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+    '/test',
+    ceCommonData, // data
+    ceCommonOptionsStrict
+  )
+  assert(ceFullStrict !== null)
+  t.ok(ceFullStrict)
+  // get JSON Schema from that instance
+  const jsonSchema = ceFullStrict.schema
+  assert(jsonSchema !== null)
+  t.ok(jsonSchema)
+  t.strictEqual(typeof jsonSchema, 'object')
+})
