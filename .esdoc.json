@@ -6,8 +6,24 @@
             "name": "esdoc-standard-plugin",
             "option": {
                 "test": {
-                    "source": "./test"
+                    "source": "./test",
+                    "interfaces": [
+                        "describe",
+                        "it",
+                        "context",
+                        "suite",
+                        "test"
+                    ],
+                    "includes": [
+                        "(spec|Spec|test|Test)\\.js$"
+                    ]
                 }
+            }
+        },
+        {
+            "name": "esdoc-ecmascript-proposal-plugin",
+            "option": {
+                "all": true
             }
         },
         { "name": "esdoc-node" }
