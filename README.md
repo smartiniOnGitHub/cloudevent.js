@@ -4,6 +4,7 @@
   [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/cloudevent.js/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/cloudevent.js/?branch=master)
+  [![Dependencies](https://david-dm.org/smartiniOnGitHub/cloudevent.js.svg)](https://david-dm.org/smartiniOnGitHub/cloudevent.js.svg)
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 

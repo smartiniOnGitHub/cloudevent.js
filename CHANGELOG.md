@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.2.1](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.1) (2018-12-20)
+Summary Changelog:
+- Updated dependencies for the development environment
+- Expose the JSON Schema even with a static method, for simpler usage by others
+- Fix documentation generation in ESDoc (using latest JavaScript syntax), 
+  and tweak configuration for documentation on tests
+- Added badge for the status (updated or not) for dependencies, in the README
+
 ## [0.2.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.0) (2018-12-09)
 Summary Changelog:
 - Updated dependencies
