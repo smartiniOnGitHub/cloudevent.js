@@ -6,7 +6,12 @@
   "scripts": {
     "docs": "npx esdoc",
     "example": "node example/nodejs-base",
-    "lint": "standard \"./*.js\" \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
+    "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
+    "lint:log": "npm run lint > ./temp/lint-standard.log",
+    "license-check": "npx legally",
+    "license-check:log": "npx legally > ./temp/license-check.log",
+    "license-checker": "npx license-checker --production --onlyAllow='Apache-2.0;BSD-2-Clause;BSD-3-Clause;MIT;ISC'",
+    "license-checker:log": "npm run license-checker | tee ./temp/license-checker.log",
     "test:unit": "tap -J test/*.test.js test/*/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
