@@ -21,6 +21,7 @@ test/
 # example/
 
 .env
+.envrc
 .babelrc
 .eslintignore
 .eslintrc*
