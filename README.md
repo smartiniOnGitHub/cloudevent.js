@@ -124,7 +124,7 @@ Look into the [example](./example/) folder for more sample scripts that uses the
 
 ## Requirements
 
-Node.js 8.14.x or later.
+Node.js 8.15.x or later.
 
 
 ## Note

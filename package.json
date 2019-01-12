@@ -27,7 +27,7 @@
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.14.0"
+    "node": ">=8.15.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
