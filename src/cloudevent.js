@@ -380,6 +380,18 @@ class CloudEvent {
   }
 
   /**
+   * Getter method to return a copy of CloudEvent data attribute,
+   * or original data payload.
+   *
+   * See {@link CloudEvent.data}.
+   *
+   * @type {(object|Map|Set)}
+   */
+  get payload () {
+    return { ...this.data }
+  }
+
+  /**
    * Override the usual toString method.
    *
    * See {@link Object.toString}.

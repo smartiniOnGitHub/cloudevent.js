@@ -218,7 +218,7 @@ const ceCommonNestedData = { ...ceCommonData,
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
-  t.plan(36)
+  t.plan(48)
 
   const CloudEvent = require('../src/') // reference the library
   // t.ok(CloudEvent)
@@ -260,6 +260,20 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
   t.same(ceFull, ceFullDeserialized)
 
+  // ensure payload data is a copy of event data
+  let dataShallowClone = ceFull.payload
+  // then ensure they are different object (references) ...
+  assert(dataShallowClone !== null)
+  assert(dataShallowClone !== ceFull.data) // they must be different object references
+  assert(dataShallowClone !== ceFull.payload) // they must be different object references, at any invocation
+  t.notEqual(dataShallowClone, ceFull.data)
+  t.notStrictEqual(dataShallowClone, ceFull.data)
+  t.notEqual(dataShallowClone, ceFull.payload)
+  dataShallowClone = 'changed: true' // reassign to test that data won't be affected by that change
+  t.notEqual(dataShallowClone, ceFull.data)
+  t.strictNotSame(dataShallowClone, ceFull.data)
+  t.notEqual(dataShallowClone, ceFull.payload)
+
   // the same with with strict mode enabled ...
   const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
     'com.github.smartiniOnGitHub.cloudeventjs.testevent',
@@ -297,4 +311,18 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
   ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
   t.same(ceFullStrict, ceFullStrictDeserialized)
+
+  // ensure payload data is a copy of event data
+  let dataShallowCloneStrict = ceFullStrict.payload
+  // then ensure they are different object (references) ...
+  assert(dataShallowCloneStrict !== null)
+  assert(dataShallowCloneStrict !== ceFullStrict.data) // they must be different object references
+  assert(dataShallowCloneStrict !== ceFullStrict.payload) // they must be different object references, at any invocation
+  t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+  t.notStrictEqual(dataShallowCloneStrict, ceFullStrict.data)
+  t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+  dataShallowCloneStrict = 'changed: true' // reassign to test that data won't be affected by that change
+  t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+  t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
+  t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
 })
