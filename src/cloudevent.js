@@ -272,18 +272,22 @@ class CloudEvent {
    * Note that here standard serialization to JSON is used (no additional libraries).
    *
    * @param {!object} event the CloudEvent to serialize
+   * @param {object} options optional serialization attributes:
+   *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  static serializeEvent (event) {
+  static serializeEvent (event, { encodedData } = {}) {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
-    if (event.contentType !== 'application/json') {
-      throw new Error(`Unsupported content type: '${event.contentType}'. Not yet implemented.`)
+    if (event.contentType === 'application/json') {
+      return JSON.stringify(event)
     }
-
-    const serialized = JSON.stringify(event)
-    return serialized
+    // else
+    if (!V.isStringNotEmpty(encodedData)) {
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
+    }
+    return JSON.stringify({ ...event, data: encodedData })
   }
 
   /**
@@ -325,12 +329,14 @@ class CloudEvent {
   /**
    * Serialize the current CloudEvent.
    *
-   * See {@link CloudEvent.serializeeEvent}.
+   * See {@link CloudEvent.serializeEvent}.
    *
+   * @param {object} options optional serialization attributes:
+   *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  serialize () {
-    return this.constructor.serializeEvent(this)
+  serialize ({ encodedData } = {}) {
+    return this.constructor.serializeEvent(this, { encodedData })
   }
 
   /**

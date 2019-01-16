@@ -67,111 +67,184 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   const CloudEvent = require('../src/') // reference the library
   // t.ok(CloudEvent)
 
-  // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
-  // note that null values are not handled by default values, only undefined values ...
-  const ceFull = new CloudEvent('1/full/sample-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceCommonData, // data
-    ceCommonOptions
-  )
-  assert(ceFull !== null)
-  t.ok(ceFull)
-  t.ok(ceFull.isValid())
-  t.ok(ceFull.validate().length === 0)
-  t.ok(ceFull.validate({ strict: false }).length === 0)
-  t.ok(ceFull.validate({ strict: true }).length === 0)
-  t.ok(CloudEvent.isValidEvent(ceFull))
-  t.ok(CloudEvent.validateEvent(ceFull).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+  {
+    // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ceFull = new CloudEvent('1/full/sample-data/no-strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      ceCommonOptions
+    )
+    assert(ceFull !== null)
+    t.ok(ceFull)
+    t.ok(ceFull.isValid())
+    t.ok(ceFull.validate().length === 0)
+    t.ok(ceFull.validate({ strict: false }).length === 0)
+    t.ok(ceFull.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFull))
+    t.ok(CloudEvent.validateEvent(ceFull).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
 
-  const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-  t.ok(ceFullSerializedStatic)
-  const ceFullSerialized = ceFull.serialize()
-  t.ok(ceFullSerialized)
-  assert(ceFullSerializedStatic === ceFullSerialized)
-  t.strictSame(ceFullSerializedStatic, ceFullSerialized)
-  const ceSerialize = CloudEvent.serializeEvent
-  assert(ceSerialize !== null)
-  t.ok(ceSerialize)
-  const ceFullSerializedFunction = ceSerialize(ceFull)
-  t.ok(ceFullSerializedFunction)
-  t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
-  t.strictSame(ceFullSerializedFunction, ceFullSerialized)
+    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+    t.ok(ceFullSerializedStatic)
+    const ceFullSerialized = ceFull.serialize()
+    t.ok(ceFullSerialized)
+    assert(ceFullSerializedStatic === ceFullSerialized)
+    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+    const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullSerializedFunction = ceSerialize(ceFull)
+    t.ok(ceFullSerializedFunction)
+    t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
+    t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-  const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullSerialized, ceFullSerializedComparison)
-  const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-  ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-  t.same(ceFull, ceFullDeserialized)
+    const ceFullSerializedComparison = `{"eventID":"1/full/sample-data/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+    const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFull, ceFullDeserialized)
+  }
 
-  // the same with with strict mode enabled ...
-  const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceCommonData, // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullStrict !== null)
-  t.ok(ceFullStrict)
-  t.ok(ceFullStrict.isValid())
-  t.ok(ceFullStrict.validate().length === 0)
-  t.ok(ceFullStrict.validate({ strict: true }).length === 0)
-  t.ok(ceFullStrict.validate({ strict: false }).length === 0)
-  t.ok(CloudEvent.isValidEvent(ceFullStrict))
-  t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+  {
+    // the same with with strict mode enabled ...
+    const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullStrict !== null)
+    t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.validate().length === 0)
+    t.ok(ceFullStrict.validate({ strict: true }).length === 0)
+    t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFullStrict))
+    t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 
-  const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
-  t.ok(ceFullStrictSerializedStatic)
-  const ceFullStrictSerialized = ceFullStrict.serialize()
-  t.ok(ceFullStrictSerialized)
-  assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
-  t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
-  // const ceSerialize = CloudEvent.serializeEvent
-  assert(ceSerialize !== null)
-  t.ok(ceSerialize)
-  const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
-  t.ok(ceFullStrictSerializedFunction)
-  t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
-  t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
+    const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+    t.ok(ceFullStrictSerializedStatic)
+    const ceFullStrictSerialized = ceFullStrict.serialize()
+    t.ok(ceFullStrictSerialized)
+    assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
+    t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
+    const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
+    t.ok(ceFullStrictSerializedFunction)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-  const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
-  const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-  ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-  t.same(ceFullStrict, ceFullStrictDeserialized)
+    const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+    const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFullStrict, ceFullStrictDeserialized)
+  }
 })
 
-// TODO: this is a limit if the current implementation, and will be resolved soon ... wip
 /** @test {CloudEvent} */
-test('serialize a CloudEvent instance with a non default contentType, expect error', (t) => {
-  t.plan(4)
+test('serialize a CloudEvent instance with a non default contentType and empty encodedData options, expect error', (t) => {
+  t.plan(7)
 
   const CloudEvent = require('../src/') // reference the library
   t.ok(CloudEvent)
 
-  // create an instance with non default contentType (other options default): expected success ...
-  // but when I try to serialize it, expect to have an error raised ...
-  const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceCommonData, // data
-    {
-      contentType: 'application/xml'
-    }
-  )
-  assert(ceFullOtherContentType !== null)
-  t.ok(ceFullOtherContentType)
-  t.ok(ceFullOtherContentType.isValid())
-  // const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-  // t.ok(ceFullStrictSerialized)
-  t.throws(function () {
-    const ceFullStrictSerialized = ceFullOtherContentType.serialize()
-    assert(ceFullStrictSerialized === null) // never executed
-  }, Error, 'Expected exception when serializing the current CloudEvent instance')
+  {
+    // create an instance with non default contentType (other options default): expected success ...
+    // when I try to serialize it without specifying already encoded data (encodedData options), expect to have an error raised ...
+    const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      {
+        ...ceCommonOptions,
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentType !== null)
+    t.ok(ceFullOtherContentType)
+    t.ok(ceFullOtherContentType.isValid())
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+  }
+
+  {
+    // the same with with strict mode enabled ...
+    const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      {
+        ...ceCommonOptionsStrict,
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentTypeStrict !== null)
+    t.ok(ceFullOtherContentTypeStrict)
+    t.ok(ceFullOtherContentTypeStrict.isValid())
+    t.throws(function () {
+      const ceFullOtherContentTypeStrictSerialized = ceFullOtherContentTypeStrict.serialize()
+      assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+  }
+})
+
+/** @test {CloudEvent} */
+test('serialize a CloudEvent instance with a non default contentType and a right encodedData options, expect success', (t) => {
+  t.plan(7)
+
+  const CloudEvent = require('../src/') // reference the library
+  t.ok(CloudEvent)
+
+  {
+    // create an instance with non default contentType (other options default): expected success ...
+    // when I try to serialize specifying already encoded data (encodedData options), expect success ...
+    const ceFullOtherContentType = new CloudEvent('1/non-default-contentType/sample-data/no-strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      {
+        ...ceCommonOptions,
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentType !== null)
+    t.ok(ceFullOtherContentType)
+    t.ok(ceFullOtherContentType.isValid())
+    const cceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize({
+      encodedData: `<data "hello"="world" "year"="2018" />`
+    })
+    t.ok(cceFullOtherContentTypeSerialized)
+  }
+
+  {
+    // the same with with strict mode enabled ...
+    const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonData, // data
+      {
+        ...ceCommonOptionsStrict,
+        contentType: 'application/xml'
+      }
+    )
+    assert(ceFullOtherContentTypeStrict !== null)
+    t.ok(ceFullOtherContentTypeStrict)
+    t.ok(ceFullOtherContentTypeStrict.isValid())
+    const ceFullOtherContentTypeStrictSerialized = ceFullOtherContentTypeStrict.serialize({
+      encodedData: `<data "hello"="world" "year"="2018" />`
+    })
+    t.ok(ceFullOtherContentTypeStrictSerialized)
+  }
 })
 
 /** @test {CloudEvent} */
@@ -223,106 +296,110 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   const CloudEvent = require('../src/') // reference the library
   // t.ok(CloudEvent)
 
-  const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceCommonNestedData, // data
-    ceCommonOptions
-  )
-  assert(ceFull !== null)
-  t.ok(ceFull)
-  t.ok(ceFull.isValid())
-  t.ok(ceFull.validate().length === 0)
-  t.ok(ceFull.validate({ strict: false }).length === 0)
-  t.ok(ceFull.validate({ strict: true }).length === 0)
-  t.ok(CloudEvent.isValidEvent(ceFull))
-  t.ok(CloudEvent.validateEvent(ceFull).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+  {
+    const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonNestedData, // data
+      ceCommonOptions
+    )
+    assert(ceFull !== null)
+    t.ok(ceFull)
+    t.ok(ceFull.isValid())
+    t.ok(ceFull.validate().length === 0)
+    t.ok(ceFull.validate({ strict: false }).length === 0)
+    t.ok(ceFull.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFull))
+    t.ok(CloudEvent.validateEvent(ceFull).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
 
-  const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-  t.ok(ceFullSerializedStatic)
-  const ceFullSerialized = ceFull.serialize()
-  t.ok(ceFullSerialized)
-  assert(ceFullSerializedStatic === ceFullSerialized)
-  t.strictSame(ceFullSerializedStatic, ceFullSerialized)
-  const ceSerialize = CloudEvent.serializeEvent
-  assert(ceSerialize !== null)
-  t.ok(ceSerialize)
-  const ceFullSerializedFunction = ceSerialize(ceFull)
-  t.ok(ceFullSerializedFunction)
-  t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
-  t.strictSame(ceFullSerializedFunction, ceFullSerialized)
+    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+    t.ok(ceFullSerializedStatic)
+    const ceFullSerialized = ceFull.serialize()
+    t.ok(ceFullSerialized)
+    assert(ceFullSerializedStatic === ceFullSerialized)
+    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+    const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullSerializedFunction = ceSerialize(ceFull)
+    t.ok(ceFullSerializedFunction)
+    t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
+    t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-  const ceFullSerializedComparison = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullSerialized, ceFullSerializedComparison)
-  const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-  ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-  t.same(ceFull, ceFullDeserialized)
+    const ceFullSerializedComparison = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+    const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFull, ceFullDeserialized)
 
-  // ensure payload data is a copy of event data
-  let dataShallowClone = ceFull.payload
-  // then ensure they are different object (references) ...
-  assert(dataShallowClone !== null)
-  assert(dataShallowClone !== ceFull.data) // they must be different object references
-  assert(dataShallowClone !== ceFull.payload) // they must be different object references, at any invocation
-  t.notEqual(dataShallowClone, ceFull.data)
-  t.notStrictEqual(dataShallowClone, ceFull.data)
-  t.notEqual(dataShallowClone, ceFull.payload)
-  dataShallowClone = 'changed: true' // reassign to test that data won't be affected by that change
-  t.notEqual(dataShallowClone, ceFull.data)
-  t.strictNotSame(dataShallowClone, ceFull.data)
-  t.notEqual(dataShallowClone, ceFull.payload)
+    // ensure payload data is a copy of event data
+    let dataShallowClone = ceFull.payload
+    // then ensure they are different object (references) ...
+    assert(dataShallowClone !== null)
+    assert(dataShallowClone !== ceFull.data) // they must be different object references
+    assert(dataShallowClone !== ceFull.payload) // they must be different object references, at any invocation
+    t.notEqual(dataShallowClone, ceFull.data)
+    t.notStrictEqual(dataShallowClone, ceFull.data)
+    t.notEqual(dataShallowClone, ceFull.payload)
+    dataShallowClone = 'changed: true' // reassign to test that data won't be affected by that change
+    t.notEqual(dataShallowClone, ceFull.data)
+    t.strictNotSame(dataShallowClone, ceFull.data)
+    t.notEqual(dataShallowClone, ceFull.payload)
+  }
 
-  // the same with with strict mode enabled ...
-  const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceCommonNestedData, // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullStrict !== null)
-  t.ok(ceFullStrict)
-  t.ok(ceFullStrict.isValid())
-  t.ok(ceFullStrict.validate().length === 0)
-  t.ok(ceFullStrict.validate({ strict: true }).length === 0)
-  t.ok(ceFullStrict.validate({ strict: false }).length === 0)
-  t.ok(CloudEvent.isValidEvent(ceFullStrict))
-  t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-  t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+  {
+    // the same with with strict mode enabled ...
+    const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+      '/test',
+      ceCommonNestedData, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullStrict !== null)
+    t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.validate().length === 0)
+    t.ok(ceFullStrict.validate({ strict: true }).length === 0)
+    t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFullStrict))
+    t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 
-  const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
-  t.ok(ceFullStrictSerializedStatic)
-  const ceFullStrictSerialized = ceFullStrict.serialize()
-  t.ok(ceFullStrictSerialized)
-  assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
-  t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
-  // const ceSerialize = CloudEvent.serializeEvent
-  assert(ceSerialize !== null)
-  t.ok(ceSerialize)
-  const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
-  t.ok(ceFullStrictSerializedFunction)
-  t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
-  t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
+    const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+    t.ok(ceFullStrictSerializedStatic)
+    const ceFullStrictSerialized = ceFullStrict.serialize()
+    t.ok(ceFullStrictSerialized)
+    assert(ceFullStrictSerializedStatic === ceFullStrictSerialized)
+    t.strictSame(ceFullStrictSerializedStatic, ceFullStrictSerialized)
+    const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    t.ok(ceSerialize)
+    const ceFullStrictSerializedFunction = ceSerialize(ceFullStrict)
+    t.ok(ceFullStrictSerializedFunction)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
+    t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-  const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
-  t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
-  const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
-  ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
-  t.same(ceFullStrict, ceFullStrictDeserialized)
+    const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+    const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
+    ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    t.same(ceFullStrict, ceFullStrictDeserialized)
 
-  // ensure payload data is a copy of event data
-  let dataShallowCloneStrict = ceFullStrict.payload
-  // then ensure they are different object (references) ...
-  assert(dataShallowCloneStrict !== null)
-  assert(dataShallowCloneStrict !== ceFullStrict.data) // they must be different object references
-  assert(dataShallowCloneStrict !== ceFullStrict.payload) // they must be different object references, at any invocation
-  t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
-  t.notStrictEqual(dataShallowCloneStrict, ceFullStrict.data)
-  t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
-  dataShallowCloneStrict = 'changed: true' // reassign to test that data won't be affected by that change
-  t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
-  t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
-  t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+    // ensure payload data is a copy of event data
+    let dataShallowCloneStrict = ceFullStrict.payload
+    // then ensure they are different object (references) ...
+    assert(dataShallowCloneStrict !== null)
+    assert(dataShallowCloneStrict !== ceFullStrict.data) // they must be different object references
+    assert(dataShallowCloneStrict !== ceFullStrict.payload) // they must be different object references, at any invocation
+    t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+    t.notStrictEqual(dataShallowCloneStrict, ceFullStrict.data)
+    t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+    dataShallowCloneStrict = 'changed: true' // reassign to test that data won't be affected by that change
+    t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+    t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
+    t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+  }
 })
