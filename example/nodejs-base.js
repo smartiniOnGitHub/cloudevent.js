@@ -76,6 +76,17 @@ assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 
+const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
+  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+  '/test',
+  { 'hello': 'world', year: 2018 }, // data
+  { ...ceCommonOptionsStrict, contentType: 'application/xml' } // use common strict options, but set strict mode to true
+)
+assert(ceFullStrictOtherContentType !== null)
+assert(ceFullStrictOtherContentType.isStrict)
+assert(!ceFull.ceFullStrictOtherContentType) // ensure common options object has not been changed when reusing some of its values for the second instance
+assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
+
 // validate/check if valid instances (optional)
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
@@ -83,12 +94,14 @@ assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
 assert(ceMinimal.isValid())
 assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
+assert(ceFullStrictOtherContentType.isValid())
 // the same, but using static method
 assert(!CloudEvent.isValidEvent(ceEmpty))
 assert(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict))
 assert(CloudEvent.isValidEvent(ceMinimal))
 assert(CloudEvent.isValidEvent(ceFull))
 assert(CloudEvent.isValidEvent(ceFullStrict))
+assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
 assert(CloudEvent.validateEvent(ceEmpty).length > 0)
 assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length > 0)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
@@ -99,20 +112,36 @@ assert(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrict).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrictOtherContentType).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: false }).length === 0)
+assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: true }).length === 0)
 // some diagnostic info
 console.log(`Some expected validation errors:`)
 console.log(`Validation output for ceEmpty (default strict mode) is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty (force strict mode to true) is: size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
+// default contentType
 console.log(`Some serialization examples:`)
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 assert(ceFullSerializedStatic !== null)
 const ceFullSerialized = ceFull.serialize()
 assert(ceFullSerialized !== null)
 assert(ceFullSerializedStatic === ceFullSerialized)
-// some diagnostic info
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
+// non default contentType
+const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
+  // encoder: (data) => '<data encoder="sample" />'
+  encodedData: '<data "hello"="world" "year"="2018" />'
+})
+assert(ceFullStrictOtherContentTypeSerializedStatic !== null)
+const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
+  // encoder: (data) => '<data encoder="sample" />',
+  encodedData: '<data "hello"="world" "year"="2018" />'
+})
+assert(ceFullStrictOtherContentTypeSerialized !== null)
+assert(ceFullStrictOtherContentTypeSerializedStatic === ceFullStrictOtherContentTypeSerialized)
+console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
 
 // then use (send/store/etc) serialized instances ...
 
