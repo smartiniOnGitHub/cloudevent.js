@@ -133,11 +133,11 @@ const ceFullSerialized = ceFull.serialize()
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
 // non default contentType
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
-  // encoder: (data) => '<data encoder="sample" />'
+  // encoder: (data) => '<data "encoder"="sample" />'
   encodedData: '<data "hello"="world" "year"="2018" />'
 })
 const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
-  // encoder: (data) => '<data encoder="sample" />'
+  // encoder: (data) => '<data "encoder"="sample" />'
   encodedData: '<data "hello"="world" "year"="2018" />'
 })
 console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
