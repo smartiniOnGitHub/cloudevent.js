@@ -270,13 +270,15 @@ class CloudEvent {
   /**
    * Serialize the given CloudEvent in JSON format.
    * Note that here standard serialization to JSON is used (no additional libraries).
+   * Note that the result of encoder function is assigned to encoded data.
    *
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
+   *        encoder (function, default null) a function that takes data and returns encoded data,
    *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  static serializeEvent (event, { encodedData } = {}) {
+  static serializeEvent (event, { encoder, encodedData } = {}) {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
@@ -284,6 +286,17 @@ class CloudEvent {
       return JSON.stringify(event)
     }
     // else
+    if (V.isDefinedAndNotNull(encoder)) {
+      if (!V.isFunction(encoder)) {
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contentType}'.`)
+      }
+      encodedData = encoder(event.payload)
+    } else {
+      // encoder not defined
+      if (!V.isDefinedAndNotNull(encodedData)) {
+        throw new Error(`Missing encoder function: use encoder function or encoded data with the given content type: '${event.contentType}'.`)
+      }
+    }
     if (!V.isStringNotEmpty(encodedData)) {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
@@ -332,11 +345,12 @@ class CloudEvent {
    * See {@link CloudEvent.serializeEvent}.
    *
    * @param {object} options optional serialization attributes:
+   *        encoder (function, default null) a function that takes data and returns encoded data,
    *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
-  serialize ({ encodedData } = {}) {
-    return this.constructor.serializeEvent(this, { encodedData })
+  serialize ({ encoder, encodedData } = {}) {
+    return this.constructor.serializeEvent(this, { encoder, encodedData })
   }
 
   /**
