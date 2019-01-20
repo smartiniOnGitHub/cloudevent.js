@@ -1,5 +1,24 @@
 # Change Log
 
+## [0.2.2](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.2) (2019-01-20)
+Summary Changelog:
+- Updated dependencies for the development environment
+- Add some tests with nested data (objects nested with some levels of depth)
+- Add a getter method for reading the data attribute (payload)
+- To handle non default 'contentType' mime type, pass an options object to serializer 
+- In serialization options, add a function to transform data and return the encoded version 
+  (but without checks on the transformed value), used with non default 'contentType'
+- In serialization options, add an argument to specify the (already) encoded version 
+  of the data (payload) (but without checks on the value), used with non default 'contentType'
+- Add an npm custom command to run Tap unit tests with Node.js debugger breaks enabled (inspector) 
+  and no parallel and no timeout, useful for example in Visual Studio Code
+- Note that accordingly with the [Semantic Versioning](https://semver.org/) specification 
+  (version number: MAJOR.MINOR.PATCH), in this case I added functionality in a backwards-compatible 
+  manner, so I should update the MINOR version now (update MAJOR is for incompatible changes, 
+  MINOR for compatible changes, and PATCH is for compatible fixes); 
+  but in this case there are no real addition of new features (but an improvement over existing 
+  features, and remove some TODO), so could be good the same even a PATCH release
+
 ## [0.2.1](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.1) (2018-12-20)
 Summary Changelog:
 - Updated dependencies for the development environment
