@@ -274,8 +274,8 @@ class CloudEvent {
    *
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
-   *        encoder (function, default null) a function that takes data and returns encoded data,
-   *        encodedData (string, default null) already encoded data (but consistency with the contentType is not checked),
+   *        encoder (function, no default) a function that takes data and returns encoded data,
+   *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
    */
   static serializeEvent (event, { encoder, encodedData } = {}) {
@@ -292,9 +292,9 @@ class CloudEvent {
       }
       encodedData = encoder(event.payload)
     } else {
-      // encoder not defined
+      // encoder not defined, check encodedData
       if (!V.isDefinedAndNotNull(encodedData)) {
-        throw new Error(`Missing encoder function: use encoder function or encoded data with the given content type: '${event.contentType}'.`)
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contentType}'.`)
       }
     }
     if (!V.isStringNotEmpty(encodedData)) {
