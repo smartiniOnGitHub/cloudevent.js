@@ -20,8 +20,21 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure the CloudEvent class is exported by the library', (t) => {
-  t.plan(4)
-  const CloudEvent = require('../src/') // reference the library
+  t.plan(12)
+  const CloudEventExports = require('../src/') // reference the library
+  assert(CloudEventExports !== null)
+  assert.strictEqual(typeof CloudEventExports, 'object')
+  t.ok(CloudEventExports)
+  t.strictEqual(typeof CloudEventExports, 'object')
+  const CloudEventClass = CloudEventExports.CloudEventDefinition // reference the implementation class
+  t.ok(CloudEventClass)
+  const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
+  t.ok(CloudEventValidator)
+  const { CloudEventDefinition: CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.strictEqual(typeof CloudEvent.isClass, 'function')
+  t.strictEqual(typeof V.isClass, 'function')
+  t.ok(V.isFunction(CloudEvent.isClass))
+  t.ok(V.isFunction(V.isClass))
   // optional, using some standard Node.js assert statements, as a sample
   assert(CloudEvent !== null)
   assert.strictEqual(typeof CloudEvent, 'function')
