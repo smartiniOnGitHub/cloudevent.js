@@ -20,4 +20,12 @@
  */
 const cloudEventDefinition = require('./cloudevent') // get CloudEvent definition and related utilities
 
-module.exports = cloudEventDefinition
+/**
+ * Get a reference to cloudevent class validator.
+ */
+const cloudEventValidator = require('./validator') // get CloudEvent definition and related utilities
+
+module.exports = {
+  CloudEventDefinition: cloudEventDefinition,
+  CloudEventValidator: cloudEventValidator
+}
