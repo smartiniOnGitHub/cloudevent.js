@@ -4,6 +4,7 @@
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
+    "dependency:log": "npm list > ./temp/dependencies.log",
     "docs": "npx esdoc",
     "example": "node example/nodejs-base",
     "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
