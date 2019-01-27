@@ -329,7 +329,6 @@ class CloudEvent {
         eventTime: { type: 'string' },
         // extensions: { type: 'object' },
         contentType: { type: 'string' },
-        // TODO: use if/then/else on contentType ... wip
         schemaURL: { type: 'string' }
       },
       required: ['cloudEventsVersion', 'eventID', 'eventType',

@@ -20,23 +20,60 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure the CloudEvent class is exported by the library', (t) => {
-  t.plan(4)
-  const CloudEvent = require('../src/') // reference the library
-  // optional, using some standard Node.js assert statements, as a sample
-  assert(CloudEvent !== null)
-  assert.strictEqual(typeof CloudEvent, 'function')
-  assert(new CloudEvent() instanceof CloudEvent)
-  assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-  t.ok(CloudEvent)
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-  t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+  t.plan(16)
+
+  {
+    const CloudEventExports = require('../src/') // reference the library
+    assert(CloudEventExports !== null)
+    assert.strictEqual(typeof CloudEventExports, 'object')
+    t.ok(CloudEventExports)
+    t.strictEqual(typeof CloudEventExports, 'object')
+    const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
+    t.ok(CloudEventClass)
+    const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
+    t.ok(CloudEventValidator)
+  }
+
+  {
+    const { CloudEvent: CEClass, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    // const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    t.strictEqual(typeof CEClass, 'function')
+    t.strictEqual(typeof V.isClass, 'function')
+    t.ok(V.isFunction(CEClass))
+    t.ok(V.isFunction(V.isClass))
+
+    const { CloudEvent } = require('../src/') // get references via destructuring
+    t.ok(CloudEvent)
+    // optional, using some standard Node.js assert statements, as a sample
+    assert(CloudEvent !== null)
+    assert.strictEqual(typeof CloudEvent, 'function')
+    assert(new CloudEvent() instanceof CloudEvent)
+    assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.ok(CloudEvent)
+    t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
+    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+
+    // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
+    const ceMinimal = new CEClass('1', // eventID
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+      '/', // source
+      {} // data (empty) // optional, but useful the same in this sample usage
+    )
+    t.ok(ceMinimal)
+    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+
+    // check that created instances belongs to the right base class
+    t.ok(V.isClass(ceMinimal, CloudEvent))
+    t.ok(V.isClass(ceMinimal, CEClass))
+  }
 })
 
 /** @test {CloudEvent} */
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
   t.plan(7)
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   // undefined
@@ -53,127 +90,137 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
   t.plan(11)
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
-  // create an instance without mandatory arguments (but no strict mode): expected success ...
-  const ceEmpty = new CloudEvent()
-  t.ok(ceEmpty)
-  t.ok(!CloudEvent.isValidEvent(ceEmpty))
-  // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
-  t.strictSame(CloudEvent.validateEvent(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(!ceEmpty.isValid())
-  t.strictSame(ceEmpty.validate(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
-
-  // create an instance without mandatory arguments (but with strict mode): expected failure ...
-  let ceEmpty2 = null
-  try {
-    ceEmpty2 = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
-    assert(ceEmpty2 === null) // never executed
-  } catch (e) {
-    t.ok(e) // expected error here
-    t.ok(!CloudEvent.isValidEvent(ceEmpty2))
-    t.strictSame(CloudEvent.validateEvent(ceEmpty2), [new Error('CloudEvent undefined or null')])
-    // the same but using normal instance methods, to ensure they works good ... no because here instance is null
+  {
+    // create an instance without mandatory arguments (but no strict mode): expected success ...
+    const ceEmpty = new CloudEvent()
+    t.ok(ceEmpty)
+    t.ok(!CloudEvent.isValidEvent(ceEmpty))
+    // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
+    t.strictSame(CloudEvent.validateEvent(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(!ceEmpty.isValid())
+    t.strictSame(ceEmpty.validate(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
   }
-  t.equal(ceEmpty2, null)
-  // the same test, but in a shorter form ...
-  t.throws(function () {
-    const ce = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
-    assert(ce === null) // never executed
-  }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+
+  {
+    // create an instance without mandatory arguments (but with strict mode): expected failure ...
+    let ceEmpty2 = null
+    try {
+      ceEmpty2 = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
+      assert(ceEmpty2 === null) // never executed
+    } catch (e) {
+      t.ok(e) // expected error here
+      t.ok(!CloudEvent.isValidEvent(ceEmpty2))
+      t.strictSame(CloudEvent.validateEvent(ceEmpty2), [new Error('CloudEvent undefined or null')])
+      // the same but using normal instance methods, to ensure they works good ... no because here instance is null
+    }
+    t.equal(ceEmpty2, null)
+    // the same test, but in a shorter form ...
+    t.throws(function () {
+      const ce = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
+      assert(ce === null) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+  }
 })
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
   t.plan(40)
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   // t.notSame(CloudEvent.isValidEvent, CloudEvent.validateEvent)
   t.strictNotSame(CloudEvent.isValidEvent, CloudEvent.validateEvent)
 
-  // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-  const ceMinimal = new CloudEvent('1', // eventID
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
-    '/', // source
-    {} // data (empty) // optional, but useful the same in this sample usage
-  )
-  t.ok(ceMinimal)
-  // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-  // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceMinimal, 'ceMinimal')}`)
-  // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
-  t.ok(CloudEvent.isValidEvent(ceMinimal))
-  t.strictSame(CloudEvent.validateEvent(ceMinimal), [])
-  // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
-  t.strictSame(CloudEvent.validateEvent(ceMinimal).length, 0) // simplify comparison of results, check only the  number of expected errors ...
-  // create another instance, similar
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceMinimal.isValid())
-  t.strictSame(ceMinimal.validate(), [])
-  t.strictSame(ceMinimal.validate().length, 0) // simplify comparison of results, check only the  number of expected errors ...
-  const ceMinimal2 = new CloudEvent('2', // eventID
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
-    '/', // source
-    {} // data (empty) // optional, but useful the same in this sample usage
-  )
-  t.ok(ceMinimal2)
-  t.ok(CloudEvent.isValidEvent(ceMinimal2)) // using default strict mode in the event
-  t.ok(CloudEvent.isValidEvent(ceMinimal2, { strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(CloudEvent.validateEvent(ceMinimal2), [])
-  t.strictSame(CloudEvent.validateEvent(ceMinimal2).length, 0)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceMinimal2.isValid()) // using default strict mode in the event
-  t.ok(ceMinimal2.isValid({ strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(ceMinimal2.validate(), [])
-  t.strictSame(ceMinimal2.validate().length, 0)
-  // then ensure they are different (have different values inside) ...
-  assert(ceMinimal !== ceMinimal2) // they must be different object references
-  t.notSame(ceMinimal, ceMinimal2)
-  t.strictNotSame(ceMinimal, ceMinimal2)
+  {
+    // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
+    const ceMinimal = new CloudEvent('1', // eventID
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+      '/', // source
+      {} // data (empty) // optional, but useful the same in this sample usage
+    )
+    t.ok(ceMinimal)
+    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
+    t.ok(CloudEvent.isValidEvent(ceMinimal))
+    t.strictSame(CloudEvent.validateEvent(ceMinimal), [])
+    // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
+    t.strictSame(CloudEvent.validateEvent(ceMinimal).length, 0) // simplify comparison of results, check only the  number of expected errors ...
+    // create another instance, similar
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceMinimal.isValid())
+    t.strictSame(ceMinimal.validate(), [])
+    t.strictSame(ceMinimal.validate().length, 0) // simplify comparison of results, check only the  number of expected errors ...
+    const ceMinimal2 = new CloudEvent('2', // eventID
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+      '/', // source
+      {} // data (empty) // optional, but useful the same in this sample usage
+    )
+    t.ok(ceMinimal2)
+    t.ok(CloudEvent.isValidEvent(ceMinimal2)) // using default strict mode in the event
+    t.ok(CloudEvent.isValidEvent(ceMinimal2, { strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(CloudEvent.validateEvent(ceMinimal2), [])
+    t.strictSame(CloudEvent.validateEvent(ceMinimal2).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceMinimal2.isValid()) // using default strict mode in the event
+    t.ok(ceMinimal2.isValid({ strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(ceMinimal2.validate(), [])
+    t.strictSame(ceMinimal2.validate().length, 0)
+    // then ensure they are different (have different values inside) ...
+    assert(ceMinimal !== ceMinimal2) // they must be different object references
+    t.notSame(ceMinimal, ceMinimal2)
+    t.strictNotSame(ceMinimal, ceMinimal2)
+  }
 
-  // create an instance with a mandatory argument undefined (but no strict mode): expected success ...
-  // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-  const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false })
-  assert(ceMinimalMandatoryUndefinedNoStrict !== null)
-  t.ok(ceMinimalMandatoryUndefinedNoStrict)
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict)) // using default strict mode in the event
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: false }).length, 3)
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: true })) // the same but validate with strict mode enabled ...
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid()) // using default strict mode in the event
-  t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid({ strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(ceMinimalMandatoryUndefinedNoStrict.validate({ strict: false }).length, 3)
-  t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid({ strict: true })) // the same but validate with strict mode enabled ...
+  {
+    // create an instance with a mandatory argument undefined (but no strict mode): expected success ...
+    // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
+    const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false })
+    assert(ceMinimalMandatoryUndefinedNoStrict !== null)
+    t.ok(ceMinimalMandatoryUndefinedNoStrict)
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict)) // using default strict mode in the event
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: false }).length, 3)
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict, { strict: true })) // the same but validate with strict mode enabled ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid()) // using default strict mode in the event
+    t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid({ strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(ceMinimalMandatoryUndefinedNoStrict.validate({ strict: false }).length, 3)
+    t.ok(!ceMinimalMandatoryUndefinedNoStrict.isValid({ strict: true })) // the same but validate with strict mode enabled ...
 
-  // the same but with strict mode: expected exception ...
-  t.throws(function () {
-    const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
-    assert(ceMinimalMandatoryUndefinedStrict === null) // never executed
-  }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+    // the same but with strict mode: expected exception ...
+    t.throws(function () {
+      const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true })
+      assert(ceMinimalMandatoryUndefinedStrict === null) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+  }
 
-  // create an instance with a mandatory argument null (but no strict mode): expected success ...
-  // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-  const ceMinimalMandatoryNullNoStrict = new CloudEvent(null, null, null, null, { strict: false })
-  assert(ceMinimalMandatoryNullNoStrict !== null)
-  t.ok(ceMinimalMandatoryNullNoStrict)
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict)) // using default strict mode in the event
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict, { strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(CloudEvent.validateEvent(ceMinimalMandatoryNullNoStrict, { strict: false }).length, 3)
-  t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict, { strict: true })) // the same but validate with strict mode enabled ...
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(!ceMinimalMandatoryNullNoStrict.isValid()) // using default strict mode in the event
-  t.ok(!ceMinimalMandatoryNullNoStrict.isValid({ strict: false })) // same of previous but using strict mode in validation options
-  t.strictSame(ceMinimalMandatoryNullNoStrict.validate({ strict: false }).length, 3)
-  t.ok(!ceMinimalMandatoryNullNoStrict.isValid({ strict: true })) // the same but validate with strict mode enabled ...
+  {
+    // create an instance with a mandatory argument null (but no strict mode): expected success ...
+    // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
+    const ceMinimalMandatoryNullNoStrict = new CloudEvent(null, null, null, null, { strict: false })
+    assert(ceMinimalMandatoryNullNoStrict !== null)
+    t.ok(ceMinimalMandatoryNullNoStrict)
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict)) // using default strict mode in the event
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict, { strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(CloudEvent.validateEvent(ceMinimalMandatoryNullNoStrict, { strict: false }).length, 3)
+    t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryNullNoStrict, { strict: true })) // the same but validate with strict mode enabled ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(!ceMinimalMandatoryNullNoStrict.isValid()) // using default strict mode in the event
+    t.ok(!ceMinimalMandatoryNullNoStrict.isValid({ strict: false })) // same of previous but using strict mode in validation options
+    t.strictSame(ceMinimalMandatoryNullNoStrict.validate({ strict: false }).length, 3)
+    t.ok(!ceMinimalMandatoryNullNoStrict.isValid({ strict: true })) // the same but validate with strict mode enabled ...
 
-  // the same but with strict mode: expected exception ...
-  t.throws(function () {
-    const ceMinimalMandatoryNullStrict = new CloudEvent(null, null, null, null, { strict: true })
-    assert(ceMinimalMandatoryNullStrict === null) // never executed
-  }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+    // the same but with strict mode: expected exception ...
+    t.throws(function () {
+      const ceMinimalMandatoryNullStrict = new CloudEvent(null, null, null, null, { strict: true })
+      assert(ceMinimalMandatoryNullStrict === null) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
+  }
 })
 
 /** create some common options, for better reuse in tests */
@@ -187,6 +234,10 @@ const ceCommonOptions = {
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create a sample namespace for events here, for better reuse in tests */
+const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+/** create a sample common server URL, for better reuse in tests */
+const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
 const ceCommonData = { 'hello': 'world', year: 2018 }
 /** create some common data from a Map, for better reuse in tests */
@@ -198,14 +249,14 @@ ceMapData.set('key-2', 'value 2')
 /** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
   t.plan(21)
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
   // note that null values are not handled by default values, only undefined values ...
   const ceFull1 = new CloudEvent('1/full',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
+    ceNamespace,
+    ceServerUrl,
     ceCommonData,
     ceCommonOptions
   )
@@ -222,8 +273,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 
   // create another instance with all fields equals: expected success ...
   const ceFull1Clone = new CloudEvent('1/full', // should be '2/full/no-strict' ...
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
+    ceNamespace,
+    ceServerUrl,
     ceCommonData,
     ceCommonOptions
   )
@@ -247,168 +298,176 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
   t.plan(81)
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
-  // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
-  // note that null values are not handled by default values, only undefined values ...
-  const ceFullDataUndefined = new CloudEvent('1/full/undefined-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    undefined, // data
-    ceCommonOptions
-  )
-  assert(ceFullDataUndefined !== null)
-  t.ok(ceFullDataUndefined)
-  t.ok(CloudEvent.isValidEvent(ceFullDataUndefined))
-  t.ok(CloudEvent.isValidEvent(ceFullDataUndefined, { strict: false }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataUndefined), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataUndefined, { strict: false }).length, 0)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataUndefined.isValid())
-  t.ok(ceFullDataUndefined.isValid({ strict: false }))
-  t.strictSame(ceFullDataUndefined.validate(), [])
-  t.strictSame(ceFullDataUndefined.validate({ strict: false }).length, 0)
-  // the same with with strict mode enabled ...
-  const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    undefined, // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullDataUndefinedStrict !== null)
-  t.ok(ceFullDataUndefinedStrict)
-  t.ok(CloudEvent.isValidEvent(ceFullDataUndefinedStrict))
-  t.ok(CloudEvent.isValidEvent(ceFullDataUndefinedStrict, { strict: true }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataUndefinedStrict), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataUndefinedStrict, { strict: true }).length, 0)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataUndefinedStrict.isValid())
-  t.ok(ceFullDataUndefinedStrict.isValid({ strict: true }))
-  t.strictSame(ceFullDataUndefinedStrict.validate(), [])
-  t.strictSame(ceFullDataUndefinedStrict.validate({ strict: true }).length, 0)
+  {
+    // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ceFullDataUndefined = new CloudEvent('1/full/undefined-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      undefined, // data
+      ceCommonOptions
+    )
+    assert(ceFullDataUndefined !== null)
+    t.ok(ceFullDataUndefined)
+    t.ok(CloudEvent.isValidEvent(ceFullDataUndefined))
+    t.ok(CloudEvent.isValidEvent(ceFullDataUndefined, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataUndefined), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullDataUndefined, { strict: false }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataUndefined.isValid())
+    t.ok(ceFullDataUndefined.isValid({ strict: false }))
+    t.strictSame(ceFullDataUndefined.validate(), [])
+    t.strictSame(ceFullDataUndefined.validate({ strict: false }).length, 0)
+    // the same with with strict mode enabled ...
+    const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      undefined, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullDataUndefinedStrict !== null)
+    t.ok(ceFullDataUndefinedStrict)
+    t.ok(CloudEvent.isValidEvent(ceFullDataUndefinedStrict))
+    t.ok(CloudEvent.isValidEvent(ceFullDataUndefinedStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataUndefinedStrict), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullDataUndefinedStrict, { strict: true }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataUndefinedStrict.isValid())
+    t.ok(ceFullDataUndefinedStrict.isValid({ strict: true }))
+    t.strictSame(ceFullDataUndefinedStrict.validate(), [])
+    t.strictSame(ceFullDataUndefinedStrict.validate({ strict: true }).length, 0)
+  }
 
-  // create an instance with null data attribute, but with strict flag disabled: expected success ...
-  // note that null values are not handled by default values, only undefined values ...
-  const ceFullDataNull = new CloudEvent('1/full/null-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    null, // data
-    ceCommonOptions
-  )
-  assert(ceFullDataNull !== null)
-  t.ok(ceFullDataNull)
-  t.ok(CloudEvent.isValidEvent(ceFullDataNull))
-  t.ok(CloudEvent.isValidEvent(ceFullDataNull, { strict: false }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataNull), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataNull, { strict: false }).length, 0)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataNull.isValid())
-  t.ok(ceFullDataNull.isValid({ strict: false }))
-  t.strictSame(ceFullDataNull.validate(), [])
-  t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
-  // the same with with strict mode enabled ...
-  const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    null, // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullDataNullStrict !== null)
-  t.ok(ceFullDataNullStrict)
-  t.ok(CloudEvent.isValidEvent(ceFullDataNullStrict))
-  t.ok(CloudEvent.isValidEvent(ceFullDataNullStrict, { strict: true }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataNullStrict), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataNullStrict, { strict: true }).length, 0)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataNullStrict.isValid())
-  t.ok(ceFullDataNullStrict.isValid({ strict: true }))
-  t.strictSame(ceFullDataNullStrict.validate(), [])
-  t.strictSame(ceFullDataNullStrict.validate({ strict: true }).length, 0)
+  {
+    // create an instance with null data attribute, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ceFullDataNull = new CloudEvent('1/full/null-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptions
+    )
+    assert(ceFullDataNull !== null)
+    t.ok(ceFullDataNull)
+    t.ok(CloudEvent.isValidEvent(ceFullDataNull))
+    t.ok(CloudEvent.isValidEvent(ceFullDataNull, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataNull), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullDataNull, { strict: false }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataNull.isValid())
+    t.ok(ceFullDataNull.isValid({ strict: false }))
+    t.strictSame(ceFullDataNull.validate(), [])
+    t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
+    // the same with with strict mode enabled ...
+    const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullDataNullStrict !== null)
+    t.ok(ceFullDataNullStrict)
+    t.ok(CloudEvent.isValidEvent(ceFullDataNullStrict))
+    t.ok(CloudEvent.isValidEvent(ceFullDataNullStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataNullStrict), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullDataNullStrict, { strict: true }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataNullStrict.isValid())
+    t.ok(ceFullDataNullStrict.isValid({ strict: true }))
+    t.strictSame(ceFullDataNullStrict.validate(), [])
+    t.strictSame(ceFullDataNullStrict.validate({ strict: true }).length, 0)
+  }
 
-  // create an instance with a string data attribute, but with strict flag disabled: expected success ...
-  const ceFullDataString = new CloudEvent('1/full/string-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    'data as a string, bad here', // data
-    ceCommonOptions
-  )
-  assert(ceFullDataString !== null)
-  t.ok(ceFullDataString)
-  // data type errors handled only in strict mode currently ...
-  t.ok(CloudEvent.isValidEvent(ceFullDataString))
-  t.ok(CloudEvent.isValidEvent(ceFullDataString, { strict: false })) // good the same
-  t.ok(!CloudEvent.isValidEvent(ceFullDataString, { strict: true })) // bad here (right)
-  t.strictSame(CloudEvent.validateEvent(ceFullDataString), [])
-  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: false }).length, 0) // good the same
-  t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: true }).length, 1) // bad here (right)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataString.isValid())
-  t.ok(ceFullDataString.isValid({ strict: false }))
-  t.ok(!ceFullDataString.isValid({ strict: true }))
-  t.strictSame(ceFullDataString.validate(), [])
-  t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
-  t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
-  // the same with with strict mode enabled ...
-  const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    'data as a string, bad here', // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullDataStringStrict !== null)
-  t.ok(ceFullDataStringStrict)
-  // data type errors handled only in strict mode currently ...
-  // note that in the following lines even if I force 'strict: false' he won't be used because already set in the object instance ...
-  t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict))
-  t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: true }))
-  t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: false }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict).length, 1)
-  t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict, { strict: true }).length, 1)
-  t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict, { strict: false }).length, 1)
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(!ceFullDataStringStrict.isValid())
-  t.ok(!ceFullDataStringStrict.isValid({ strict: true }))
-  t.ok(!ceFullDataStringStrict.isValid({ strict: false }))
-  t.strictSame(ceFullDataStringStrict.validate().length, 1)
-  t.strictSame(ceFullDataStringStrict.validate({ strict: true }).length, 1)
-  t.strictSame(ceFullDataStringStrict.validate({ strict: false }).length, 1)
+  {
+    // create an instance with a string data attribute, but with strict flag disabled: expected success ...
+    const ceFullDataString = new CloudEvent('1/full/string-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      'data as a string, bad here', // data
+      ceCommonOptions
+    )
+    assert(ceFullDataString !== null)
+    t.ok(ceFullDataString)
+    // data type errors handled only in strict mode currently ...
+    t.ok(CloudEvent.isValidEvent(ceFullDataString))
+    t.ok(CloudEvent.isValidEvent(ceFullDataString, { strict: false })) // good the same
+    t.ok(!CloudEvent.isValidEvent(ceFullDataString, { strict: true })) // bad here (right)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataString), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: false }).length, 0) // good the same
+    t.strictSame(CloudEvent.validateEvent(ceFullDataString, { strict: true }).length, 1) // bad here (right)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataString.isValid())
+    t.ok(ceFullDataString.isValid({ strict: false }))
+    t.ok(!ceFullDataString.isValid({ strict: true }))
+    t.strictSame(ceFullDataString.validate(), [])
+    t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
+    t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
+    // the same with with strict mode enabled ...
+    const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      'data as a string, bad here', // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullDataStringStrict !== null)
+    t.ok(ceFullDataStringStrict)
+    // data type errors handled only in strict mode currently ...
+    // note that in the following lines even if I force 'strict: false' he won't be used because already set in the object instance ...
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict))
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: true }))
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStringStrict, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict, { strict: true }).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStringStrict, { strict: false }).length, 1)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(!ceFullDataStringStrict.isValid())
+    t.ok(!ceFullDataStringStrict.isValid({ strict: true }))
+    t.ok(!ceFullDataStringStrict.isValid({ strict: false }))
+    t.strictSame(ceFullDataStringStrict.validate().length, 1)
+    t.strictSame(ceFullDataStringStrict.validate({ strict: true }).length, 1)
+    t.strictSame(ceFullDataStringStrict.validate({ strict: false }).length, 1)
+  }
 
-  // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
-  // note that null values are not handled by default values, only undefined values ...
-  const ceFullDataMap = new CloudEvent('1/full/map-data/no-strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceMapData, // data
-    ceCommonOptions
-  )
-  assert(ceFullDataMap !== null)
-  t.ok(ceFullDataMap)
-  t.ok(CloudEvent.isValidEvent(ceFullDataMap))
-  t.ok(CloudEvent.isValidEvent(ceFullDataMap, { strict: false }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataMap), []) // data type errors handled only in strict mode currently ...
-  t.strictSame(CloudEvent.validateEvent(ceFullDataMap, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataMap.isValid())
-  t.ok(ceFullDataMap.isValid({ strict: false }))
-  t.strictSame(ceFullDataMap.validate(), []) // data type errors handled only in strict mode currently ...
-  t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
-  // the same with with strict mode enabled ...
-  const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
-    'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-    '/test',
-    ceMapData, // data
-    ceCommonOptionsStrict
-  )
-  assert(ceFullDataMapStrict !== null)
-  t.ok(ceFullDataMapStrict)
-  t.ok(CloudEvent.isValidEvent(ceFullDataMapStrict))
-  t.ok(CloudEvent.isValidEvent(ceFullDataMapStrict, { strict: true }))
-  t.strictSame(CloudEvent.validateEvent(ceFullDataMapStrict).length, 0) // data type errors handled only in strict mode currently ...
-  t.strictSame(CloudEvent.validateEvent(ceFullDataMapStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
-  // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFullDataMapStrict.isValid())
-  t.ok(ceFullDataMapStrict.isValid({ strict: true }))
-  t.strictSame(ceFullDataMapStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
-  t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+  {
+    // create an instance with a sample Map data attribute, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ceFullDataMap = new CloudEvent('1/full/map-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceMapData, // data
+      ceCommonOptions
+    )
+    assert(ceFullDataMap !== null)
+    t.ok(ceFullDataMap)
+    t.ok(CloudEvent.isValidEvent(ceFullDataMap))
+    t.ok(CloudEvent.isValidEvent(ceFullDataMap, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataMap), []) // data type errors handled only in strict mode currently ...
+    t.strictSame(CloudEvent.validateEvent(ceFullDataMap, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataMap.isValid())
+    t.ok(ceFullDataMap.isValid({ strict: false }))
+    t.strictSame(ceFullDataMap.validate(), []) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    // the same with with strict mode enabled ...
+    const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceMapData, // data
+      ceCommonOptionsStrict
+    )
+    assert(ceFullDataMapStrict !== null)
+    t.ok(ceFullDataMapStrict)
+    t.ok(CloudEvent.isValidEvent(ceFullDataMapStrict))
+    t.ok(CloudEvent.isValidEvent(ceFullDataMapStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataMapStrict).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(CloudEvent.validateEvent(ceFullDataMapStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataMapStrict.isValid())
+    t.ok(ceFullDataMapStrict.isValid({ strict: true }))
+    t.strictSame(ceFullDataMapStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+  }
 })

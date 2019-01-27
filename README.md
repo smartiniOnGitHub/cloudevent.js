@@ -1,4 +1,4 @@
-# cloudevent.js
+# cloudevent / cloudevent.js
 
   [![NPM Version](https://img.shields.io/npm/v/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
   [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
@@ -9,15 +9,17 @@
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
-The purpose of this library is to create instances of CloudEvents in a simple way (with some useful defaults), 
-or in a full way (all attributes).
+The purpose of this library is to create instances of CloudEvents in a simple way 
+(with some useful defaults), or in a full way (all attributes).
 Optional, it's possible to validate created instances to be sure they are compliant with the standard.
 
 Then, created instances can be serialized, for example to be sent (or saved/stored) somewhere.
 
-Note that many features are exposed directly from the CloudEvent class with standard class instance methods, and even as class static methods (that operates on a given CloudEvent).
-
-More features will follow.
+Note that many features are exposed directly by the CloudEvent class with standard class instance 
+methods, and even as class static methods (that operates on a given CloudEvent).
+Anyway, to be more future-proof the library now exports a main object, with all features inside 
+(the class for CloudEvent, its Validator class as CloudEventValidator, etc); 
+using destructuring assignment (as seen in code samples) usage will be easier.
 
 
 ## Usage
@@ -27,7 +29,13 @@ Get a reference to the library:
 ```js
 // Node.js example
 
-const CloudEvent = require('cloudevent')
+// reference the library, not needed if using destructuring assignment, see below
+const CloudEventExports = require('cloudevent')
+
+// minimal, most common usage
+const { CloudEvent } = require('cloudevent')
+// other, get more objects exposed by the library
+// const { CloudEvent, CloudEventValidator: V } = require('cloudevent')
 ```
 
 create some sample CloudEvent instances:
@@ -88,7 +96,8 @@ assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 ```
 
 optional, do some validations/checks on created instances.
-As sample, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
+As sample, use class static methods like 'isValidEvent' and 'ValidateEvent', 
+or instance methods like 'isValid', 'validate', etc ...
 
 ```js
 assert(!ceEmpty.isValid())
@@ -146,7 +155,8 @@ console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` 
 
 ```
 
-Look into the [example](./example/) folder for more sample scripts that uses the library (inline but it's the same using it from npm registry).
+Look into the [example](./example/) folder for more sample scripts that uses the library 
+(inline but it's the same using it from npm registry).
 
 
 ## Requirements
@@ -156,14 +166,17 @@ Node.js 8.15.x or later.
 
 ## Note
 
-Note that in this implementation there is even the ability to validate CloudEvent instances in a stricter way, by setting to true the attribute 'strict' in options in constructor options; or specify it during validation.
+Note that in this implementation there is even the ability to validate CloudEvent instances 
+in a stricter way, by setting to true the attribute 'strict' in options in constructor options; 
+or specify it during validation.
 That attribute when set will be put in the 'extensions' standard attribute of a CloudEvent.
 
 You can find Code Documentation for the API of the library [here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
-In the past the name for this package was 'cloudevent.js', but it has deprecated and changed to the simpler 'cloudevent' (published the same as '0.2.0' release), so it will be easier to get it at npm.
+In the past the name for this package was 'cloudevent.js', but it has been deprecated now 
+and changed to the simpler 'cloudevent', so it will be easier to get it at npm.
 
 
 ## Contributing

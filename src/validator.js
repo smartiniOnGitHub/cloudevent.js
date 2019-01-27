@@ -31,6 +31,9 @@ const url = require('url')
 class Validator {
   /**
    * Create a new instance of a Validator object.
+   *
+   * Note that instancing is not allowed for this class because all its methods are static.
+   *
    * @throws {Error} because instancing not allowed for this class
    */
   constructor () {
