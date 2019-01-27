@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (unreleased)
+Summary Changelog:
+- Updated dependencies for the development environment
+- Breaking change: to be more future proof, the main object exported by the library now
+  is only a container for library classes/objects/functions; 
+  using destructuring assignment, using the library will be simple the same;
+  see samples and documentation for more info
+
 ## [0.2.2](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.2) (2019-01-20)
 Summary Changelog:
 - Updated dependencies for the development environment
