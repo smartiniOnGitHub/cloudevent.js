@@ -23,10 +23,16 @@ const assert = require('assert')
 
 console.log(`Sample script: start execution ...\n`)
 
-// get a reference only to cloudevent class definition
+// reference the library, not needed if using destructuring assignment, see below
+const CloudEventExports = require('../src/') // from local path
+assert(CloudEventExports !== null)
+
+// get a reference only to cloudevent class definition/s
 // const { CloudEvent } = require('cloudevent') // from published module
-const { CloudEvent } = require('../src/') // from local path
+// const { CloudEvent } = require('../src/') // from local path
+const { CloudEvent, CloudEventValidator: V } = require('../src/') // from local path
 assert(CloudEvent !== null)
+assert(V !== null)
 
 // create some sample instances but without mandatory fields (for validation) ...
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)

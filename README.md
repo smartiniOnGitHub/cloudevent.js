@@ -27,7 +27,13 @@ Get a reference to the library:
 ```js
 // Node.js example
 
+// reference the library, not needed if using destructuring assignment, see below
+const CloudEventExports = require('cloudevent')
+
+// minimal, most common usage
 const { CloudEvent } = require('cloudevent')
+// other, get more objects exposed by the library
+// const { CloudEvent, CloudEventValidator: V } = require('cloudevent')
 ```
 
 create some sample CloudEvent instances:
