@@ -27,7 +27,7 @@ Get a reference to the library:
 ```js
 // Node.js example
 
-const CloudEvent = require('cloudevent')
+const { CloudEvent } = require('cloudevent')
 ```
 
 create some sample CloudEvent instances:

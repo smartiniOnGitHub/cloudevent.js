@@ -23,9 +23,9 @@ const assert = require('assert')
 
 console.log(`Sample script: start execution ...\n`)
 
-// get a reference to cloudevent class definition
-// const CloudEvent = require('cloudevent') // from published module
-const CloudEvent = require('../src/') // from local path
+// get a reference only to cloudevent class definition
+// const { CloudEvent } = require('cloudevent') // from published module
+const { CloudEvent } = require('../src/') // from local path
 assert(CloudEvent !== null)
 
 // create some sample instances but without mandatory fields (for validation) ...
