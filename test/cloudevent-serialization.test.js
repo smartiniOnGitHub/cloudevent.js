@@ -20,37 +20,46 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(14)
+  t.plan(15)
 
-  const CloudEventExports = require('../src/') // reference the library
-  assert(CloudEventExports !== null)
-  assert.strictEqual(typeof CloudEventExports, 'object')
-  t.ok(CloudEventExports)
-  t.strictEqual(typeof CloudEventExports, 'object')
-  const CloudEventClass = CloudEventExports.CloudEventDefinition // reference the implementation class
-  t.ok(CloudEventClass)
-  const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
-  t.ok(CloudEventValidator)
-  const { CloudEventDefinition: CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
-  t.strictEqual(typeof CloudEvent.isClass, 'function')
-  t.strictEqual(typeof V.isClass, 'function')
-  t.ok(V.isFunction(CloudEvent.isClass))
-  t.ok(V.isFunction(V.isClass))
-  // optional, using some standard Node.js assert statements, as a sample
-  assert(CloudEvent !== null)
-  assert.strictEqual(typeof CloudEvent, 'function')
-  assert(new CloudEvent() instanceof CloudEvent)
-  assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-  t.ok(CloudEvent)
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-  t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+  {
+    const CloudEventExports = require('../src/') // reference the library
+    assert(CloudEventExports !== null)
+    assert.strictEqual(typeof CloudEventExports, 'object')
+    t.ok(CloudEventExports)
+    t.strictEqual(typeof CloudEventExports, 'object')
+    const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
+    t.ok(CloudEventClass)
+    const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
+    t.ok(CloudEventValidator)
+  }
 
-  const ceSerialize = CloudEvent.serializeEvent
-  assert(ceSerialize !== null)
-  assert(typeof ceSerialize === 'function')
-  t.ok(ceSerialize)
-  t.strictEqual(typeof ceSerialize, 'function')
+  {
+    const { CloudEvent: CEClass, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    // const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    t.strictEqual(typeof CEClass, 'function')
+    t.strictEqual(typeof V.isClass, 'function')
+    t.ok(V.isFunction(CEClass))
+    t.ok(V.isFunction(V.isClass))
+
+    const { CloudEvent } = require('../src/') // get references via destructuring
+    t.ok(CloudEvent)
+    // optional, using some standard Node.js assert statements, as a sample
+    assert(CloudEvent !== null)
+    assert.strictEqual(typeof CloudEvent, 'function')
+    assert(new CloudEvent() instanceof CloudEvent)
+    assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.ok(CloudEvent)
+    t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
+    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+
+    const ceSerialize = CloudEvent.serializeEvent
+    assert(ceSerialize !== null)
+    assert(typeof ceSerialize === 'function')
+    t.ok(ceSerialize)
+    t.strictEqual(typeof ceSerialize, 'function')
+  }
 })
 
 /** create some common options, for better reuse in tests */
@@ -81,7 +90,7 @@ ceMapData.set('key-2', 'value 2')
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
   t.plan(36)
 
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   // t.ok(CloudEvent)
 
   {
@@ -170,7 +179,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 test('serialize a CloudEvent instance with a non default contentType and empty serialization options, expect error', (t) => {
   t.plan(8)
 
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   {
@@ -232,7 +241,7 @@ function encoderSample () {
 test('serialize a CloudEvent instance with a non default contentType and right serialization options, expect success', (t) => {
   t.plan(11)
 
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   {
@@ -311,7 +320,7 @@ test('serialize a CloudEvent instance with a non default contentType and right s
 test('ensure the JSON Schema for a CloudEvent (static and for a normal instance) is available', (t) => {
   t.plan(6)
 
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   // get JSON Schema from a static method
@@ -353,7 +362,7 @@ const ceCommonNestedData = { ...ceCommonData,
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
   t.plan(48)
 
-  const CloudEvent = require('../src/') // reference the library
+  const { CloudEvent } = require('../src/')
   // t.ok(CloudEvent)
 
   {
