@@ -22,7 +22,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure the Validator class (direct reference to it) works good', (t) => {
-  t.plan(4)
+  t.plan(5)
   const V = require('../src/validator') // direct reference to the library
   t.ok(V)
   t.strictEqual(typeof V, 'function')
@@ -32,6 +32,7 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
   assert.strictEqual(typeof V, 'function')
   // assert(new V() instanceof V) // no more allowed
 
+  t.ok(V.isFunction(V))
   t.ok(V.isFunction(V.isClass))
   t.throws(function () {
     const v = new V()
@@ -39,16 +40,9 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
   }, Error, 'Expected exception when creating a Validator instance')
 })
 
-/** create some classes, for better reuse in following tests */
-const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
-class NotCESubclass {
-}
-class CESubclass extends CEClass {
-}
-
 /** @test {CloudEvent} */
-test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
-  t.plan(28)
+test('ensure CloudEvent exported class and Validator class (exported as CloudEventValidator) are exported by the library', (t) => {
+  t.plan(15)
 
   {
     const CloudEventExports = require('../src/') // reference the library
@@ -58,8 +52,10 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.strictEqual(typeof CloudEventExports, 'object')
     const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
     t.ok(CloudEventClass)
+    t.strictEqual(typeof CloudEventClass, 'function')
     const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
     t.ok(CloudEventValidator)
+    t.strictEqual(typeof CloudEventValidator, 'function')
   }
 
   {
@@ -73,6 +69,40 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     const { CloudEvent } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
+
+    // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
+    const ceMinimal = new CEClass('1', // eventID
+      'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+      '/', // source
+      {} // data (empty) // optional, but useful the same in this sample usage
+    )
+    t.ok(ceMinimal)
+    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+
+    // check that created instances belongs to the right base class
+    t.ok(V.isClass(ceMinimal, CloudEvent))
+    t.ok(V.isClass(ceMinimal, CEClass))
+  }
+})
+
+/** @test {CloudEvent} */
+test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
+  t.plan(22)
+
+  /** create some classes, for better reuse in following tests */
+  const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
+  class NotCESubclass {
+  }
+  class CESubclass extends CEClass {
+  }
+
+  {
+    const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(typeof V.isClass, 'function')
+    t.ok(V.isFunction(CloudEvent))
+    t.ok(V.isFunction(V.isClass))
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimal = new CEClass('1', // eventID
