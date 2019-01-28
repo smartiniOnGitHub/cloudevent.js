@@ -339,6 +339,9 @@ const ceCommonNestedData = { ...ceCommonData,
   }
 }
 
+const ceNestedFullSerializedJson = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+const ceNestedFullStrictSerializedJson = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
   t.plan(48)
@@ -378,7 +381,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
     t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-    const ceFullSerializedComparison = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    const ceFullSerializedComparison = ceNestedFullSerializedJson
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -432,7 +435,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-    const ceFullStrictSerializedComparison = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${commonEventTime.toISOString()}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+    const ceFullStrictSerializedComparison = ceNestedFullStrictSerializedJson
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.eventTime = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
@@ -453,3 +456,80 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
   }
 })
+
+/** @test {CloudEvent} */
+test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
+  t.plan(24)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+
+  {
+    const serialized = ceNestedFullSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    const ceDeserialized = CloudEvent.deserializeEvent(serialized)
+    assert(ceDeserialized !== null)
+    // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
+    // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
+    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
+    t.ok(ceDeserialized)
+    t.ok(V.isClass(ceDeserialized, CloudEvent))
+    t.ok(ceDeserialized.isValid())
+    t.ok(ceDeserialized.validate().length === 0)
+    t.ok(ceDeserialized.validate({ strict: false }).length === 0)
+    t.ok(ceDeserialized.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceDeserialized))
+    t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: true }).length === 0)
+    // TODO: check that ceDeserialized is a CloudEvent instance, using the new static method CloudEvent.isCloudEvent() ... wip
+
+    // inspect content of deserialized CloudEvent
+    // TODO: at least on data (the payload) and eventTime ... wip
+  }
+
+  {
+    // the same with with strict mode enabled ...
+    const serialized = ceNestedFullStrictSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    const ceDeserialized = CloudEvent.deserializeEvent(serialized)
+    assert(ceDeserialized !== null)
+    // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
+    // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
+    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
+    t.ok(ceDeserialized)
+    t.ok(V.isClass(ceDeserialized, CloudEvent))
+    t.ok(ceDeserialized.isValid())
+    t.ok(ceDeserialized.validate().length === 0)
+    t.ok(ceDeserialized.validate({ strict: false }).length === 0)
+    t.ok(ceDeserialized.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceDeserialized))
+    t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: true }).length === 0)
+    // TODO: check that ceDeserialized is a CloudEvent instance, using the new static method CloudEvent.isCloudEvent() ... wip
+
+    // inspect content of deserialized CloudEvent
+    // TODO: at least on data (the payload) and eventTime ... wip
+  }
+})
+
+// TODO: ensure non valid serialized strings throw Error when deserializing ... wip
+
+/*
+// TODO: enable and use in deserialization tests ... wip
+// sample decoding function, to use in tests here
+function decoderSample () {
+  // return { hello: 'world', year: 2018 }
+  return { decoded: 'Sample' }
+}
+ */

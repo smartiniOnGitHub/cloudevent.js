@@ -50,7 +50,7 @@ class CloudEvent {
     eventTypeVersion,
     eventTime = new Date(),
     extensions,
-    contentType = 'application/json',
+    contentType = CloudEvent.contentTypeDefault(),
     schemaURL,
     strict = false } = {}
   ) {
@@ -169,6 +169,16 @@ class CloudEvent {
   }
 
   /**
+   * Return the default content Type for a CloudEvent
+   *
+   * @static
+   * @return {string} the value
+   */
+  static contentTypeDefault () {
+    return 'application/json'
+  }
+
+  /**
    * Return the MIME Type for a CloudEvent
    *
    * @static
@@ -184,7 +194,7 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @return {boolean} true if strict, otherwise false
-   * @throws {Error} if event if undefined or null
+   * @throws {Error} if event is undefined or null
    */
   static isStrictEvent (event) {
     if (V.isUndefinedOrNull(event)) {
@@ -277,12 +287,13 @@ class CloudEvent {
    *        encoder (function, no default) a function that takes data and returns encoded data,
    *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
    * @return {string} the serialized event, as a string
+   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
   static serializeEvent (event, { encoder, encodedData } = {}) {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
-    if (event.contentType === 'application/json') {
+    if (event.contentType === CloudEvent.contentTypeDefault()) {
       return JSON.stringify(event)
     }
     // else
@@ -301,6 +312,67 @@ class CloudEvent {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
     return JSON.stringify({ ...event, data: encodedData })
+  }
+
+  /**
+   * Serialize the given CloudEvent in JSON format.
+   * Note that here standard serialization to JSON is used (no additional libraries).
+   * Note that the result of encoder function is assigned to encoded data.
+   *
+   * @param {!string} ser the serialized CloudEvent to parse/deserialize
+   * @param {object} options optional deserialization attributes:
+   *        decoder (function, no default) a function that takes data and returns decoder data,
+   *        decodedData (object, no default) already decoded data (but consistency with the contentType is not checked),
+   * @return {object} the deserialized event as a CloudEvent instance
+   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
+   * @throws {Error} in case of JSON parsing error
+   */
+  static deserializeEvent (ser, { decoder, decodedData } = {}) {
+    if (V.isUndefinedOrNull(ser)) {
+      throw new Error('Serialized CloudEvent undefined or null')
+    }
+    if (!V.isStringNotEmpty(ser)) {
+      throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
+    }
+    // deserialize standard attributes, always in JSON format
+    const parsed = JSON.parse(ser)
+    // fill a new CludEvent instance with parsed data
+    const ce = new CloudEvent(parsed.eventID,
+      parsed.eventType,
+      parsed.source,
+      parsed.data,
+      { // options
+        eventTypeVersion: parsed.eventTypeVersion,
+        // TODO: handle the transformation back from string to Date/timestamp for eventTime ... wip
+        eventTime: parsed.eventTime,
+        extensions: parsed.extensions,
+        contentType: parsed.contentType,
+        schemaURL: parsed.schemaURL,
+        strict: parsed.strict
+      }
+    )
+    // depending on the contentType, decode the data attribute (the payload)
+    if (parsed.contentType === CloudEvent.contentTypeDefault()) {
+      return ce
+    }
+    // else
+    if (V.isDefinedAndNotNull(decoder)) {
+      if (!V.isFunction(decoder)) {
+        throw new Error(`Missing or wrong decoder function: '${decoder}' for the given content type: '${parsed.contentType}'.`)
+      }
+      // TODO: get payload from json parse of main object ...
+      decodedData = decoder(parsed.payload)
+    } else {
+      // decoder not defined, check decodedData
+      if (!V.isDefinedAndNotNull(decodedData)) {
+        throw new Error(`Missing decoder function: use decoder function or already decoded data with the given content type: '${parsed.contentType}'.`)
+      }
+    }
+    if (!V.isObject(decodedData)) {
+      throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given content type: '${parsed.contentType}'.`)
+    }
+    // TODO: in ce, overwrite data with decodedData before returning it ... wip
+    return ce
   }
 
   /**
