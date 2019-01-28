@@ -19,29 +19,10 @@ const assert = require('assert')
 const test = require('tap').test
 
 /** @test {CloudEvent} */
-test('ensure decorator functions (exposed by the plugin) exists', (t) => {
-  t.plan(15)
+test('ensure serialization functions exists (heck only the static method here)', (t) => {
+  t.plan(7)
 
   {
-    const CloudEventExports = require('../src/') // reference the library
-    assert(CloudEventExports !== null)
-    assert.strictEqual(typeof CloudEventExports, 'object')
-    t.ok(CloudEventExports)
-    t.strictEqual(typeof CloudEventExports, 'object')
-    const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
-    t.ok(CloudEventClass)
-    const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
-    t.ok(CloudEventValidator)
-  }
-
-  {
-    const { CloudEvent: CEClass, CloudEventValidator: V } = require('../src/') // get references via destructuring
-    // const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof CEClass, 'function')
-    t.strictEqual(typeof V.isClass, 'function')
-    t.ok(V.isFunction(CEClass))
-    t.ok(V.isFunction(V.isClass))
-
     const { CloudEvent } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
     // optional, using some standard Node.js assert statements, as a sample

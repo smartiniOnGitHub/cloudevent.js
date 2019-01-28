@@ -19,54 +19,39 @@ const assert = require('assert')
 const test = require('tap').test
 
 /** @test {CloudEvent} */
-test('ensure the CloudEvent class is exported by the library', (t) => {
-  t.plan(16)
+test('ensure CloudEvent class (and related Validator class) are exported by the library', (t) => {
+  t.plan(12)
 
   {
-    const CloudEventExports = require('../src/') // reference the library
-    assert(CloudEventExports !== null)
-    assert.strictEqual(typeof CloudEventExports, 'object')
-    t.ok(CloudEventExports)
-    t.strictEqual(typeof CloudEventExports, 'object')
-    const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
-    t.ok(CloudEventClass)
-    const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
-    t.ok(CloudEventValidator)
-  }
-
-  {
-    const { CloudEvent: CEClass, CloudEventValidator: V } = require('../src/') // get references via destructuring
-    // const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof CEClass, 'function')
-    t.strictEqual(typeof V.isClass, 'function')
-    t.ok(V.isFunction(CEClass))
-    t.ok(V.isFunction(V.isClass))
-
-    const { CloudEvent } = require('../src/') // get references via destructuring
+    const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
     // optional, using some standard Node.js assert statements, as a sample
     assert(CloudEvent !== null)
     assert.strictEqual(typeof CloudEvent, 'function')
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-    t.ok(CloudEvent)
+    t.ok(V)
+    t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(typeof V, 'function')
+    t.ok(V.isFunction(CloudEvent))
+    t.ok(V.isFunction(V))
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CEClass('1', // eventID
+    const ceMinimal = new CloudEvent('1', // eventID
       'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
       '/', // source
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
+    t.strictEqual(typeof ceMinimal, 'object')
     t.ok(V.isClass(ceMinimal, CloudEvent))
-    t.ok(V.isClass(ceMinimal, CEClass))
   }
 })
 
