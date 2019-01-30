@@ -76,6 +76,33 @@ class Transformer {
       return `${n}: ${JSON.stringify(obj)}`
     }
   }
+
+  /**
+   * Utility function that parse a string representation
+   * (compatible with the CloudEvent standard) of the given timestamp (Date)
+   * and returns it (if possible).
+   *
+   * @static
+   * @param {string} obj the timestamp/date to parse (as a string)
+   * @return {object} the parsed version, as a timestamp (Date) object, if possible
+   */
+  static timestampFromString (obj) {
+    // TODO: check argument (and add the throws docs clause), then implement ... wip
+    return new Date()
+  }
+
+  /**
+   * Utility function that return a string representation
+   * (compatible with the CloudEvent standard) of the given timestamp (Date).
+   *
+   * @static
+   * @param {object} obj the timestamp/date to convert
+   * @return {string} the string representation of the object
+   */
+  static timestampToString (obj) {
+    // TODO: check argument (and add the throws docs clause) ... wip
+    return obj.toISOString()
+  }
 }
 
 module.exports = Transformer

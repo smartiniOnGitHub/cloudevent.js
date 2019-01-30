@@ -345,8 +345,7 @@ class CloudEvent {
       parsed.data,
       { // options
         eventTypeVersion: parsed.eventTypeVersion,
-        // TODO: handle the transformation back from string to Date/timestamp for eventTime ... wip
-        eventTime: parsed.eventTime,
+        eventTime: T.timestampFromString(parsed.eventTime),
         extensions: parsed.extensions,
         contentType: parsed.contentType,
         schemaURL: parsed.schemaURL,
