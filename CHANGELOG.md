@@ -3,12 +3,16 @@
 ## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (unreleased)
 Summary Changelog:
 - Updated dependencies for the development environment
+- Add a static method 'isCloudEvent' to tell the given object, if it's 
+  a class/subclass instance of CloudEvent
+- Add an utility class 'Transformer' with useful static methods 
+  to transform CloudEvent related data, in a general way
 - Breaking change: to be more future proof, the main object exported by the library now
   is only a container for library classes/objects/functions; 
   using destructuring assignment, using the library will be simple the same;
   see samples and documentation for more info
-- Add a static method 'isCloudEvent' to tell the given object, if it's 
-  a class/subclass instance of CloudEvent
+- Breaking change: move the utility static method 'dumpObject' from the CloudEvent class 
+  to the new Transformer class
 
 ## [0.2.2](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.2) (2019-01-20)
 Summary Changelog:

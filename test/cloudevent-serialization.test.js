@@ -461,6 +461,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
   t.plan(24)
 
+  // const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
   {
@@ -473,7 +474,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     assert(ceDeserialized !== null)
     // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
     // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
     // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
     // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
     t.ok(ceDeserialized)
@@ -503,7 +504,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     assert(ceDeserialized !== null)
     // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
     // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
     // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
     // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
     t.ok(ceDeserialized)

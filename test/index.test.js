@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure objects exported by index script, exists and are of the right type', (t) => {
-  t.plan(15)
+  t.plan(19)
 
   {
     const CloudEventExports = require('../src/') // reference the library
@@ -34,15 +34,20 @@ test('ensure objects exported by index script, exists and are of the right type'
     const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
     t.ok(CloudEventValidator)
     t.strictEqual(typeof CloudEventValidator, 'function')
+    const CloudEventTransformer = CloudEventExports.CloudEventTransformer // reference the transformer class
+    t.ok(CloudEventTransformer)
+    t.strictEqual(typeof CloudEventTransformer, 'function')
   }
 
   {
-    const { CloudEvent: CEClass, CloudEventValidator: V } = require('../src/') // get references via destructuring
-    // const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    const { CloudEvent: CEClass, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+    // const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
     t.strictEqual(typeof CEClass, 'function')
     t.strictEqual(typeof V.isClass, 'function')
+    t.strictEqual(typeof T.dumpObject, 'function')
     t.ok(V.isFunction(CEClass))
     t.ok(V.isFunction(V.isClass))
+    t.ok(V.isFunction(T.dumpObject))
 
     const { CloudEvent } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
@@ -56,7 +61,7 @@ test('ensure objects exported by index script, exists and are of the right type'
     )
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimal, CloudEvent))

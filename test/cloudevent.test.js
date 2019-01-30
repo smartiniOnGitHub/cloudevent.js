@@ -19,11 +19,11 @@ const assert = require('assert')
 const test = require('tap').test
 
 /** @test {CloudEvent} */
-test('ensure CloudEvent class (and related Validator class) are exported by the library', (t) => {
-  t.plan(12)
+test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
+  t.plan(13)
 
   {
-    const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
     // optional, using some standard Node.js assert statements, as a sample
     assert(CloudEvent !== null)
@@ -33,6 +33,7 @@ test('ensure CloudEvent class (and related Validator class) are exported by the 
     t.ok(V)
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(typeof V, 'function')
+    t.strictEqual(typeof T, 'function')
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(V))
     t.strictEqual(typeof CloudEvent, 'function')
@@ -47,7 +48,7 @@ test('ensure CloudEvent class (and related Validator class) are exported by the 
     )
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.strictEqual(typeof ceMinimal, 'object')
@@ -129,7 +130,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     )
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CloudEvent.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
     // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
     t.ok(CloudEvent.isValidEvent(ceMinimal))
     t.strictSame(CloudEvent.validateEvent(ceMinimal), [])

@@ -40,7 +40,7 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
-  t.plan(22)
+  t.plan(25)
 
   /** create some classes, for better reuse in following tests */
   const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
@@ -50,11 +50,14 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
   }
 
   {
-    const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+    const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
     t.strictEqual(typeof CloudEvent, 'function')
+    t.strictEqual(typeof CloudEvent.version, 'function')
     t.strictEqual(typeof V.isClass, 'function')
+    t.strictEqual(typeof T.dumpObject, 'function')
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(V.isClass))
+    t.ok(V.isFunction(T.dumpObject))
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimal = new CEClass('1', // eventID
@@ -64,7 +67,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     )
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimal, CloudEvent))
@@ -80,7 +83,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     )
     t.ok(ceMinimalSubclass)
     // console.log(`DEBUG - cloudEvent details: ceMinimalSubclass = ${JSON.stringify(ceMinimalSubclass)}`)
-    // console.log(`DEBUG - cloudEvent details: ${CEClass.dumpObject(ceMinimalSubclass, 'ceMinimalSubclass')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimalSubclass, 'ceMinimalSubclass')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimalSubclass, CloudEvent))

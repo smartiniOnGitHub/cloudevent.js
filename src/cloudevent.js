@@ -21,9 +21,18 @@
  */
 
 /**
- * Get a reference to cloudevent validator class.
+ * Get a reference to cloudevent Validator class.
+ *
+ * @see Validator
  */
 const V = require('./validator') // get validator from here
+
+/**
+ * Get a reference to cloudevent Transformer class.
+ *
+ * @see Transformer
+ */
+const T = require('./transformer') // get transformer from here
 
 /**
  * CloudEvent implementation.
@@ -134,27 +143,6 @@ class CloudEvent {
     if (strict === true) {
       this.extensions = this.extensions || {}
       this.extensions.strict = strict
-    }
-  }
-
-  /**
-   * Utility function that return a dump of the given object.
-   *
-   * @static
-   * @param {(object|Map|Set)} obj the object to dump
-   * @param {string} name the name to assign in the returned string
-   * @return {string} the dump of the object or a message when obj is undefined/null/not an object
-   */
-  static dumpObject (obj, name) {
-    const n = name || 'noname'
-    if (V.isUndefined(obj)) {
-      return `${n}: undefined`
-    } else if (V.isNull(obj)) {
-      return `${n}: null`
-    } else if (!V.isObjectOrCollection(obj)) {
-      return `${n}: '${obj.toString()}'`
-    } else {
-      return `${n}: ${JSON.stringify(obj)}`
     }
   }
 
@@ -504,7 +492,7 @@ class CloudEvent {
    * @return {string} a string representation for object instance
    */
   toString () {
-    return `CloudEvent[cloudEventsVersion: ${this.cloudEventsVersion}, ${this.constructor.dumpObject(this.eventID, 'eventID')}, ${this.constructor.dumpObject(this.eventType, 'eventType')}, ${this.constructor.dumpObject(this.data, 'data')}, ...]`
+    return `CloudEvent[cloudEventsVersion: ${this.cloudEventsVersion}, ${T.dumpObject(this.eventID, 'eventID')}, ${T.dumpObject(this.eventType, 'eventType')}, ${T.dumpObject(this.data, 'data')}, ...]`
   }
 
   /**

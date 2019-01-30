@@ -35,7 +35,7 @@ const CloudEventExports = require('cloudevent')
 // minimal, most common usage
 const { CloudEvent } = require('cloudevent')
 // other, get more objects exposed by the library
-// const { CloudEvent, CloudEventValidator: V } = require('cloudevent')
+// const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('cloudevent')
 ```
 
 create some sample CloudEvent instances:
@@ -113,8 +113,8 @@ assert(CloudEvent.isValidEvent(ceMinimal))
 assert(CloudEvent.isValidEvent(ceFull))
 assert(CloudEvent.isValidEvent(ceFullStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
-assert(CloudEvent.validateEvent(ceEmpty).length > 0)
-assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length > 0)
+assert(CloudEvent.validateEvent(ceEmpty).length === 3)
+assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 6)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
 assert(CloudEvent.validateEvent(ceMinimal).length === 0)
 assert(CloudEvent.validateEvent(ceFull).length === 0)

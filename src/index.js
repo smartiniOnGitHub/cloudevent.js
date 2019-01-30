@@ -16,20 +16,28 @@
 'use strict'
 
 /**
- * Get a reference to cloudevent class definition.
+ * Get a reference to CloudEvent class definition.
  *
  * See {@link CloudEvent}.
  */
-const cloudEventDefinition = require('./cloudevent') // get CloudEvent definition and related utilities
+const cloudEventDefinition = require('./cloudevent')
 
 /**
- * Get a reference to cloudevent class validator.
+ * Get a reference to cloudevent class Validator.
  *
  * See {@link Validator}.
  */
-const cloudEventValidator = require('./validator') // get CloudEvent definition and related utilities
+const cloudEventValidator = require('./validator')
+
+/**
+ * Get a reference to cloudevent class Transformer.
+ *
+ * See {@link Transformer}.
+ */
+const cloudEventTransformer = require('./transformer')
 
 module.exports = {
   CloudEvent: cloudEventDefinition,
-  CloudEventValidator: cloudEventValidator
+  CloudEventValidator: cloudEventValidator,
+  CloudEventTransformer: cloudEventTransformer
 }

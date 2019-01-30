@@ -30,15 +30,17 @@ assert(CloudEventExports !== null)
 // get a reference only to cloudevent class definition/s
 // const { CloudEvent } = require('cloudevent') // from published module
 // const { CloudEvent } = require('../src/') // from local path
-const { CloudEvent, CloudEventValidator: V } = require('../src/') // from local path
-assert(CloudEvent !== null)
-assert(V !== null)
+const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // from local path
+assert(CloudEvent !== null && V !== null && T !== null)
 
 // create some sample instances but without mandatory fields (for validation) ...
+console.log(`\nCreation of some CloudEvent instances, and related diagnostics:`)
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
 assert(ceEmpty !== null)
+console.log(`cloudEvent dump: ${T.dumpObject(ceEmpty, 'ceEmpty')}`)
 const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false }) // expected success
 assert(ceMinimalMandatoryUndefinedNoStrict !== null)
+console.log(`cloudEvent dump: ${T.dumpObject(ceMinimalMandatoryUndefinedNoStrict, 'ceMinimalMandatoryUndefinedNoStrict')}`)
 // const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true }) // expected failure
 // assert(ceMinimalMandatoryUndefinedStrict == null) // no, ReferenceError: ceMinimalMandatoryUndefinedStrict is not defined
 
@@ -49,6 +51,7 @@ const ceMinimal = new CloudEvent('1', // eventID
   {} // data (empty) // optional, but useful the same in this sample usage
 )
 assert(ceMinimal !== null)
+console.log(`cloudEvent dump: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
 // create some instance with all attributes ...
 // define some common attributes
@@ -71,6 +74,7 @@ const ceFull = new CloudEvent('1/full',
 )
 assert(ceFull !== null)
 assert(!ceFull.isStrict)
+console.log(`cloudEvent dump: ${T.dumpObject(ceFull, 'ceFull')}`)
 const ceFullStrict = new CloudEvent('2/full-strict',
   'com.github.smartiniOnGitHub.cloudeventjs.testevent',
   '/test',
@@ -81,6 +85,7 @@ assert(ceFullStrict !== null)
 assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)
 
 const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
   'com.github.smartiniOnGitHub.cloudeventjs.testevent',
@@ -92,6 +97,7 @@ assert(ceFullStrictOtherContentType !== null)
 assert(ceFullStrictOtherContentType.isStrict)
 assert(!ceFull.ceFullStrictOtherContentType) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentType, 'ceFullStrictOtherContentType')}`)
 
 // validate/check if valid instances (optional)
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
@@ -108,8 +114,8 @@ assert(CloudEvent.isValidEvent(ceMinimal))
 assert(CloudEvent.isValidEvent(ceFull))
 assert(CloudEvent.isValidEvent(ceFullStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
-assert(CloudEvent.validateEvent(ceEmpty).length > 0)
-assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length > 0)
+assert(CloudEvent.validateEvent(ceEmpty).length === 3)
+assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 6)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
 assert(CloudEvent.validateEvent(ceMinimal).length === 0)
 assert(CloudEvent.validateEvent(ceFull).length === 0)
@@ -122,13 +128,13 @@ assert(CloudEvent.validateEvent(ceFullStrictOtherContentType).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: false }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: true }).length === 0)
 // some diagnostic info
-console.log(`Some expected validation errors:`)
+console.log(`\nSome expected validation errors:`)
 console.log(`Validation output for ceEmpty (default strict mode) is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty (force strict mode to true) is: size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
 // default contentType
-console.log(`Some serialization examples:`)
+console.log(`\nSome serialization examples:`)
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 assert(ceFullSerializedStatic !== null)
 const ceFullSerialized = ceFull.serialize()
