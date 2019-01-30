@@ -7,6 +7,8 @@ Summary Changelog:
   is only a container for library classes/objects/functions; 
   using destructuring assignment, using the library will be simple the same;
   see samples and documentation for more info
+- Add a static method 'isCloudEvent' to tell the given object, if it's 
+  a class/subclass instance of CloudEvent
 
 ## [0.2.2](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.2) (2019-01-20)
 Summary Changelog:

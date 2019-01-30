@@ -456,3 +456,80 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
   }
 })
+
+/** @test {CloudEvent} */
+test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, but not other objects', (t) => {
+  t.plan(32)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(CloudEvent)
+
+  /** create some classes, for better reuse in following tests */
+  class NotCESubclass {
+  }
+  class CESubclass extends CloudEvent {
+  }
+
+  {
+    // check that an undefined object is not seen as a CloudEvent
+    const ceObject = undefined
+    t.strictEqual(ceObject, undefined)
+    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.ok(!V.isClass(ceObject, CloudEvent))
+    t.throws(function () {
+      const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
+      assert(isCloudEvent === undefined) // never executed
+    }, Error, `Expected exception when calling 'CloudEvent.isCloudEvent' with an undefined or null argument`)
+  }
+
+  {
+    // check that a null object is not seen as a CloudEvent
+    const ceObject = null
+    t.strictEqual(typeof ceObject, 'object')
+    t.strictEqual(ceObject, null)
+    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.ok(!V.isClass(ceObject, CloudEvent))
+    t.throws(function () {
+      const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
+      assert(isCloudEvent === null) // never executed
+    }, Error, `Expected exception when calling 'CloudEvent.isCloudEvent' with an undefined or null argument`)
+  }
+
+  {
+    // check that a generic object is not seen as a CloudEvent
+    const ceObject = {}
+    t.strictEqual(typeof ceObject, 'object')
+    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.ok(!V.isClass(ceObject, CloudEvent))
+    t.ok(!CloudEvent.isCloudEvent(ceObject))
+  }
+
+  {
+    // check that even an empty instance belongs to the right base class
+    const ceEmpty = new CloudEvent()
+    t.strictEqual(typeof ceEmpty, 'object')
+    t.strictEqual(ceEmpty instanceof CloudEvent, true)
+    t.ok(!V.isClass(ceEmpty, NotCESubclass))
+    t.ok(V.isClass(ceEmpty, CloudEvent))
+    t.ok(!V.isClass(ceEmpty, CESubclass))
+    t.ok(CloudEvent.isCloudEvent(ceEmpty))
+
+    // check that a subclass instance is seen as a CloudEvent
+    const ceEmptySubclass = new CESubclass()
+    t.strictEqual(typeof ceEmptySubclass, 'object')
+    t.strictEqual(ceEmptySubclass instanceof CloudEvent, true)
+    t.ok(!V.isClass(ceEmptySubclass, NotCESubclass))
+    t.ok(V.isClass(ceEmptySubclass, CloudEvent))
+    t.ok(V.isClass(ceEmptySubclass, CESubclass))
+    t.ok(CloudEvent.isCloudEvent(ceEmptySubclass))
+
+    // check that a class instance outside CloudEvent class hierarchy is not seen as a CloudEvent
+    const ceEmptyNoSubclass = new NotCESubclass()
+    t.strictEqual(typeof ceEmptyNoSubclass, 'object')
+    t.strictEqual(ceEmptyNoSubclass instanceof CloudEvent, false)
+    t.ok(V.isClass(ceEmptyNoSubclass, NotCESubclass))
+    t.ok(!V.isClass(ceEmptyNoSubclass, CloudEvent))
+    t.ok(!V.isClass(ceEmptyNoSubclass, CESubclass))
+    t.ok(!CloudEvent.isCloudEvent(ceEmptyNoSubclass))
+  }
+})

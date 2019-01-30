@@ -278,6 +278,20 @@ class CloudEvent {
   }
 
   /**
+   * Tell the given CloudEvent, if it's instance of the CloudEvent class or a subclass of it.
+   *
+   * @static
+   * @param {!object} event the CloudEvent to check
+   * @return {boolean} true if it's an instance (or a subclass), otherwise false
+   */
+  static isCloudEvent (event) {
+    if (V.isUndefinedOrNull(event)) {
+      throw new Error('CloudEvent undefined or null')
+    }
+    return V.isClass(event, CloudEvent)
+  }
+
+  /**
    * Serialize the given CloudEvent in JSON format.
    * Note that here standard serialization to JSON is used (no additional libraries).
    * Note that the result of encoder function is assigned to encoded data.
