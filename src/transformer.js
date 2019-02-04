@@ -88,7 +88,7 @@ class Transformer {
    */
   static timestampFromString (obj) {
     // TODO: check argument (and add the throws docs clause), then implement ... wip
-    return new Date()
+    return Date.parse(obj)
   }
 
   /**

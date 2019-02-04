@@ -371,7 +371,8 @@ class CloudEvent {
     if (!V.isObject(decodedData)) {
       throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given content type: '${parsed.contentType}'.`)
     }
-    // TODO: in ce, overwrite data with decodedData before returning it ... wip
+    // overwrite data with decodedData before returning it
+    ce.data = decodedData
     return ce
   }
 
