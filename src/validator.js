@@ -144,16 +144,16 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a valid date and in the past.
+   * Tell if the given ergument is a valid date and in the past or now.
    *
    * See {@link Validator.isDateValid}.
    *
    * @static
    * @param {object} arg the object to check
-   * @return {boolean} true if it's a valid date in the past, false otherwise
+   * @return {boolean} true if it's a valid date in the past (or now), false otherwise
    */
   static isDatePast (arg) {
-    return (Validator.isDateValid(arg) && arg < Date.now())
+    return (Validator.isDateValid(arg) && arg <= Date.now())
   }
 
   /**
