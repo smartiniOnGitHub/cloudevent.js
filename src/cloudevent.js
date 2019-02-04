@@ -361,8 +361,7 @@ class CloudEvent {
       if (!V.isFunction(decoder)) {
         throw new Error(`Missing or wrong decoder function: '${decoder}' for the given content type: '${parsed.contentType}'.`)
       }
-      // TODO: get payload from json parse of main object ...
-      decodedData = decoder(parsed.payload)
+      decodedData = decoder(parsed.data)
     } else {
       // decoder not defined, check decodedData
       if (!V.isDefinedAndNotNull(decodedData)) {

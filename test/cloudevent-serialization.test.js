@@ -460,7 +460,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
 
 /** @test {CloudEvent} */
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
-  t.plan(34)
+  t.plan(52)
 
   // const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
@@ -495,8 +495,21 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.eventTime))
     t.ok(V.isDateValid(ceDeserialized.eventTime))
     t.ok(V.isDatePast(ceDeserialized.eventTime))
-    // TODO: ensure eventTime is the same as the origianl one ... wip
-    // TODO: on data (the payload) ... wip
+    // TODO: ensure eventTime has the same value (but not the same reference) as the original one ... wip
+    // t.strictSame(ceDeserialized.eventTime.getTime(), commonEventTime.getTime())
+    t.notStrictEqual(ceDeserialized.eventTime, commonEventTime)
+    t.notEqual(ceDeserialized.eventTime, commonEventTime)
+    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    t.ok(ceDeserialized.data)
+    t.ok(V.isObject(ceDeserialized.data))
+    t.ok(ceDeserialized.payload)
+    t.ok(V.isObject(ceDeserialized.payload))
+    // then ensure the value of both are the same ...
+    t.strictSame(ceDeserialized.data, ceDeserialized.payload)
+    // then ensure they are different object (references) ...
+    t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.notEqual(ceDeserialized.data, ceDeserialized.payload)
   }
 
   {
@@ -530,8 +543,21 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.eventTime))
     t.ok(V.isDateValid(ceDeserialized.eventTime))
     t.ok(V.isDatePast(ceDeserialized.eventTime))
-    // TODO: ensure eventTime is the same as the origianl one ... wip
-    // TODO: on data (the payload) ... wip
+    // TODO: ensure eventTime has the same value (but not the same reference) as the original one ... wip
+    // t.strictSame(ceDeserialized.eventTime.getTime(), commonEventTime.getTime())
+    t.notStrictEqual(ceDeserialized.eventTime, commonEventTime)
+    t.notEqual(ceDeserialized.eventTime, commonEventTime)
+    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    t.ok(ceDeserialized.data)
+    t.ok(V.isObject(ceDeserialized.data))
+    t.ok(ceDeserialized.payload)
+    t.ok(V.isObject(ceDeserialized.payload))
+    // then ensure the value of both are the same ...
+    t.strictSame(ceDeserialized.data, ceDeserialized.payload)
+    // then ensure they are different object (references) ...
+    t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.notEqual(ceDeserialized.data, ceDeserialized.payload)
   }
 })
 
