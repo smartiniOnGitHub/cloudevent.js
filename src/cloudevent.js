@@ -317,9 +317,9 @@ class CloudEvent {
   }
 
   /**
-   * Serialize the given CloudEvent in JSON format.
-   * Note that here standard serialization to JSON is used (no additional libraries).
-   * Note that the result of encoder function is assigned to encoded data.
+   * Deserialize/parse the given CloudEvent from JSON format.
+   * Note that here standard parse from JSON is used (no additional libraries).
+   * Note that the result of decoder function is assigned to decoded data.
    *
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
    * @param {object} options optional deserialization attributes:
