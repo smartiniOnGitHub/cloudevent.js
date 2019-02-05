@@ -157,6 +157,19 @@ class Validator {
   }
 
   /**
+   * Tell if the given ergument is a valid date and in the future or now.
+   *
+   * See {@link Validator.isDateValid}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @return {boolean} true if it's a valid date in the future (or now), false otherwise
+   */
+  static isDateFuture (arg) {
+    return (Validator.isDateValid(arg) && arg >= Date.now())
+  }
+
+  /**
    * Tell if the given ergument is a number.
    *
    * @static
@@ -431,7 +444,7 @@ class Validator {
   }
 
   /**
-   * Ensure that the given argument ia a date in the past.
+   * Ensure that the given argument ia a date in the past or now.
    *
    * See {@link Validator.isDatePast}.
    *
@@ -443,6 +456,22 @@ class Validator {
   static ensureIsDatePast (arg, name) {
     if (!Validator.isDatePast(arg)) {
       return new Error(`The object '${name}' must be a Date that belongs to the past`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument ia a date in the future or now.
+   *
+   * See {@link Validator.isDateFuture}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {Error} if it's not a date in the future, nothing otherwise
+   */
+  static ensureIsDateFuture (arg, name) {
+    if (!Validator.isDateFuture(arg)) {
+      return new Error(`The object '${name}' must be a Date that belongs to the future`)
     }
   }
 
