@@ -18,7 +18,7 @@
 const assert = require('assert')
 const test = require('tap').test
 
-/** @test {CloudEvent} */
+/** @test {Validator} */
 test('ensure the Validator class (direct reference to it) works good', (t) => {
   t.plan(5)
   const V = require('../src/validator') // direct reference to the library
