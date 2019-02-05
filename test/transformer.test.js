@@ -15,7 +15,162 @@
  */
 'use strict'
 
-// const assert = require('assert')
-// const test = require('tap').test
+const assert = require('assert')
+const test = require('tap').test
 
-// TODO: add some tests ... wip
+/** @test {Transformer} */
+test('ensure the Transformer class (direct reference to it) works good', (t) => {
+  t.plan(4)
+
+  {
+    const T = require('../src/transformer') // direct reference to the library
+    t.ok(T)
+    t.strictEqual(typeof T, 'function')
+    // optional, using some standard Node.js assert statements, as a sample
+    assert(T !== null)
+    assert.strictEqual(typeof T, 'function')
+    // assert(new T() instanceof T) // no more allowed
+  }
+
+  {
+    const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+    t.ok(V.isFunction(T))
+    t.throws(function () {
+      const t = new T()
+      assert(t === null) // never executed
+    }, Error, 'Expected exception when creating a Transformer instance')
+  }
+})
+
+/** @test {Transformer} */
+test('ensure the Transformer class is good and expose some functions to transform timestamps', (t) => {
+  t.plan(10)
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.strictEqual(typeof CloudEvent, 'function')
+  t.strictEqual(typeof V.isClass, 'function')
+  t.strictEqual(typeof T.dumpObject, 'function')
+  t.strictEqual(typeof T.timestampFromString, 'function')
+  t.strictEqual(typeof T.timestampToString, 'function')
+  t.ok(V.isFunction(CloudEvent))
+  t.ok(V.isFunction(V.isClass))
+  t.ok(V.isFunction(T.dumpObject))
+  t.ok(V.isFunction(T.timestampFromString))
+  t.ok(V.isFunction(T.timestampToString))
+})
+
+/** create some common options, for better reuse in tests */
+const commonEventTime = new Date()
+const endOf2018TimestampAsString = '2018-12-31T23:59:59.999Z'
+
+/** @test {Transformer} */
+test('ensure timestamps are transformed to string in the right way', (t) => {
+  t.plan(9)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString()
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a string')
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString(undefined)
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a string')
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString(null)
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming an null timestamp to a string')
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString({})
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp (Date) to a string')
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString('bad timestamp')
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp (Date) to a string')
+
+  t.throws(function () {
+    const timestampAsString = T.timestampToString(endOf2018TimestampAsString) // ok but no string accepted here
+    assert(timestampAsString === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp (Date) to a string')
+
+  {
+    const timestampAsString = T.timestampToString(commonEventTime)
+    t.ok(timestampAsString)
+    t.ok(V.isString(timestampAsString))
+    // console.log(`timestampAsString: '${timestampAsString}'`)
+  }
+})
+
+/** @test {Transformer} */
+test('ensure timestamps are transformed from string in the right way', (t) => {
+  t.plan(9)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString()
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString(undefined)
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString(null)
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an null timestamp string to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString({})
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp string to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString('bad timestamp')
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp string to a timestamp (Date)')
+
+  {
+    const timestamp = T.timestampFromString(endOf2018TimestampAsString)
+    t.ok(timestamp)
+    t.ok(V.isDateValid(timestamp))
+    // console.log(`timestamp: '${timestamp}'`)
+  }
+
+  t.throws(function () {
+    const timestamp = T.timestampFromString(commonEventTime) // ok but no Date accepted here
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp string to a timestamp (Date)')
+})
+
+/** @test {Transformer} */
+test('ensure the current timestamp is transformed to string and back as date in the right way', (t) => {
+  t.plan(8)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  const timestampAsString = T.timestampToString(commonEventTime)
+  t.ok(timestampAsString)
+  t.ok(V.isString(timestampAsString))
+  // console.log(`current timestamp as string (UTC): '${timestampAsString}'`)
+
+  const timestampFromString = T.timestampFromString(timestampAsString)
+  t.ok(timestampFromString)
+  t.ok(V.isDateValid(timestampFromString))
+  // console.log(`current timestamp from string (with timezone offset): '${timestampFromString}'`)
+
+  // ensure both timestamps have the same value, but they are different object references
+  t.strictSame(timestampFromString.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+  t.notStrictEqual(timestampFromString, commonEventTime)
+  t.notEqual(timestampFromString, commonEventTime)
+})

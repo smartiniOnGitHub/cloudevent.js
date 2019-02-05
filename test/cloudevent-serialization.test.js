@@ -462,8 +462,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
   t.plan(54)
 
-  // const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
-  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
   {
     const serialized = ceNestedFullSerializedJson
@@ -495,7 +494,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.eventTime))
     t.ok(V.isDateValid(ceDeserialized.eventTime))
     t.ok(V.isDatePast(ceDeserialized.eventTime))
-    t.strictSame(ceDeserialized.eventTime.getTime(), commonEventTime.getTime())
+    t.strictSame(ceDeserialized.eventTime.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
     t.notStrictEqual(ceDeserialized.eventTime, commonEventTime)
     t.notEqual(ceDeserialized.eventTime, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
@@ -542,7 +541,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.eventTime))
     t.ok(V.isDateValid(ceDeserialized.eventTime))
     t.ok(V.isDatePast(ceDeserialized.eventTime))
-    t.strictSame(ceDeserialized.eventTime.getTime(), commonEventTime.getTime())
+    t.strictSame(ceDeserialized.eventTime.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
     t.notStrictEqual(ceDeserialized.eventTime, commonEventTime)
     t.notEqual(ceDeserialized.eventTime, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)

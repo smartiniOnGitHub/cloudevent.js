@@ -78,29 +78,50 @@ class Transformer {
   }
 
   /**
+   * Utility function that returns the timezone offset value, in msec.
+   *
+   * @static
+   * @return {number} the timezone offset, in msec
+   */
+  static get timezoneOffsetMsec () {
+    return new Date().getTimezoneOffset() * 60 * 1000
+  }
+
+  /**
    * Utility function that parse a string representation
    * (compatible with the CloudEvent standard) of the given timestamp (Date)
    * and returns it (if possible).
    *
+   * Note that the value returned has already been adjusted with the current timezone offset.
+   *
    * @static
    * @param {string} obj the timestamp/date to parse (as a string)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
+   * @throws {Error} if obj is undefined or null, or is not a string
    */
   static timestampFromString (obj) {
-    // TODO: check argument (and add the throws docs clause), then implement ... wip
-    return Date.parse(obj)
+    if (!V.isStringNotEmpty(obj)) {
+      throw new Error(`Missing or wrong timestamp: '${obj}' must be a string and not a: '${typeof obj}'.`)
+    }
+    const timestampMsec = Date.parse(obj)
+    return new Date(timestampMsec + Transformer.timezoneOffsetMsec)
   }
 
   /**
    * Utility function that return a string representation
    * (compatible with the CloudEvent standard) of the given timestamp (Date).
    *
+   * Note that the value returned is in the UTC format.
+   *
    * @static
    * @param {object} obj the timestamp/date to convert
    * @return {string} the string representation of the object
+   * @throws {Error} if obj is undefined or null, or is not a Date instance
    */
   static timestampToString (obj) {
-    // TODO: check argument (and add the throws docs clause) ... wip
+    if (!V.isDateValid(obj)) {
+      throw new Error(`Missing or wrong timestamp: '${obj}' must be a date and not a: '${typeof obj}'.`)
+    }
     return obj.toISOString()
   }
 }
