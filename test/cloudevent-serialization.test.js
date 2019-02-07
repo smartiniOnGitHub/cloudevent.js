@@ -250,13 +250,13 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       encodedData: `<data "hello"="world" "year"="2018" />`
     })
     t.ok(cceFullOtherContentTypeSerialized2)
-    const constEncodedData = `<data "constant"="encoded" />`
+    const fixedEncodedData = `<data "fixed"="encoded" />`
     const cceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
       encoder: encoderSample,
       // encodedData: undefined
       // encodedData: null
       // encodedData: `<data "hello"="world" "year"="2018" />`
-      encodedData: constEncodedData
+      encodedData: fixedEncodedData
     })
     t.ok(cceFullOtherContentTypeSerialized3)
   }
@@ -285,13 +285,13 @@ test('serialize a CloudEvent instance with a non default contentType and right s
       encodedData: `<data "hello"="world" "year"="2018" />`
     })
     t.ok(ceFullOtherContentTypeStrictSerialized2)
-    const constEncodedData = `<data "constant"="encoded" />`
+    const fixedEncodedData = `<data "fixed"="encoded" />`
     const ceFullOtherContentTypeStrictSerialized3 = ceFullOtherContentTypeStrict.serialize({
       encoder: encoderSample,
       // encodedData: undefined
       // encodedData: null
       // encodedData: `<data "hello"="world" "year"="2018" />`
-      encodedData: constEncodedData
+      encodedData: fixedEncodedData
     })
     t.ok(ceFullOtherContentTypeStrictSerialized3)
   }
@@ -342,6 +342,8 @@ const ceCommonNestedData = { ...ceCommonData,
 const { CloudEventTransformer: T } = require('../src/')
 const ceNestedFullSerializedJson = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
 const ceNestedFullStrictSerializedJson = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+const ceFullOtherContentTypeSerializedJson = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2018' />","cloudEventsVersion":"0.1","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
+const ceFullOtherContentTypeStrictSerializedJson = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2018' />","cloudEventsVersion":"0.1","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
@@ -558,13 +560,106 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
   }
 })
 
-// TODO: ensure non valid serialized strings throw Error when deserializing ... wip
+/** @test {CloudEvent} */
+test('deserialize a CloudEvent instance with a non default contentType and empty deserialization options, expect error', (t) => {
+  t.plan(6)
 
-/*
-// TODO: enable and use in deserialization tests ... wip
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+
+  {
+    const serialized = ceFullOtherContentTypeSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized)
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+  }
+
+  {
+    const serialized = ceFullOtherContentTypeStrictSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decoder: null,
+        decodedData: null
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+  }
+})
+
+/** @test {CloudEvent} */
+test('deserialize a CloudEvent instance with a non default contentType and right deserialization options, expect success', (t) => {
+  t.plan(10)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+
+  {
+    const serialized = ceFullOtherContentTypeSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    // test different combinations of deserialization options
+    // note that if given, decoder function has priority over decoded data
+    const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample
+    })
+    t.ok(ceFullOtherContentTypeDeserialized1)
+    const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
+      decodedData: { hello: 'world', year: 2018 }
+    })
+    t.ok(ceFullOtherContentTypeDeserialized2)
+    const fixedDecodedData = { fixed: 'encoded' }
+    const ceFullOtherContentTypeDeserialized3 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      // decodedData: undefined
+      // decodedData: null
+      // decodedData: { hello: 'world', year: 2018 }
+      decodedData: fixedDecodedData
+    })
+    t.ok(ceFullOtherContentTypeDeserialized3)
+  }
+
+  {
+    // the same with with strict mode enabled ...
+    const serialized = ceFullOtherContentTypeStrictSerializedJson
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    // test different combinations of deserialization options
+    // note that if given, decoder function has priority over decoded data
+    const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample
+    })
+    t.ok(ceFullOtherContentTypeDeserialized1)
+    const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
+      decodedData: { hello: 'world', year: 2018 }
+    })
+    t.ok(ceFullOtherContentTypeDeserialized2)
+    const fixedDecodedData = { fixed: 'encoded' }
+    const ceFullOtherContentTypeDeserialized3 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      // decodedData: undefined
+      // decodedData: null
+      // decodedData: { hello: 'world', year: 2018 }
+      decodedData: fixedDecodedData
+    })
+    t.ok(ceFullOtherContentTypeDeserialized3)
+  }
+})
+
 // sample decoding function, to use in tests here
 function decoderSample () {
   // return { hello: 'world', year: 2018 }
   return { decoded: 'Sample' }
 }
- */
+
+// TODO: ensure non valid serialized strings throw Error when deserializing ... wip
