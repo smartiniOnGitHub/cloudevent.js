@@ -338,6 +338,11 @@ class CloudEvent {
     }
     // deserialize standard attributes, always in JSON format
     const parsed = JSON.parse(ser)
+    // ensure it's an object (single), and not a string neither a collection or an array
+    if (!V.isObject(parsed) || V.isArray(parsed)) {
+      throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
+    }
+
     // fill a new CludEvent instance with parsed data
     const ce = new CloudEvent(parsed.eventID,
       parsed.eventType,

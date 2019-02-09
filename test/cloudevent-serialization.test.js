@@ -461,6 +461,43 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
 })
 
 /** @test {CloudEvent} */
+test('deserialize generic strings (not JSON representation for an Object) into a CloudEvent instance, expected Errors', (t) => {
+  t.plan(8)
+
+  const { CloudEvent } = require('../src/') // get references via destructuring
+  t.ok(CloudEvent)
+
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent()
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing an undefined reference')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent(undefined)
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing an undefined reference')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent(null)
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a null reference')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('')
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing an empty string')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('sample string')
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }')
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('[ "sample array/list", "of", "values" ]')
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a string representing an array (in JSON)')
+})
+
+/** @test {CloudEvent} */
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
   t.plan(54)
 
@@ -661,5 +698,3 @@ test('deserialize a CloudEvent instance with a non default contentType and right
     t.ok(ceFullOtherContentTypeDeserialized3)
   }
 })
-
-// TODO: ensure non valid serialized strings throw Error when deserializing ... undefined, null, empty, bad json ... wip
