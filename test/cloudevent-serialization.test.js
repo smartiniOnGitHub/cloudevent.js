@@ -594,6 +594,12 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
   }
 })
 
+// sample decoding function, to use in tests here
+function decoderSample () {
+  // return { hello: 'world', year: 2018 }
+  return { decoded: 'Sample' }
+}
+
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contentType and right deserialization options, expect success', (t) => {
   t.plan(10)
@@ -656,10 +662,4 @@ test('deserialize a CloudEvent instance with a non default contentType and right
   }
 })
 
-// sample decoding function, to use in tests here
-function decoderSample () {
-  // return { hello: 'world', year: 2018 }
-  return { decoded: 'Sample' }
-}
-
-// TODO: ensure non valid serialized strings throw Error when deserializing ... wip
+// TODO: ensure non valid serialized strings throw Error when deserializing ... undefined, null, empty, bad json ... wip
