@@ -95,7 +95,7 @@ class Transformer {
    * Note that the value returned has already been adjusted with the current timezone offset.
    *
    * @static
-   * @param {string} obj the timestamp/date to parse (as a string)
+   * @param {!string} obj the timestamp/date to parse (as a string)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {Error} if obj is undefined or null, or is not a string
    */
@@ -114,7 +114,7 @@ class Transformer {
    * Note that the value returned is in the UTC format.
    *
    * @static
-   * @param {object} obj the timestamp/date to convert
+   * @param {!object} obj the timestamp/date to convert
    * @return {string} the string representation of the object
    * @throws {Error} if obj is undefined or null, or is not a Date instance
    */
@@ -123,6 +123,49 @@ class Transformer {
       throw new Error(`Missing or wrong timestamp: '${obj}' must be a date and not a: '${typeof obj}'.`)
     }
     return obj.toISOString()
+  }
+
+  /**
+   * Utility function that map an Error into an object
+   * (compatible with the CloudEvent standard), to fill its 'data' attribute.
+   *
+   * @static
+   * @param {!Error} err the Error to transform
+   * @param {object} options transformation options:
+   *        includeStackTrace flag (default false) to add the StackTrace into the object to return,
+   *        addStatus flag (default true) to add a 'status' attribute into the object to return,
+   *        addTimestamp flag (default false) to add the current 'timestamp' as attribute into the object to return,
+   * @return {object} the object representation of the error
+   * @throws {Error} if err is undefined or null, or is not an Error instance
+   */
+  static errorToData (err, {
+    includeStackTrace = false,
+    addStatus = true,
+    addTimestamp = false
+  } = {}
+  ) {
+    if (!V.isError(err)) {
+      throw new Error(`Missing or wrong argument: '${err}' must be an Error and not a: '${typeof err}'.`)
+    }
+    const data = {
+      // TODO: cleanup ... wip
+      // code: err.code || undefined,
+      name: err.name,
+      message: err.message,
+      stack: (includeStackTrace === true) ? err.stack : null
+      // status: (addStatus === true) ? 'error' : undefined,
+      // timestamp: (addTimestamp === true) ? Date.now() : undefined
+    }
+    if (V.isDefinedAndNotNull(err.code)) {
+      data.code = err.code
+    }
+    if (addStatus === true) {
+      data.status = 'error'
+    }
+    if (addTimestamp === true) {
+      data.timestamp = Date.now()
+    }
+    return data
   }
 }
 

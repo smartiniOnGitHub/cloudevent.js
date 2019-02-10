@@ -174,3 +174,105 @@ test('ensure the current timestamp is transformed to string and back as date in 
   t.notStrictEqual(timestampFromString, commonEventTime)
   t.notEqual(timestampFromString, commonEventTime)
 })
+
+/** @test {Transformer} */
+test('ensure errors are transformed into data attribute in the right way', (t) => {
+  t.plan(30)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  t.throws(function () {
+    const data = T.errorToData()
+    assert(data === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to object')
+
+  t.throws(function () {
+    const data = T.errorToData(undefined)
+    assert(data === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to object')
+
+  t.throws(function () {
+    const data = T.errorToData(null)
+    assert(data === null) // never executed
+  }, Error, 'Expected exception when transforming an null error to object')
+
+  t.throws(function () {
+    const data = T.errorToData({})
+    assert(data === null) // never executed
+  }, Error, 'Expected exception when transforming not a right error to object')
+
+  t.throws(function () {
+    const data = T.errorToData('error string')
+    assert(data === null) // never executed
+  }, Error, 'Expected exception when transforming not a right error to object')
+
+  {
+    const error = new Error()
+    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    t.ok(V.isError(error))
+    const data = T.errorToData(error)
+    // console.log(`DEBUG - data details: ${T.dumpObject(data, 'data')}`)
+    t.ok(data)
+    t.ok(V.isObject(data))
+    // TODO: cleanup ... wip
+    /*
+    t.strictSame(data.code, undefined)
+    t.strictSame(data.name, 'Error')
+    t.strictSame(data.message, '')
+    t.strictSame(data.status, 'error')
+    t.strictSame(data.stack, undefined)
+     */
+    // t.strictSame(data, { code: null, name: 'Error', message: '', status: 'error', stack: null, timestamp: null })
+    t.strictSame(data, { name: 'Error', message: '', stack: null, status: 'error' })
+  }
+
+  {
+    const error = new TypeError()
+    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    t.ok(V.isError(error))
+    const data = T.errorToData(error)
+    // console.log(`DEBUG - data details: ${T.dumpObject(data, 'data')}`)
+    t.ok(data)
+    t.ok(V.isObject(data))
+    t.strictSame(data, { name: 'TypeError', message: '', stack: null, status: 'error' })
+  }
+
+  {
+    const error = new Error('sample error')
+    t.ok(V.isError(error))
+    const data = T.errorToData(error, {
+      includeStackTrace: true,
+      // addStatus: false,
+      addTimestamp: true
+    })
+    t.ok(data)
+    t.ok(V.isObject(data))
+    t.ok(data.stack)
+    t.ok(V.isString(data.stack))
+    data.stack = null // empty the attribute to simplify next comparison
+    t.ok(data.timestamp)
+    t.ok(V.isDatePast(new Date(data.timestamp)))
+    delete data.timestamp // delete the attribute to simplify next comparison
+    t.strictSame(data, { name: 'Error', message: 'sample error', stack: null, status: 'error' })
+  }
+
+  {
+    const error = new TypeError('sample type error')
+    t.ok(V.isError(error))
+    const data = T.errorToData(error, {
+      includeStackTrace: true,
+      // addStatus: false,
+      addTimestamp: true
+    })
+    t.ok(data)
+    t.ok(V.isObject(data))
+    t.ok(data.stack)
+    t.ok(V.isString(data.stack))
+    data.stack = null // empty the attribute to simplify next comparison
+    t.ok(data.timestamp)
+    t.ok(V.isDatePast(new Date(data.timestamp)))
+    delete data.timestamp // delete the attribute to simplify next comparison
+    t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, status: 'error' })
+  }
+})
