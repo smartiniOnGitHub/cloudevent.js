@@ -52,7 +52,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is undefined.
+   * Tell if the given argument is undefined.
    *
    * @static
    * @param {object} arg the object to check
@@ -63,7 +63,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is null.
+   * Tell if the given argument is null.
    *
    * @static
    * @param {object} arg the object to check
@@ -74,7 +74,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is undefined or null.
+   * Tell if the given argument is undefined or null.
    *
    * @static
    * @param {object} arg the object to check
@@ -85,7 +85,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is defined and not null.
+   * Tell if the given argument is defined and not null.
    *
    * @static
    * @param {object} arg the object to check
@@ -96,7 +96,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a string.
+   * Tell if the given argument is a string.
    *
    * @static
    * @param {object} arg the object to check
@@ -107,7 +107,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a not empty string.
+   * Tell if the given argument is a not empty string.
    *
    * See {@link Validator.isString}.
    *
@@ -120,7 +120,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a date.
+   * Tell if the given argument is a date.
    *
    * @static
    * @param {object} arg the object to check
@@ -131,7 +131,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a valid date.
+   * Tell if the given argument is a valid date.
    *
    * See {@link Validator.isDate}.
    *
@@ -144,7 +144,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a valid date and in the past or now.
+   * Tell if the given argument is a valid date and in the past or now.
    *
    * See {@link Validator.isDateValid}.
    *
@@ -157,7 +157,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a valid date and in the future or now.
+   * Tell if the given argument is a valid date and in the future or now.
    *
    * See {@link Validator.isDateValid}.
    *
@@ -170,7 +170,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a number.
+   * Tell if the given argument is a number.
    *
    * @static
    * @param {object} arg the object to check
@@ -181,7 +181,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an array.
+   * Tell if the given argument is an array.
    *
    * @static
    * @param {object} arg the object to check
@@ -192,7 +192,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a boolean.
+   * Tell if the given argument is a boolean.
    *
    * @static
    * @param {object} arg the object to check
@@ -203,7 +203,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an instance of the given class reference.
+   * Tell if the given argument is an instance of the given class reference.
    *
    * @static
    * @param {object} arg the object to check
@@ -215,7 +215,18 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a function.
+   * Tell if the given argument is an error.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @return {boolean} true if it's an error, false otherwise
+   */
+  static isError (arg) {
+    return (arg instanceof Error && typeof arg.message !== 'undefined')
+  }
+
+  /**
+   * Tell if the given argument is a function.
    *
    * @static
    * @param {object} arg the object to check
@@ -226,7 +237,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an object.
+   * Tell if the given argument is an object.
    *
    * @static
    * @param {object} arg the object to check
@@ -237,7 +248,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a keyed collection.
+   * Tell if the given argument is a keyed collection.
    *
    * @static
    * @param {object} arg the object to check
@@ -251,7 +262,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an object or a keyed collection.
+   * Tell if the given argument is an object or a keyed collection.
    *
    * See {@link Validator.isObject}, {@link Validator.isKeyedCollection}.
    *
@@ -264,7 +275,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an object or a keyed collection, but not a string.
+   * Tell if the given argument is an object or a keyed collection, but not a string.
    *
    * See {@link Validator.isObjectOrCollection}.
    *
@@ -277,7 +288,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is a string representation of a version number.
+   * Tell if the given argument is a string representation of a version number.
    *
    * Note that the version string could be something like:
    * - as minimum a number is needed for an integer version
@@ -296,7 +307,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given ergument is an URI or an URL.
+   * Tell if the given argument is an URI or an URL.
    *
    * @static
    * @param {string} arg the uri/url to check
@@ -335,7 +346,7 @@ class Validator {
   }
 
   /**
-   * Ensure that the given ergument is an instance of the given class reference.
+   * Ensure that the given argument is an instance of the given class reference.
    *
    * @static
    * @param {object} arg the object to check
@@ -350,7 +361,7 @@ class Validator {
   }
 
   /**
-   * Ensure that the given ergument is a function.
+   * Ensure that the given argument is a function.
    *
    * @static
    * @param {object} arg the object to check
