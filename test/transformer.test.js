@@ -215,15 +215,6 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     // console.log(`DEBUG - data details: ${T.dumpObject(data, 'data')}`)
     t.ok(data)
     t.ok(V.isObject(data))
-    // TODO: cleanup ... wip
-    /*
-    t.strictSame(data.code, undefined)
-    t.strictSame(data.name, 'Error')
-    t.strictSame(data.message, '')
-    t.strictSame(data.status, 'error')
-    t.strictSame(data.stack, undefined)
-     */
-    // t.strictSame(data, { code: null, name: 'Error', message: '', status: 'error', stack: null, timestamp: null })
     t.strictSame(data, { name: 'Error', message: '', stack: null, status: 'error' })
   }
 

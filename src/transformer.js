@@ -148,13 +148,9 @@ class Transformer {
       throw new Error(`Missing or wrong argument: '${err}' must be an Error and not a: '${typeof err}'.`)
     }
     const data = {
-      // TODO: cleanup ... wip
-      // code: err.code || undefined,
       name: err.name,
       message: err.message,
       stack: (includeStackTrace === true) ? err.stack : null
-      // status: (addStatus === true) ? 'error' : undefined,
-      // timestamp: (addTimestamp === true) ? Date.now() : undefined
     }
     if (V.isDefinedAndNotNull(err.code)) {
       data.code = err.code
