@@ -487,6 +487,22 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is an error instance or its subclass.
+   *
+   * See {@link Validator.isError}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {Error} if it's not an error or its subclass, nothing otherwise
+   */
+  static ensureIsError (arg, name) {
+    if (!Validator.isError(arg)) {
+      return new Error(`The object '${name}' must be an Error or a subclass of it`)
+    }
+  }
+
+  /**
    * Ensure that the given argument ia a string version.
    *
    * See {@link Validator.isVersion}.
