@@ -64,10 +64,15 @@ const endOf2018TimestampAsString = '2018-12-31T23:59:59.999Z'
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed to string in the right way', (t) => {
-  t.plan(9)
+  t.plan(14)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
+  t.ok(endOf2018TimestampAsString)
+  t.ok(V.isString(endOf2018TimestampAsString))
+  t.ok(V.isStringNotEmpty(endOf2018TimestampAsString))
+  t.ok(!V.ensureIsString(endOf2018TimestampAsString, 'endOf2018TimestampAsString')) // no error returned
+  t.ok(!V.ensureIsStringNotEmpty(endOf2018TimestampAsString, 'endOf2018TimestampAsString')) // no error returned
 
   t.throws(function () {
     const timestampAsString = T.timestampToString()
@@ -109,7 +114,7 @@ test('ensure timestamps are transformed to string in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from string in the right way', (t) => {
-  t.plan(9)
+  t.plan(20)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -143,7 +148,22 @@ test('ensure timestamps are transformed from string in the right way', (t) => {
     const timestamp = T.timestampFromString(endOf2018TimestampAsString)
     t.ok(timestamp)
     t.ok(V.isDateValid(timestamp))
+    t.ok(V.isNumber(timestamp.getTime()))
     // console.log(`timestamp: '${timestamp}'`)
+  }
+
+  {
+    const timestampFuture = new Date(Date.now() + 1000)
+    t.ok(timestampFuture)
+    t.ok(V.isDateValid(timestampFuture))
+    t.ok(V.isNumber(timestampFuture.getTime()))
+    t.ok(!V.isDatePast(timestampFuture))
+    t.ok(V.isDateFuture(timestampFuture))
+    t.ok(V.ensureIsDatePast(timestampFuture, 'timestampFuture')) // expected error returned
+    t.ok(!V.ensureIsDateFuture(timestampFuture, 'timestampFuture')) // no error returned
+    t.strictSame(V.ensureIsDate(timestampFuture, 'timestampFuture'), undefined) // no error returned
+    t.strictSame(V.ensureIsDatePast(timestampFuture, 'timestampFuture') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsDateFuture(timestampFuture, 'timestampFuture'), undefined) // no error returned
   }
 
   t.throws(function () {
@@ -177,7 +197,7 @@ test('ensure the current timestamp is transformed to string and back as date in 
 
 /** @test {Transformer} */
 test('ensure errors are transformed into data attribute in the right way', (t) => {
-  t.plan(30)
+  t.plan(51)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -208,6 +228,16 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
   }, Error, 'Expected exception when transforming not a right error to object')
 
   {
+    const error = {}
+    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    t.ok(!V.isError(error))
+    t.ok(!V.ensureIsObjectOrCollection(error, 'error')) // no error returned
+    t.ok(V.ensureIsError(error, 'error')) // expected error returned
+    t.strictSame(V.ensureIsObjectOrCollection(error, 'error'), undefined) // no error returned
+    t.strictSame(V.ensureIsError(error, 'error') instanceof Error, true) // expected error returned
+  }
+
+  {
     const error = new Error()
     // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
     t.ok(V.isError(error))
@@ -232,6 +262,8 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
   {
     const error = new Error('sample error')
     t.ok(V.isError(error))
+    error.code = 1000 // add a sample error code, as number
+    t.ok(V.isNumber(error.code))
     const data = T.errorToData(error, {
       includeStackTrace: true,
       // addStatus: false,
@@ -243,7 +275,16 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     t.ok(V.isString(data.stack))
     data.stack = null // empty the attribute to simplify next comparison
     t.ok(data.timestamp)
-    t.ok(V.isDatePast(new Date(data.timestamp)))
+    t.ok(V.isNumber(data.timestamp))
+    const timestampParsed = new Date(data.timestamp)
+    t.ok(V.isDatePast(timestampParsed))
+    t.ok(!V.isDateFuture(timestampParsed))
+    t.ok(!V.ensureIsDate(timestampParsed, 'timestampParsed')) // no error returned
+    t.ok(!V.ensureIsDatePast(timestampParsed, 'timestampParsed')) // no error returned
+    t.ok(V.ensureIsDateFuture(timestampParsed, 'timestampParsed')) // expected error returned
+    t.strictSame(V.ensureIsDate(timestampParsed, 'timestampParsed'), undefined) // no error returned
+    t.strictSame(V.ensureIsDateFuture(timestampParsed, 'timestampParsed') instanceof Error, true) // expected error returned
+    delete data.code // delete the attribute to simplify next comparison
     delete data.timestamp // delete the attribute to simplify next comparison
     t.strictSame(data, { name: 'Error', message: 'sample error', stack: null, status: 'error' })
   }
@@ -251,6 +292,8 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
   {
     const error = new TypeError('sample type error')
     t.ok(V.isError(error))
+    error.code = '1000' // add a sample error code, as string
+    t.ok(V.isString(error.code))
     const data = T.errorToData(error, {
       includeStackTrace: true,
       // addStatus: false,
@@ -262,8 +305,37 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     t.ok(V.isString(data.stack))
     data.stack = null // empty the attribute to simplify next comparison
     t.ok(data.timestamp)
-    t.ok(V.isDatePast(new Date(data.timestamp)))
+    t.ok(V.isNumber(data.timestamp))
+    const timestampParsed = new Date(data.timestamp)
+    t.ok(V.isDatePast(timestampParsed))
+    t.ok(!V.isDateFuture(timestampParsed))
+    t.ok(!V.ensureIsDate(timestampParsed, 'timestampParsed')) // no error returned
+    t.ok(!V.ensureIsDatePast(timestampParsed, 'timestampParsed')) // no error returned
+    t.ok(V.ensureIsDateFuture(timestampParsed, 'timestampParsed')) // expected error returned
+    t.strictSame(V.ensureIsDate(timestampParsed, 'timestampParsed'), undefined) // no error returned
+    t.strictSame(V.ensureIsDateFuture(timestampParsed, 'timestampParsed') instanceof Error, true) // expected error returned
+    delete data.code // delete the attribute to simplify next comparison
     delete data.timestamp // delete the attribute to simplify next comparison
     t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, status: 'error' })
   }
+})
+
+/** @test {Transformer} */
+test('ensure dumpObject works in the right way', (t) => {
+  t.plan(12)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  t.ok(T.dumpObject())
+  t.ok(T.dumpObject(null))
+  t.ok(T.dumpObject(null, null))
+  t.ok(T.dumpObject({}, 'empty_object'))
+  t.ok(T.dumpObject({ name: 'Name', age: 20, note: null }, 'object'))
+  t.ok(T.dumpObject([1, 2, 3, null], 'array'))
+  t.ok(T.dumpObject(new Map([['key-1', 'value 1'], ['key-2', 'value 2']]), 'map'))
+  t.ok(T.dumpObject(new Set([['key-1', 'value 1'], ['key-2', 'value 2']]), 'set'))
+  t.ok(T.dumpObject(`12345 67890 `, 'string'))
+  t.ok(T.dumpObject(1234567890, 'number'))
+  t.ok(T.dumpObject(true, 'boolean'))
 })

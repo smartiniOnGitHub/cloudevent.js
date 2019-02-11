@@ -40,7 +40,7 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
-  t.plan(25)
+  t.plan(33)
 
   /** create some classes, for better reuse in following tests */
   const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
@@ -74,6 +74,10 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.ok(V.isClass(ceMinimal, CEClass))
     t.ok(!V.isClass(ceMinimal, NotCESubclass))
     t.ok(!V.isClass(ceMinimal, CESubclass))
+    t.ok(!V.ensureIsClass(ceMinimal, CloudEvent, 'ceMinimal')) // no error returned
+    t.ok(!V.ensureIsClass(ceMinimal, CEClass, 'ceMinimal')) // no error returned
+    t.ok(V.isClass(V.ensureIsClass(ceMinimal, CESubclass, 'ceMinimal'), TypeError)) // expected error returned
+    t.ok(V.isClass(V.ensureIsClass(ceMinimal, NotCESubclass, 'ceMinimal'), TypeError)) // expected error returned
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimalSubclass = new CESubclass('1EX', // eventID
@@ -90,6 +94,10 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.ok(V.isClass(ceMinimalSubclass, CEClass))
     t.ok(!V.isClass(ceMinimalSubclass, NotCESubclass))
     t.ok(V.isClass(ceMinimalSubclass, CESubclass))
+    t.ok(!V.ensureIsClass(ceMinimalSubclass, CloudEvent, 'ceMinimal')) // no error returned
+    t.ok(!V.ensureIsClass(ceMinimalSubclass, CEClass, 'ceMinimal')) // no error returned
+    t.ok(!V.ensureIsClass(ceMinimalSubclass, CESubclass, 'ceMinimal')) // no error returned
+    t.ok(V.isClass(V.ensureIsClass(ceMinimalSubclass, NotCESubclass, 'ceMinimal'), TypeError)) // expected error returned
   }
 
   {
@@ -104,5 +112,145 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.strictEqual(typeof CloudEventValidator, 'function')
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(CloudEventValidator))
+  }
+})
+
+/** @test {CloudEvent} */
+test('ensure some (less used) validation functions are right', (t) => {
+  t.plan(68)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(CloudEvent)
+  t.ok(V)
+
+  {
+    const undefinedGood = undefined
+    t.ok(V.isUndefined(undefinedGood))
+    t.strictSame(V.ensureIsUndefined(undefinedGood, 'test'), undefined) // no error returned
+    t.ok(V.isUndefinedOrNull(undefinedGood))
+    t.strictSame(V.ensureIsUndefinedOrNull(undefinedGood, 'test'), undefined) // no error returned
+    const undefinedBad = 'defined'
+    t.ok(!V.isUndefined(undefinedBad))
+    t.strictSame(V.ensureIsUndefined(undefinedBad, 'test') instanceof Error, true) // expected error returned
+    t.ok(!V.isUndefinedOrNull(undefinedBad))
+    t.strictSame(V.ensureIsUndefinedOrNull(undefinedBad, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const nullGood = null
+    t.ok(V.isNull(nullGood))
+    t.strictSame(V.ensureIsNull(nullGood, 'test'), undefined) // no error returned
+    t.ok(V.isUndefinedOrNull(nullGood))
+    t.strictSame(V.ensureIsUndefinedOrNull(nullGood, 'test'), undefined) // no error returned
+    const nullBad = 'defined'
+    t.ok(!V.isNull(nullBad))
+    t.strictSame(V.ensureIsNull(nullBad, 'test') instanceof Error, true) // expected error returned
+    t.ok(!V.isUndefinedOrNull(nullBad))
+    t.strictSame(V.ensureIsUndefinedOrNull(nullBad, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const dateGood = new Date()
+    t.ok(V.isDate(dateGood))
+    t.strictSame(V.ensureIsDate(dateGood, 'test'), undefined) // no error returned
+    const dateBad = Date.now()
+    t.ok(!V.isDate(dateBad))
+    t.strictSame(V.ensureIsDate(dateBad, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const relGood = '1.0.0'
+    t.ok(V.isVersion(relGood))
+    t.strictSame(V.ensureIsVersion(relGood, 'test'), undefined) // no error returned
+    const relBad = 'a.b.c-d'
+    t.ok(!V.isVersion(relBad))
+    t.strictSame(V.ensureIsVersion(relBad, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const objectBad = 1234567890
+    t.ok(V.isNumber(objectBad))
+    t.ok(!V.isObject(objectBad))
+    t.ok(V.ensureIsObjectOrCollection(objectBad, 'error')) // expected error returned
+    t.strictSame(V.ensureIsObjectOrCollection(objectBad, 'error') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const stringBad = 1234567890
+    t.ok(!V.isString(stringBad))
+    t.ok(!V.isStringNotEmpty(stringBad))
+    t.ok(V.ensureIsString(stringBad, 'error')) // expected error returned
+    t.strictSame(V.ensureIsString(stringBad, 'error') instanceof Error, true) // expected error returned
+    t.ok(V.ensureIsStringNotEmpty(stringBad, 'error')) // expected error returned
+    t.strictSame(V.ensureIsStringNotEmpty(stringBad, 'error') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const functionBad = '1234567890'
+    t.ok(V.isString(functionBad))
+    t.ok(!V.isFunction(functionBad))
+    t.ok(V.ensureIsFunction(functionBad, 'error')) // expected error returned
+    t.strictSame(V.ensureIsFunction(functionBad, 'error') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const boolGood = true
+    t.ok(V.isBoolean(boolGood))
+    t.strictSame(V.ensureIsBoolean(boolGood, 'test'), undefined) // no error returned
+    const boolBad = 'false'
+    t.ok(!V.isBoolean(boolBad))
+    t.strictSame(V.ensureIsBoolean(boolBad, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const uriGood = 'http://localhost:3000/path/nested?param1=value1'
+    t.ok(V.isURI(uriGood))
+    t.strictSame(V.ensureIsURI(uriGood, null, 'test'), undefined) // no error returned
+    const uriBad = 'path/nested?param1=value1' // not relative nor absolute uri, so not a real uri string
+    t.ok(!V.isURI(uriBad))
+    t.strictSame(V.ensureIsURI(uriBad, null, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const uriGoodPath = '/path/nested?param1=value1'
+    const uriGoodBase = 'http://localhost:3000'
+    t.ok(V.isURI(uriGoodPath, uriGoodBase))
+    t.strictSame(V.ensureIsURI(uriGoodPath, uriGoodBase, 'test'), undefined) // no error returned
+    const uriBad = 'path/nested?param1=value1' // not relative nor absolute uri, so not a real uri string
+    t.ok(!V.isURI(uriBad, null))
+    t.strictSame(V.ensureIsURI(uriBad, null, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    // test getSize with different argument types
+    t.ok(V.isUndefined(V.getSize(null)))
+    t.strictSame(V.getSize(null), undefined)
+    const obj = { name: 'Name', age: 20, note: null }
+    t.ok(V.isNumber(V.getSize(obj)))
+    t.strictSame(V.getSize(obj), 3) // include even null items in the size
+    const arr = [1, 2, 3, null]
+    t.ok(V.isNumber(V.getSize(arr)))
+    t.strictSame(V.getSize(arr), 4) // include even null items in the size
+    const map = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
+    t.ok(V.isNumber(V.getSize(map)))
+    t.strictSame(V.getSize(map), 2)
+    const set = new Set([['key-1', 'value 1'], ['key-2', 'value 2']])
+    t.ok(V.isNumber(V.getSize(set)))
+    t.strictSame(V.getSize(set), 2)
+    const str = '12345 67890 '
+    t.ok(V.isNumber(V.getSize(str)))
+    t.strictSame(V.getSize(str), 12)
+    const otherBadNumber = 1234567890
+    t.ok(V.isNumber(otherBadNumber))
+    t.throws(function () {
+      const size = V.getSize(otherBadNumber)
+      assert(size !== null) // never executed
+    }, Error, 'Expected exception when trying to get the size of a bad object')
+    const otherBadBoolean = true
+    t.ok(V.isBoolean(otherBadBoolean))
+    t.throws(function () {
+      const size = V.getSize(otherBadBoolean)
+      assert(size !== null) // never executed
+    }, Error, 'Expected exception when trying to get the size of a bad object')
   }
 })
