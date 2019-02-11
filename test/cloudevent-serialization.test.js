@@ -63,7 +63,7 @@ const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2018 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
-// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
+// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 
@@ -220,10 +220,13 @@ function encoderSample () {
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType and right serialization options, expect success', (t) => {
-  t.plan(11)
+  t.plan(14)
 
-  const { CloudEvent } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
+  t.ok(encoderSample)
+  t.ok(V.isFunction(encoderSample))
+  t.ok(!V.ensureIsFunction(encoderSample, 'encoderSample')) // no error returned
 
   {
     // create an instance with non default contentType (other options default): expected success ...
@@ -639,9 +642,13 @@ function decoderSample () {
 
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contentType and right deserialization options, expect success', (t) => {
-  t.plan(10)
+  t.plan(14)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(V)
+  t.ok(decoderSample)
+  t.ok(V.isFunction(decoderSample))
+  t.ok(!V.ensureIsFunction(decoderSample, 'decoderSample')) // no error returned
 
   {
     const serialized = ceFullOtherContentTypeSerializedJson

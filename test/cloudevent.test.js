@@ -228,7 +228,7 @@ const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2018 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
-// const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
+// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 
