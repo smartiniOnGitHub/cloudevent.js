@@ -346,6 +346,62 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is undefined.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not undefined, nothing otherwise
+   */
+  static ensureIsUndefined (arg, name) {
+    if (!Validator.isUndefined(arg)) {
+      return new TypeError(`The argument '${name}' must be undefined, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument is null.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not null, nothing otherwise
+   */
+  static ensureIsNull (arg, name) {
+    if (!Validator.isNull(arg)) {
+      return new TypeError(`The argument '${name}' must be null, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument is undefined or null.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not undefined or null, nothing otherwise
+   */
+  static ensureIsUndefinedOrNull (arg, name) {
+    if (!Validator.isUndefinedOrNull(arg)) {
+      return new TypeError(`The argument '${name}' must be undefined or null, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument is a boolean.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not a boolean, nothing otherwise
+   */
+  static ensureIsBoolean (arg, name) {
+    if (!Validator.isBoolean(arg)) {
+      return new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
    * Ensure that the given argument is an instance of the given class reference.
    *
    * @static
@@ -366,7 +422,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
-   * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
+   * @return {TypeError} if it's not a function, nothing otherwise
    */
   static ensureIsFunction (arg, name) {
     if (!Validator.isFunction(arg)) {
@@ -525,17 +581,18 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
+   * @param {string} base the (optional) base to build the full URL
    * @param {string} name the name to use in generated error (if any)
    * @return {Error} if it's not an URI/URL, nothing otherwise
    */
-  static ensureIsURI (arg, name) {
-    if (!Validator.isURI(arg)) {
-      return new Error(`The object '${name}' must be an URI or URL string, and not '${arg}'`)
+  static ensureIsURI (arg, base, name) {
+    if (!Validator.isURI(arg, base)) {
+      return new Error(`The object '${name}' must be an URI or URL string, and not '${arg}', '${base}'`)
     }
   }
 
   /**
-   * Tell the size of the given aobject
+   * Tell the size of the given object
    *
    * @static
    * @param {object} arg the object to check
@@ -554,6 +611,8 @@ class Validator {
     } else if (typeof arg === 'string') {
       return arg.length
     }
+    // else
+    throw new TypeError(`Unable to calculate the size of the argument '${arg}'.`)
   }
 }
 

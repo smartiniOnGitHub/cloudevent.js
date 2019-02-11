@@ -233,7 +233,7 @@ class CloudEvent {
       if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
         ve.push(V.ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
       }
-      ve.push(V.ensureIsURI(event.source, 'source'))
+      ve.push(V.ensureIsURI(event.source, null, 'source'))
       if (V.isDefinedAndNotNull(event.extensions)) {
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         const extensionsSize = V.getSize(event.extensions)
@@ -243,7 +243,7 @@ class CloudEvent {
       }
       ve.push(V.ensureIsDatePast(event.eventTime, 'eventTime'))
       ve.push(V.ensureIsStringNotEmpty(event.contentType, 'contentType'))
-      ve.push(V.ensureIsURI(event.schemaURL, 'schemaURL'))
+      ve.push(V.ensureIsURI(event.schemaURL, null, 'schemaURL'))
     }
 
     return ve.filter((i) => i)
