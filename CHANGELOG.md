@@ -1,18 +1,24 @@
 # Change Log
 
-## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (unreleased)
+## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (2019-02-12)
 Summary Changelog:
 - Updated dependencies for the development environment
+- Add the ability to deserialize/parse a string into a CloudEvent 
+  (via the static method 'deserializeEvent')
 - Add a static method 'isCloudEvent' to tell the given object, if it's 
   a class/subclass instance of CloudEvent
 - Add an utility class 'Transformer' with useful static methods 
-  to transform CloudEvent related data, in a general way
+  to transform CloudEvent related data, like: 
+  tmestamp (Date) to/from string, error to data (the CloudEvent data attribute), 
+  process info to data, etc
+- Add some useful static methods to the class 'Validator'
 - Breaking change: to be more future proof, the main object exported by the library now
   is only a container for library classes/objects/functions; 
   using destructuring assignment, using the library will be simple the same;
   see samples and documentation for more info
 - Breaking change: move the utility static method 'dumpObject' from the CloudEvent class 
   to the new Transformer class
+- Improve (Test) Code Coverage, to be near 100%
 
 ## [0.2.2](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.2.2) (2019-01-20)
 Summary Changelog:
