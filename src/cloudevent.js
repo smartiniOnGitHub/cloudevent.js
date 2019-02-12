@@ -182,11 +182,12 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @return {boolean} true if strict, otherwise false
+   * @throws {TypeError} if event is not a CloudEvent instance or subclass
    * @throws {Error} if event is undefined or null
    */
   static isStrictEvent (event) {
-    if (V.isUndefinedOrNull(event)) {
-      throw new Error('CloudEvent undefined or null')
+    if (!CloudEvent.isCloudEvent(event)) {
+      throw new TypeError('The given event is not a CloudEvent instance')
     }
     if (V.isDefinedAndNotNull(event.extensions)) {
       return event.extensions.strict === true

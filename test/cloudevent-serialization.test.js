@@ -69,7 +69,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(36)
+  t.plan(40)
 
   const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
@@ -93,6 +93,15 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFull).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+
+    t.throws(function () {
+      const ceFullSerialized = CloudEvent.serializeEvent(undefined)
+      assert(ceFullSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing an undefined / null CloudEvent instance')
+    t.throws(function () {
+      const ceFullSerialized = CloudEvent.serializeEvent(null)
+      assert(ceFullSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing an undefined / null CloudEvent instance')
 
     const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
     t.ok(ceFullSerializedStatic)
@@ -134,6 +143,15 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
 
+    t.throws(function () {
+      const ceFullSerialized = CloudEvent.serializeEvent(undefined)
+      assert(ceFullSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing an undefined / null CloudEvent instance')
+    t.throws(function () {
+      const ceFullSerialized = CloudEvent.serializeEvent(null)
+      assert(ceFullSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing an undefined / null CloudEvent instance')
+
     const ceFullStrictSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
     t.ok(ceFullStrictSerializedStatic)
     const ceFullStrictSerialized = ceFullStrict.serialize()
@@ -158,7 +176,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType and empty serialization options, expect error', (t) => {
-  t.plan(8)
+  t.plan(24)
 
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
@@ -178,10 +196,48 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
     assert(ceFullOtherContentType !== null)
     t.ok(ceFullOtherContentType)
     t.ok(ceFullOtherContentType.isValid())
+    t.ok(!ceFullOtherContentType.isStrict)
     t.throws(function () {
       const ceFullOtherContentTypeSerialized = ceFullOtherContentType.serialize()
       assert(ceFullOtherContentTypeSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentType, {
+        encoder: 'encoderSample'
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentType, {
+        encodedData: true
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent(undefined)
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent(null)
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent({})
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for for not a CloudEvent instance')
+
+    {
+      const ce = ceFullOtherContentType
+      ce.extensions = { strict: false }
+      const flag = CloudEvent.isStrictEvent(ce)
+      t.strictSame(flag, false)
+    }
+    {
+      const ce = ceFullOtherContentType
+      delete ce.extensions
+      const flag = CloudEvent.isStrictEvent(ce)
+      t.strictSame(flag, false)
+    }
   }
 
   {
@@ -198,6 +254,7 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
     assert(ceFullOtherContentTypeStrict !== null)
     t.ok(ceFullOtherContentTypeStrict)
     t.ok(ceFullOtherContentTypeStrict.isValid())
+    t.ok(ceFullOtherContentTypeStrict.isStrict)
     t.throws(function () {
       const ceFullOtherContentTypeStrictSerialized = ceFullOtherContentTypeStrict.serialize()
       assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
@@ -209,6 +266,43 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
       })
       assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+        encoder: 'encoderSample'
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+        encodedData: true
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent(undefined)
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent(null)
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const flag = CloudEvent.isStrictEvent({})
+      assert(flag === false) // never executed
+    }, Error, 'Expected exception when trying to get the strict mode for for not a CloudEvent instance')
+
+    {
+      const ce = ceFullOtherContentTypeStrict
+      ce.extensions = { strict: true }
+      const flag = CloudEvent.isStrictEvent(ce)
+      t.strictSame(flag, true)
+    }
+    {
+      const ce = ceFullOtherContentTypeStrict
+      delete ce.extensions
+      const flag = CloudEvent.isStrictEvent(ce)
+      t.strictSame(flag, false)
+    }
   }
 })
 
@@ -601,8 +695,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
 })
 
 /** @test {CloudEvent} */
-test('deserialize a CloudEvent instance with a non default contentType and empty deserialization options, expect error', (t) => {
-  t.plan(6)
+test('deserialize a CloudEvent instance with a non default contentType and empty/wrong deserialization options, expect error', (t) => {
+  t.plan(10)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
@@ -614,6 +708,18 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
 
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized)
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decoder: 'decoderSample'
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: true
+      })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
   }
@@ -628,6 +734,18 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decoder: null,
         decodedData: null
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decoder: 'decoderSample'
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')

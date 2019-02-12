@@ -75,7 +75,7 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
-  t.plan(11)
+  t.plan(12)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -89,6 +89,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     // the same but using normal instance methods, to ensure they works good ...
     t.ok(!ceEmpty.isValid())
     t.strictSame(ceEmpty.validate(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
+    t.ok(!ceEmpty.isStrict)
   }
 
   {
@@ -114,7 +115,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
-  t.plan(40)
+  t.plan(41)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -141,6 +142,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
     t.ok(ceMinimal.isValid())
     t.strictSame(ceMinimal.validate(), [])
     t.strictSame(ceMinimal.validate().length, 0) // simplify comparison of results, check only the  number of expected errors ...
+    t.ok(!ceMinimal.isStrict)
     const ceMinimal2 = new CloudEvent('2', // eventID
       'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
       '/', // source
@@ -460,7 +462,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
 /** @test {CloudEvent} */
 test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, but not other objects', (t) => {
-  t.plan(32)
+  t.plan(36)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -503,6 +505,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.strictEqual(ceObject instanceof CloudEvent, false)
     t.ok(!V.isClass(ceObject, CloudEvent))
     t.ok(!CloudEvent.isCloudEvent(ceObject))
+    t.ok(V.isStringNotEmpty(ceObject.toString()))
   }
 
   {
@@ -514,6 +517,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.ok(V.isClass(ceEmpty, CloudEvent))
     t.ok(!V.isClass(ceEmpty, CESubclass))
     t.ok(CloudEvent.isCloudEvent(ceEmpty))
+    t.ok(V.isStringNotEmpty(ceEmpty.toString()))
 
     // check that a subclass instance is seen as a CloudEvent
     const ceEmptySubclass = new CESubclass()
@@ -523,6 +527,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.ok(V.isClass(ceEmptySubclass, CloudEvent))
     t.ok(V.isClass(ceEmptySubclass, CESubclass))
     t.ok(CloudEvent.isCloudEvent(ceEmptySubclass))
+    t.ok(V.isStringNotEmpty(ceEmptySubclass.toString()))
 
     // check that a class instance outside CloudEvent class hierarchy is not seen as a CloudEvent
     const ceEmptyNoSubclass = new NotCESubclass()
@@ -532,5 +537,6 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.ok(!V.isClass(ceEmptyNoSubclass, CloudEvent))
     t.ok(!V.isClass(ceEmptyNoSubclass, CESubclass))
     t.ok(!CloudEvent.isCloudEvent(ceEmptyNoSubclass))
+    t.ok(V.isStringNotEmpty(ceEmptyNoSubclass.toString()))
   }
 })
