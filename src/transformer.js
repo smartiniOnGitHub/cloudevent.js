@@ -27,6 +27,12 @@
  */
 const V = require('./validator') // get validator from here
 
+/** Get the host name where this code is runninng */
+const hostname = require('os').hostname()
+
+/** Get the process id (pid) where this code is runninng */
+const pid = require('process').pid
+
 /**
  * Useful Transformations for CloudEvent objects.
  *
@@ -162,6 +168,20 @@ class Transformer {
       data.timestamp = Date.now()
     }
     return data
+  }
+
+  /**
+   * Utility function that get some process-related info and wrap into an object
+   * (compatible with the CloudEvent standard), to fill its 'data' attribute.
+   *
+   * @static
+   * @return {object} the object representation of process-related info data
+   */
+  static processInfoToData () {
+    return {
+      hostname: hostname,
+      pid: pid
+    }
   }
 }
 

@@ -339,3 +339,28 @@ test('ensure dumpObject works in the right way', (t) => {
   t.ok(T.dumpObject(1234567890, 'number'))
   t.ok(T.dumpObject(true, 'boolean'))
 })
+
+/** @test {Transformer} */
+test('ensure process info are transformed into data attribute in the right way', (t) => {
+  t.plan(10)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(V))
+  t.ok(V.isFunction(T))
+  t.ok(V.isFunction(T.processInfoToData))
+
+  const hostname = require('os').hostname()
+  const pid = require('process').pid
+
+  {
+    const data = T.processInfoToData()
+    // console.log(`DEBUG - data: ${T.dumpObject(data, 'data')}`)
+    t.ok(V.isObject(data))
+    t.ok(!V.ensureIsObjectOrCollection(data, 'data')) // no error returned
+    t.strictSame(V.ensureIsObjectOrCollection(data, 'data'), undefined) // no error returned
+    t.ok(data.hostname)
+    t.ok(data.pid)
+    t.strictSame(data.hostname, hostname)
+    t.strictSame(data.pid, pid)
+  }
+})

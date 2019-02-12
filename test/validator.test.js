@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {CloudEvent} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(68)
+  t.plan(70)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -219,6 +219,13 @@ test('ensure some (less used) validation functions are right', (t) => {
     const uriBad = 'path/nested?param1=value1' // not relative nor absolute uri, so not a real uri string
     t.ok(!V.isURI(uriBad, null))
     t.strictSame(V.ensureIsURI(uriBad, null, 'test') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const uriGoodPath = '/path/nested?param1=value1'
+    const uriBadBase = 'httpz:bad'
+    t.ok(!V.isURI(uriGoodPath, uriBadBase))
+    t.strictSame(V.ensureIsURI(uriGoodPath, uriBadBase, 'test') instanceof Error, true) // expected error returned
   }
 
   {
