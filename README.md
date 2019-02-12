@@ -33,9 +33,10 @@ Get a reference to the library:
 const CloudEventExports = require('cloudevent')
 
 // minimal, most common usage
-const { CloudEvent } = require('cloudevent')
+// const { CloudEvent } = require('cloudevent')
 // other, get more objects exposed by the library
-// const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('cloudevent')
+const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('cloudevent')
+assert(CloudEvent !== null && V !== null && T !== null)
 ```
 
 create some sample CloudEvent instances:
@@ -122,27 +123,7 @@ assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
 assert(ceErrorStrict.isValid())
 assert(ceFullStrictOtherContentType.isValid())
-// the same, but using static method
-assert(!CloudEvent.isValidEvent(ceEmpty))
-assert(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict))
-assert(CloudEvent.isValidEvent(ceMinimal))
-assert(CloudEvent.isValidEvent(ceFull))
-assert(CloudEvent.isValidEvent(ceFullStrict))
-assert(CloudEvent.isValidEvent(ceErrorStrict))
-assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
-assert(CloudEvent.validateEvent(ceEmpty).length === 3)
-assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 6)
-assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
-assert(CloudEvent.validateEvent(ceMinimal).length === 0)
-assert(CloudEvent.validateEvent(ceFull).length === 0)
-assert(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
-assert(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrict).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrictOtherContentType).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: false }).length === 0)
-assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: true }).length === 0)
+// etc ...
 
 console.log(`Validation on ceEmpty: isValid: ${ceEmpty.isValid()}, `)
 
