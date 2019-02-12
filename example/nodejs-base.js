@@ -86,7 +86,24 @@ assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)
-
+// create an instance that wrap an Error
+const error = new Error('sample error')
+error.code = 1000 // add a sample error code, as number
+const errorToData = T.errorToData(error, {
+  includeStackTrace: true,
+  // addStatus: false,
+  addTimestamp: true
+})
+const ceErrorStrict = new CloudEvent('2/error-strict',
+  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
+  '/test',
+  errorToData, // data
+  ceCommonOptionsStrict // use common options, but set strict mode to true
+)
+assert(ceErrorStrict !== null)
+assert(ceErrorStrict.isStrict)
+console.log(`cloudEvent dump: ${T.dumpObject(ceErrorStrict, 'ceErrorStrict')}`)
+// create an instance with a different content type
 const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
   'com.github.smartiniOnGitHub.cloudeventjs.testevent',
   '/test',
@@ -106,6 +123,7 @@ assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
 assert(ceMinimal.isValid())
 assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
+assert(ceErrorStrict.isValid())
 assert(ceFullStrictOtherContentType.isValid())
 // the same, but using static method
 assert(!CloudEvent.isValidEvent(ceEmpty))
@@ -113,6 +131,7 @@ assert(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict))
 assert(CloudEvent.isValidEvent(ceMinimal))
 assert(CloudEvent.isValidEvent(ceFull))
 assert(CloudEvent.isValidEvent(ceFullStrict))
+assert(CloudEvent.isValidEvent(ceErrorStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
 assert(CloudEvent.validateEvent(ceEmpty).length === 3)
 assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 6)
@@ -156,6 +175,28 @@ assert(ceFullStrictOtherContentTypeSerializedStatic === ceFullStrictOtherContent
 console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
 
 // then use (send/store/etc) serialized instances ...
+
+// deserialization examples
+// default contentType
+console.log(`\nSome deserialization/parse examples:`)
+const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
+assert(ceFullDeserialized !== null)
+assert(ceFullDeserialized.isValid())
+assert(!ceFullDeserialized.isStrict)
+assert(CloudEvent.isCloudEvent(ceFullDeserialized))
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullDeserialized, 'ceFullDeserialized')}`)
+// non default contentType
+const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
+  // decoder: (data) => { decoder: 'Sample' },
+  decodedData: { hello: 'world', year: 2018 }
+})
+assert(ceFullStrictOtherContentTypeDeserialized !== null)
+assert(ceFullStrictOtherContentTypeDeserialized.isValid())
+assert(ceFullStrictOtherContentTypeDeserialized.isStrict)
+assert(CloudEvent.isCloudEvent(ceFullStrictOtherContentTypeDeserialized))
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeserialized, 'ceFullStrictOtherContentTypeDeserialized')}`)
+
+// then use (validate/send/store/etc) deserialized instances ...
 
 console.log(`\nSample script: end execution.`)
 // end of script
