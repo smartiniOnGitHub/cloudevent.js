@@ -61,6 +61,7 @@ test('ensure the Transformer class is good and expose some functions to transfor
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const endOf2018TimestampAsString = '2018-12-31T23:59:59.999Z'
+const endOf2018TimestampAsNumber = 1546300799999 // Date.parse(endOf2018TimestampAsString)
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed to string in the right way', (t) => {
@@ -193,6 +194,95 @@ test('ensure the current timestamp is transformed to string and back as date in 
   t.strictSame(timestampFromString.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
   t.notStrictEqual(timestampFromString, commonEventTime)
   t.notEqual(timestampFromString, commonEventTime)
+})
+
+/** @test {Transformer} */
+test('ensure timestamps are transformed from number in the right way', (t) => {
+  t.plan(26)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(V))
+  t.ok(V.isFunction(T))
+  t.ok(endOf2018TimestampAsNumber)
+  t.ok(V.isNumber(endOf2018TimestampAsNumber))
+  t.ok(!V.isStringNotEmpty(endOf2018TimestampAsNumber))
+  t.ok(!V.ensureIsNumber(endOf2018TimestampAsNumber, 'endOf2018TimestampAsNumber')) // no error returned
+  t.ok(V.ensureIsStringNotEmpty(endOf2018TimestampAsNumber, 'endOf2018TimestampAsNumber')) // error returned
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber()
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber(undefined)
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber(null)
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming an null timestamp number to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber({})
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp number to a timestamp (Date)')
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber('bad timestamp')
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp number to a timestamp (Date)')
+
+  {
+    const timestamp = T.timestampFromNumber(endOf2018TimestampAsNumber)
+    t.ok(timestamp)
+    t.ok(V.isDateValid(timestamp))
+    t.ok(V.isNumber(timestamp.getTime()))
+    // console.log(`timestamp: '${timestamp}'`)
+  }
+
+  {
+    const timestampFuture = new Date(Date.now() + 1000)
+    t.ok(timestampFuture)
+    t.ok(V.isDateValid(timestampFuture))
+    t.ok(V.isNumber(timestampFuture.getTime()))
+    t.ok(!V.isDatePast(timestampFuture))
+    t.ok(V.isDateFuture(timestampFuture))
+    t.ok(V.ensureIsDatePast(timestampFuture, 'timestampFuture')) // expected error returned
+    t.ok(!V.ensureIsDateFuture(timestampFuture, 'timestampFuture')) // no error returned
+    t.strictSame(V.ensureIsDate(timestampFuture, 'timestampFuture'), undefined) // no error returned
+    t.strictSame(V.ensureIsDatePast(timestampFuture, 'timestampFuture') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsDateFuture(timestampFuture, 'timestampFuture'), undefined) // no error returned
+  }
+
+  t.throws(function () {
+    const timestamp = T.timestampFromNumber(commonEventTime) // ok but no Date accepted here
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp number to a timestamp (Date)')
+})
+
+/** @test {Transformer} */
+test('ensure the current timestamp is transformed to number and back as date in the right way', (t) => {
+  t.plan(8)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+
+  const timestampAsNumber = T.timestampToNumber(commonEventTime)
+  t.ok(timestampAsNumber)
+  t.ok(V.isNumber(timestampAsNumber))
+  // console.log(`current timestamp as number: '${timestampAsNumber}'`)
+
+  const timestampFromNumber = T.timestampFromNumber(timestampAsNumber)
+  t.ok(timestampFromNumber)
+  t.ok(V.isDateValid(timestampFromNumber))
+  // console.log(`current timestamp from number: '${timestampFromNumber}'`)
+
+  // ensure both timestamps have the same value, but they are different object references
+  t.strictSame(timestampFromNumber.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+  t.notStrictEqual(timestampFromNumber, commonEventTime)
+  t.notEqual(timestampFromNumber, commonEventTime)
 })
 
 /** @test {Transformer} */

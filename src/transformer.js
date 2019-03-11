@@ -132,6 +132,47 @@ class Transformer {
   }
 
   /**
+   * Utility function that parse a number representation
+   * of the given timestamp (Date)
+   * and returns it (if possible).
+   *
+   * Note that the value returned has already been adjusted with the current timezone offset.
+   *
+   * @static
+   * @param {!number} obj the timestamp/date to parse (as a number)
+   * @return {object} the parsed version, as a timestamp (Date) object, if possible
+   * @throws {Error} if obj is undefined or null, or is not a number
+   */
+  static timestampFromNumber (obj) {
+    if (!V.isNumber(obj)) {
+      throw new Error(`Missing or wrong timestamp: '${obj}' must be a number and not a: '${typeof obj}'.`)
+    }
+    return new Date(obj + Transformer.timezoneOffsetMsec)
+  }
+
+  /**
+   * Utility function that return a number representation
+   * of the given timestamp (Date), or the current one will be used.
+   *
+   * Note that the value returned is in the UTC format.
+   *
+   * @static
+   * @param {object} obj the timestamp/date to convert, or the current one
+   * @return {number} the number representation of the object
+   * @throws {Error} if obj is not a Date instance
+   */
+  static timestampToNumber (obj) {
+    let timestamp = obj
+    if (V.isUndefinedOrNull(timestamp)) {
+      timestamp = new Date()
+    }
+    if (!V.isDateValid(timestamp)) {
+      throw new Error(`Wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
+    }
+    return timestamp.getTime()
+  }
+
+  /**
    * Utility function that map an Error into an object
    * (compatible with the CloudEvent standard), to fill its 'data' attribute.
    *

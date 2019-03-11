@@ -543,6 +543,22 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is a number.
+   *
+   * See {@link Validator.isNumber}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {Error} if it's not a number, nothing otherwise
+   */
+  static ensureIsNumber (arg, name) {
+    if (!Validator.isNumber(arg)) {
+      return new Error(`The object '${name}' must be a Number`)
+    }
+  }
+
+  /**
    * Ensure that the given argument is an error instance or its subclass.
    *
    * See {@link Validator.isError}.
