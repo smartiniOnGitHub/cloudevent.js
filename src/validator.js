@@ -288,6 +288,19 @@ class Validator {
   }
 
   /**
+   * Tell if the given argument is an object or a keyed collection, or a string.
+   *
+   * See {@link Validator.isObjectOrCollection}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @return {boolean} true if it's an object or a keyed collection or a string, false otherwise
+   */
+  static isObjectOrCollectionOrString (arg) {
+    return (Validator.isObjectOrCollection(arg) || (typeof arg === 'string'))
+  }
+
+  /**
    * Tell if the given argument is a string representation of a version number.
    *
    * Note that the version string could be something like:
@@ -491,6 +504,22 @@ class Validator {
   static ensureIsObjectOrCollectionNotString (arg, name) {
     if (!Validator.isObjectOrCollectionNotString(arg)) {
       return new TypeError(`The object '${name}' must be an object or a collection, and not a string`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument ia an object or a collection, or a string.
+   *
+   * See {@link Validator.isObjectOrCollectionOrString}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not an object nor a collection nor a string, nothing otherwise
+   */
+  static ensureIsObjectOrCollectionOrString (arg, name) {
+    if (!Validator.isObjectOrCollectionOrString(arg)) {
+      return new TypeError(`The object '${name}' must be an object or a collection, or a string`)
     }
   }
 

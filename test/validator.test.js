@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {CloudEvent} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(70)
+  t.plan(82)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -173,6 +173,26 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.ok(!V.isObject(objectBad))
     t.ok(V.ensureIsObjectOrCollection(objectBad, 'error')) // expected error returned
     t.strictSame(V.ensureIsObjectOrCollection(objectBad, 'error') instanceof Error, true) // expected error returned
+  }
+
+  {
+    const objectGood = { name: 'Name', age: 20, note: null }
+    t.ok(V.isObject(objectGood))
+    t.ok(!V.isString(objectGood))
+    t.ok(!V.ensureIsObjectOrCollection(objectGood, 'object')) // no error returned
+    t.strictSame(V.ensureIsObjectOrCollection(objectGood, 'object') instanceof Error, false) // no error returned
+    t.ok(!V.ensureIsObjectOrCollectionNotString(objectGood, 'object')) // no error returned
+    t.ok(!V.ensureIsObjectOrCollectionOrString(objectGood, 'object')) // no error returned
+  }
+
+  {
+    const objectAsStringGood = '{ name: "Name", age: 20, note: null }'
+    t.ok(!V.isObject(objectAsStringGood))
+    t.ok(V.isString(objectAsStringGood))
+    t.ok(V.ensureIsObjectOrCollection(objectAsStringGood, 'string')) // expected error returned
+    t.strictSame(V.ensureIsObjectOrCollection(objectAsStringGood, 'string') instanceof Error, true) // expected error returned
+    t.ok(V.ensureIsObjectOrCollectionNotString(objectAsStringGood, 'object')) // expected error returned
+    t.ok(!V.ensureIsObjectOrCollectionOrString(objectAsStringGood, 'object')) // no error returned
   }
 
   {

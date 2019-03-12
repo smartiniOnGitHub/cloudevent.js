@@ -229,7 +229,12 @@ class CloudEvent {
       ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.cloudEventsVersion, 'cloudEventsVersion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+        if (event.contentType === CloudEvent.contentTypeDefault()) {
+          ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+        } else {
+          // even a string in this case would be good
+          ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
+        }
       }
       if (V.isDefinedAndNotNull(event.eventTypeVersion)) {
         ve.push(V.ensureIsVersion(event.eventTypeVersion, 'eventTypeVersion'))
@@ -289,15 +294,20 @@ class CloudEvent {
    * @param {object} options optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
    *        encodedData (string, no default) already encoded data (but consistency with the contentType is not checked),
+   *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
-  static serializeEvent (event, { encoder, encodedData } = {}) {
+  static serializeEvent (event, { encoder, encodedData, onlyValid = false } = {}) {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
     if (event.contentType === CloudEvent.contentTypeDefault()) {
-      return JSON.stringify(event)
+      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
+        return JSON.stringify(event)
+      } else {
+        throw new Error(`Unable to serialize a not valid CloudEvent.`)
+      }
     }
     // else
     if (V.isDefinedAndNotNull(encoder)) {
@@ -314,7 +324,16 @@ class CloudEvent {
     if (!V.isStringNotEmpty(encodedData)) {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    return JSON.stringify({ ...event, data: encodedData })
+    const newEvent = {
+      ...event,
+      data: encodedData,
+      __proto__: CloudEvent.prototype // set the right prototype in the clone
+    }
+    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
+      return JSON.stringify(newEvent)
+    } else {
+      throw new Error(`Unable to serialize a not valid CloudEvent.`)
+    }
   }
 
   /**
@@ -326,11 +345,12 @@ class CloudEvent {
    * @param {object} options optional deserialization attributes:
    *        decoder (function, no default) a function that takes data and returns decoder data,
    *        decodedData (object, no default) already decoded data (but consistency with the contentType is not checked),
+   *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    */
-  static deserializeEvent (ser, { decoder, decodedData } = {}) {
+  static deserializeEvent (ser, { decoder, decodedData, onlyValid = false } = {}) {
     if (V.isUndefinedOrNull(ser)) {
       throw new Error('Serialized CloudEvent undefined or null')
     }
@@ -379,7 +399,12 @@ class CloudEvent {
     }
     // overwrite data with decodedData before returning it
     ce.data = decodedData
-    return ce
+    // return ce, depending on its validation option
+    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
+      return ce
+    } else {
+      throw new Error(`Unable to deserialize a not valid CloudEvent.`)
+    }
   }
 
   /**
