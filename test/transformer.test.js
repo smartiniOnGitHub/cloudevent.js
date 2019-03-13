@@ -469,3 +469,73 @@ test('ensure process info are transformed into data attribute in the right way',
     t.strictSame(data.pid, pid)
   }
 })
+
+/** @test {Transformer} */
+test('ensure uri/url are stripped by arguments in the right way', (t) => {
+  t.plan(22)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  // t.ok(V.isFunction(V))
+  t.ok(V.isFunction(T))
+  t.ok(V.isFunction(T.uriStripArguments))
+
+  t.throws(function () {
+    const url = T.uriStripArguments()
+    assert(url === null) // never executed
+  }, Error, 'Expected exception when transforming an undefined reference to a stripped url (string)')
+  t.throws(function () {
+    const url = T.uriStripArguments(null)
+    assert(url === null) // never executed
+  }, Error, 'Expected exception when transforming a null reference to a stripped url (string)')
+
+  {
+    const url = T.uriStripArguments('')
+    t.ok(V.isString(url))
+    t.strictSame(url, '')
+  }
+  {
+    const url = T.uriStripArguments('sample string')
+    t.ok(V.isString(url))
+    t.strictSame(url, 'sample string')
+  }
+  {
+    const url = T.uriStripArguments('http://localhost:3000/path/nested')
+    t.ok(V.isString(url))
+    t.strictSame(url, 'http://localhost:3000/path/nested')
+  }
+  {
+    const url = T.uriStripArguments('http://localhost:3000/path/nested?param1=value1&param2=&param3=Test')
+    t.ok(V.isString(url))
+    t.strictSame(url, 'http://localhost:3000/path/nested')
+  }
+  {
+    const url = T.uriStripArguments('/path/nested?param1=value1&param2=&param3=Test')
+    t.ok(V.isString(url))
+    t.strictSame(url, '/path/nested')
+  }
+
+  // the same but woth strict mode enabled
+  t.throws(function () {
+    const url = T.uriStripArguments('', { strict: true })
+    assert(url === null) // never executed
+  }, Error, 'Expected exception when transforming a bad URI/URL to a stripped one (string)')
+  t.throws(function () {
+    const url = T.uriStripArguments('sample string', { strict: true })
+    assert(url === null) // never executed
+  }, Error, 'Expected exception when transforming a bad URI/URL to a stripped one (string)')
+  {
+    const url = T.uriStripArguments('http://localhost:3000/path/nested', { strict: true })
+    t.ok(V.isString(url))
+    t.strictSame(url, 'http://localhost:3000/path/nested')
+  }
+  {
+    const url = T.uriStripArguments('http://localhost:3000/path/nested?param1=value1&param2=&param3=Test', { strict: true })
+    t.ok(V.isString(url))
+    t.strictSame(url, 'http://localhost:3000/path/nested')
+  }
+  {
+    const url = T.uriStripArguments('/path/nested?param1=value1&param2=&param3=Test', { strict: true })
+    t.ok(V.isString(url))
+    t.strictSame(url, '/path/nested')
+  }
+})

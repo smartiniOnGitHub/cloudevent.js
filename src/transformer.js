@@ -213,6 +213,28 @@ class Transformer {
       pid: pid
     }
   }
+
+  /**
+   * Utility function that strip all arguments (if any) from the given URI/URL string
+   * and returns the string without them.
+   *
+   * @static
+   * @param {!string} url the URI/URL (as a string)
+   * @param {object} options containing: strict (boolean, default false) to check it in a more strict way
+   * @return {string} the parsed version, but without arguments (if any)
+   * @throws {Error} if url is undefined or null, or is not a string
+   */
+  static uriStripArguments (url, { strict = false } = {}) {
+    if (!V.isString(url)) {
+      throw new Error(`Missing or wrong URL: '${url}' must be a string and not a: '${typeof url}'.`)
+    }
+    if (strict === true) {
+      if (!V.isURI(url)) {
+        throw new Error(`Missing or wrong URL: '${url}'`)
+      }
+    }
+    return url.split('?')[0]
+  }
 }
 
 module.exports = Transformer

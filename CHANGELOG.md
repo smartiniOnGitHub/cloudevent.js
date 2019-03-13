@@ -10,6 +10,9 @@ Summary Changelog:
   the 'data' attribute could be a string
 - in Transformer, add utility static methods 'timestampToNumber' and 'timestampFromNumber', 
   to simplify timestamp handling even when in number format
+- in Transformer, add utility static method 'uriStripArguments', to return the given URI/URL string 
+  but without arguments (if any); note that this would be useful to cleanup given url (sometimes 
+  returned by frameworks as requested by web clients), to put into the 'source' attribute
 - Achieve 100% test code coverage
 
 ## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (2019-02-12)
