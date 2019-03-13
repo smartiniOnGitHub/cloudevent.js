@@ -160,15 +160,22 @@ const ceFullSerialized = ceFull.serialize()
 assert(ceFullSerialized !== null)
 assert(ceFullSerializedStatic === ceFullSerialized)
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
+const ceFullStrictSerialized = ceFullStrict.serialize()
+assert(ceFullStrictSerialized !== null)
+console.log(`Serialization output for ceFullStrict, details:\n` + ceFullStrictSerialized)
+const ceFullStrictSerializedOnlyValid = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true })
+assert(ceFullStrictSerializedOnlyValid !== null)
 // non default contentType
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
-  // encoder: (data) => '<data "encoder"="sample" />'
-  encodedData: '<data "hello"="world" "year"="2018" />'
+  // encoder: (data) => '<data "encoder"="sample" />',
+  encodedData: '<data "hello"="world" "year"="2018" />',
+  onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeSerializedStatic !== null)
 const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
   // encoder: (data) => '<data "encoder"="sample" />',
-  encodedData: '<data "hello"="world" "year"="2018" />'
+  encodedData: '<data "hello"="world" "year"="2018" />',
+  onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeSerialized !== null)
 assert(ceFullStrictOtherContentTypeSerializedStatic === ceFullStrictOtherContentTypeSerialized)
@@ -185,10 +192,14 @@ assert(ceFullDeserialized.isValid())
 assert(!ceFullDeserialized.isStrict)
 assert(CloudEvent.isCloudEvent(ceFullDeserialized))
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullDeserialized, 'ceFullDeserialized')}`)
+const ceFullStrictDeserializedOnlyValid = CloudEvent.deserializeEvent(ceFullStrictSerialized, { onlyValid: true })
+assert(ceFullStrictDeserializedOnlyValid !== null)
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictDeserializedOnlyValid, 'ceFullStrictDeserializedOnlyValid')}`)
 // non default contentType
 const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
   // decoder: (data) => { decoder: 'Sample' },
-  decodedData: { hello: 'world', year: 2018 }
+  decodedData: { hello: 'world', year: 2018 },
+  onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeDeserialized !== null)
 assert(ceFullStrictOtherContentTypeDeserialized.isValid())

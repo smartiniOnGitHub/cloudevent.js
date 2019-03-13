@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.4.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.4.0) (unreleased)
+Summary Changelog:
+- Updated dependencies for the development environment
+- Remove unused dev dependencies
+- In serialization/deserialization methods, add a boolean option 'onlyValid' (by default false) 
+  to serialize/deserialize only if validation is successful
+- Relax strict validation rules, so when contentType is not default, 
+  the 'data' attribute could be a string
+- in Transformer, add utility static methods 'timestampToNumber' and 'timestampFromNumber', 
+  to simplify timestamp handling even when in number format
+- Achieve 100% test code coverage
+
 ## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (2019-02-12)
 Summary Changelog:
 - Updated dependencies for the development environment

@@ -138,14 +138,18 @@ serialization examples:
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 const ceFullSerialized = ceFull.serialize()
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
+const ceFullStrictSerialized = ceFullStrict.serialize()
+console.log(`Serialization output for ceFullStrict, details:\n` + ceFullStrictSerialized)
 // non default contentType
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
-  // encoder: (data) => '<data "encoder"="sample" />'
-  encodedData: '<data "hello"="world" "year"="2018" />'
+  // encoder: (data) => '<data "encoder"="sample" />',
+  encodedData: '<data "hello"="world" "year"="2018" />',
+  onlyValid: true
 })
 const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
-  // encoder: (data) => '<data "encoder"="sample" />'
-  encodedData: '<data "hello"="world" "year"="2018" />'
+  // encoder: (data) => '<data "encoder"="sample" />',
+  encodedData: '<data "hello"="world" "year"="2018" />',
+  onlyValid: true
 })
 console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
 
@@ -165,10 +169,14 @@ assert(ceFullDeserialized.isValid())
 assert(!ceFullDeserialized.isStrict)
 assert(CloudEvent.isCloudEvent(ceFullDeserialized))
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullDeserialized, 'ceFullDeserialized')}`)
+const ceFullStrictDeserializedOnlyValid = CloudEvent.deserializeEvent(ceFullStrictSerialized, { onlyValid: true })
+assert(ceFullStrictDeserializedOnlyValid !== null)
+console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictDeserializedOnlyValid, 'ceFullStrictDeserializedOnlyValid')}`)
 // non default contentType
 const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
   // decoder: (data) => { decoder: 'Sample' },
-  decodedData: { hello: 'world', year: 2018 }
+  decodedData: { hello: 'world', year: 2018 },
+  onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeDeserialized !== null)
 assert(ceFullStrictOtherContentTypeDeserialized.isValid())
