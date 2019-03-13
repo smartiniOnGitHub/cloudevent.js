@@ -69,7 +69,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(44)
+  t.plan(52)
 
   const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
@@ -127,6 +127,24 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(ceFullSerializedOnlyValidFalse)
     const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, { onlyValid: true })
     t.ok(ceFullSerializedOnlyValidTrue)
+
+    {
+      const ceFullBad = new CloudEvent(null,
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        ceCommonOptions
+      )
+      assert(ceFullBad !== null)
+      t.ok(ceFullBad)
+      t.ok(!ceFullBad.isValid())
+      const ceFullBadSerializedOnlyValidFalse = ceSerialize(ceFullBad, { onlyValid: false })
+      t.ok(ceFullBadSerializedOnlyValidFalse)
+      t.throws(function () {
+        const ceFullBadSerializedOnlyValidTrue = ceSerialize(ceFullBad, { onlyValid: true })
+        assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
+      }, Error, 'Expected exception when serializing a bad CloudEvent instance')
+    }
   }
 
   {
@@ -181,12 +199,31 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(ceFullStrictSerializedOnlyValidFalse)
     const ceFullStrictSerializedOnlyValidTrue = ceSerialize(ceFullStrict, { onlyValid: true })
     t.ok(ceFullStrictSerializedOnlyValidTrue)
+
+    {
+      const ceFullStrictBad = new CloudEvent('1/full/sample-data/strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        ceCommonOptionsStrict
+      )
+      assert(ceFullStrictBad !== null)
+      t.ok(ceFullStrictBad)
+      ceFullStrictBad.eventID = null // remove some mandatory attribute now, to let serialization fail
+      t.ok(!ceFullStrictBad.isValid())
+      const ceFullStrictBadSerializedOnlyValidFalse = ceSerialize(ceFullStrictBad, { onlyValid: false })
+      t.ok(ceFullStrictBadSerializedOnlyValidFalse)
+      t.throws(function () {
+        const ceFullStrictBadSerializedOnlyValidTrue = ceSerialize(ceFullStrictBad, { onlyValid: true })
+        assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
+      }, Error, 'Expected exception when serializing a bad CloudEvent instance')
+    }
   }
 })
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contentType and empty serialization options, expect error', (t) => {
-  t.plan(26)
+  t.plan(34)
 
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
@@ -247,6 +284,33 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
       delete ce.extensions
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, false)
+    }
+
+    {
+      const ceFullOtherContentTypeBad = new CloudEvent(null,
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        {
+          ...ceCommonOptions,
+          contentType: 'application/xml'
+        }
+      )
+      assert(ceFullOtherContentTypeBad !== null)
+      t.ok(ceFullOtherContentTypeBad)
+      t.ok(!ceFullOtherContentTypeBad.isValid())
+      const ceFullBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
+        encodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      t.ok(ceFullBadSerializedOnlyValidFalse)
+      t.throws(function () {
+        const ceFullBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
+          encodedData: `<data "hello"="world" "year"="2018" />`,
+          onlyValid: true
+        })
+        assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
+      }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
   }
 
@@ -324,6 +388,34 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
       delete ce.extensions
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, false)
+    }
+
+    {
+      const ceFullOtherContentTypeStrictBad = new CloudEvent('1/non-default-contentType/sample-data/strict',
+        ceNamespace,
+        ceServerUrl,
+        ceCommonData, // data
+        {
+          ...ceCommonOptions,
+          contentType: 'application/xml'
+        }
+      )
+      assert(ceFullOtherContentTypeStrictBad !== null)
+      t.ok(ceFullOtherContentTypeStrictBad)
+      ceFullOtherContentTypeStrictBad.eventID = null // remove some mandatory attribute now, to let serialization fail
+      t.ok(!ceFullOtherContentTypeStrictBad.isValid())
+      const ceFullStrictBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
+        encodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      t.ok(ceFullStrictBadSerializedOnlyValidFalse)
+      t.throws(function () {
+        const ceFullStrictBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
+          encodedData: `<data "hello"="world" "year"="2018" />`,
+          onlyValid: true
+        })
+        assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
+      }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
   }
 })
@@ -497,6 +589,8 @@ const ceNestedFullSerializedJson = `{"eventID":"1/full/sample-data-nested/no-str
 const ceNestedFullStrictSerializedJson = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2018,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"cloudEventsVersion":"0.1","contentType":"application/json","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
 const ceFullOtherContentTypeSerializedJson = `{"eventID":"1/full/sample-data-nested/no-strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2018' />","cloudEventsVersion":"0.1","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value"},"schemaURL":"http://my-schema.localhost.localdomain"}`
 const ceFullOtherContentTypeStrictSerializedJson = `{"eventID":"1/full/sample-data-nested/strict","eventType":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2018' />","cloudEventsVersion":"0.1","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","eventTypeVersion":"1.0.0","extensions":{"exampleExtension":"value","strict":true},"schemaURL":"http://my-schema.localhost.localdomain"}`
+const ceFullOtherContentTypeSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2018' />","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","extensions":{"exampleExtension":"value"}}`
+const ceFullOtherContentTypeStrictSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2018' />","contentType":"application/xml","eventTime":"${T.timestampToString(commonEventTime)}","extensions":{"exampleExtension":"value","strict":true}}`
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
@@ -625,7 +719,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
 
 /** @test {CloudEvent} */
 test('deserialize generic strings (not JSON representation for an Object) into a CloudEvent instance, expected Errors', (t) => {
-  t.plan(8)
+  t.plan(10)
 
   const { CloudEvent } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -658,6 +752,14 @@ test('deserialize generic strings (not JSON representation for an Object) into a
     const deserialized = CloudEvent.deserializeEvent('[ "sample array/list", "of", "values" ]')
     assert(deserialized === null) // never executed
   }, Error, 'Expected exception when deserializing a string representing an array (in JSON)')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', { onlyValid: false })
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
+  t.throws(function () {
+    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', { onlyValid: true })
+    assert(deserialized === null) // never executed
+  }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
 })
 
 /** @test {CloudEvent} */
@@ -762,7 +864,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
 
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contentType and empty/wrong deserialization options, expect error', (t) => {
-  t.plan(10)
+  t.plan(18)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
@@ -785,6 +887,34 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: true
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: true
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -812,6 +942,34 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: true
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: true
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: false
+      })
+      assert(ceFullOtherContentTypeDeserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
+        decodedData: `<data "hello"="world" "year"="2018" />`,
+        onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')

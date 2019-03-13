@@ -264,20 +264,35 @@ test('ensure timestamps are transformed from number in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to number and back as date in the right way', (t) => {
-  t.plan(8)
+  t.plan(12)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
+  const nowAsNumber = T.timestampToNumber()
+  t.ok(nowAsNumber)
+  t.ok(V.isNumber(nowAsNumber))
+  // console.log(`current timestamp as number: '${nowAsNumber}'`)
+
+  t.throws(function () {
+    const timestamp = T.timestampToNumber('bad timestamp')
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp to a timestamp (Number)')
+
+  t.throws(function () {
+    const timestamp = T.timestampToNumber({}) // bad timestamp
+    assert(timestamp === null) // never executed
+  }, Error, 'Expected exception when transforming not a right timestamp to a timestamp (Number)')
+
   const timestampAsNumber = T.timestampToNumber(commonEventTime)
   t.ok(timestampAsNumber)
   t.ok(V.isNumber(timestampAsNumber))
-  // console.log(`current timestamp as number: '${timestampAsNumber}'`)
+  // console.log(`timestamp as number: '${timestampAsNumber}'`)
 
   const timestampFromNumber = T.timestampFromNumber(timestampAsNumber)
   t.ok(timestampFromNumber)
   t.ok(V.isDateValid(timestampFromNumber))
-  // console.log(`current timestamp from number: '${timestampFromNumber}'`)
+  // console.log(`timestamp from number: '${timestampFromNumber}'`)
 
   // ensure both timestamps have the same value, but they are different object references
   t.strictSame(timestampFromNumber.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
