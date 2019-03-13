@@ -52,17 +52,6 @@ class Transformer {
   }
 
   /**
-   * Gives a string valued property that is used in the creation of the default string description of an object.
-   *
-   * See {@link Symbol.toStringTag}.
-   *
-   * @return {string} a string representation of the object type
-   */
-  get [Symbol.toStringTag] () {
-    return 'Transformer'
-  }
-
-  /**
    * Utility function that return a dump of the given object.
    *
    * @static

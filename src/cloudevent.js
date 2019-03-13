@@ -394,7 +394,7 @@ class CloudEvent {
         throw new Error(`Missing decoder function: use decoder function or already decoded data with the given content type: '${parsed.contentType}'.`)
       }
     }
-    if (!V.isObject(decodedData)) {
+    if (!V.isObject(decodedData) && !V.isStringNotEmpty(decodedData)) {
       throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given content type: '${parsed.contentType}'.`)
     }
     // overwrite data with decodedData before returning it
