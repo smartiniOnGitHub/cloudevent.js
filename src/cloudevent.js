@@ -324,6 +324,7 @@ class CloudEvent {
     if (!V.isStringNotEmpty(encodedData)) {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
+    // TODO: change with the new method in Transformer ... wip
     const newEvent = {
       ...event,
       data: encodedData,

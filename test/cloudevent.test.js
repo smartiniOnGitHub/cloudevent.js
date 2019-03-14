@@ -540,3 +540,38 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.ok(V.isStringNotEmpty(ceEmptyNoSubclass.toString()))
   }
 })
+
+/** @test {CloudEvent} */
+test('ensure CloudEvent and objects are merged in the right way', (t) => {
+  t.plan(14)
+
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(CloudEvent))
+  t.ok(V.isFunction(V))
+  t.ok(V.isFunction(T))
+  t.ok(V.isFunction(T.mergeObjects))
+
+  {
+    const base = new CloudEvent()
+    const obj = T.mergeObjects(base)
+    t.ok(V.isObject(obj))
+    t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
+  }
+  {
+    const base = new CloudEvent('1', // eventID
+      ceNamespace,
+      ceServerUrl,
+      {} // data (empty) // optional, but useful the same in this sample usage
+    )
+    t.ok(base)
+    t.ok(base.isValid({ strict: false })) // strict false here because base is missing some attribute, for the test
+    t.ok(!base.isStrict)
+    const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, { extensions: { strict: true } })
+    // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'obj')}`)
+    t.ok(obj)
+    t.ok(V.isObject(obj))
+    t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
+    t.ok(obj.isValid({ strict: true }))
+    t.ok(obj.isStrict)
+  }
+})

@@ -56,19 +56,18 @@ class Transformer {
    *
    * @static
    * @param {(object|Map|Set)} obj the object to dump
-   * @param {string} name the name to assign in the returned string
+   * @param {string} name the name to assign in the returned string, or 'noname' as default value
    * @return {string} the dump of the object or a message when obj is undefined/null/not an object
    */
-  static dumpObject (obj, name) {
-    const n = name || 'noname'
+  static dumpObject (obj, name = 'noname') {
     if (V.isUndefined(obj)) {
-      return `${n}: undefined`
+      return `${name}: undefined`
     } else if (V.isNull(obj)) {
-      return `${n}: null`
+      return `${name}: null`
     } else if (!V.isObjectOrCollection(obj)) {
-      return `${n}: '${obj.toString()}'`
+      return `${name}: '${obj.toString()}'`
     } else {
-      return `${n}: ${JSON.stringify(obj)}`
+      return `${name}: ${JSON.stringify(obj)}`
     }
   }
 
@@ -234,6 +233,37 @@ class Transformer {
       }
     }
     return url.split('?')[0]
+  }
+
+  /**
+   * Utility function that merge the given objects (at least one base and another)
+   * and returns the new one (but with the prototype of the first).
+   *
+   * @static
+   * @param {!object} base the first object to merge
+   * @param {object} others all other(s) object to merge (at least one)
+   * @return {object} the new object
+   * @throws {Error} if base is undefined or null, or is not an object
+   */
+  static mergeObjects (base, ...others) {
+    if (!V.isObject(base)) {
+      throw new Error(`Missing or wrong argument: '${base}' must be an object and not a: '${typeof base}'.`)
+    }
+    /*
+    const merged = {
+      ...base,
+      ...others || {}
+      // __proto__: CloudEvent.prototype // set the right prototype in the clone
+      // TODO: better, use the prototype of the given base (to avoid direct references to CloudEvent) ... ok
+      // __proto__: base.prototype // set the prototype of the first argument in the clone
+      // TODO: set the prototype but not in a deprecated way ... ok
+    }
+     */
+    // Object.setPrototypeOf(merged, base.prototype) // set the prototype of the first argument in the clone
+    // TODO: use the following version ... ok
+    const baseProto = Object.getPrototypeOf(base)
+    // return Object.assign(Object.create(baseProto), merged) // set the prototype of the first argument in the clone
+    return Object.assign(Object.create(baseProto), base, ...others) // set the prototype of the first argument in the clone
   }
 }
 

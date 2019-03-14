@@ -471,7 +471,7 @@ test('ensure process info are transformed into data attribute in the right way',
 })
 
 /** @test {Transformer} */
-test('ensure uri/url are stripped by arguments in the right way', (t) => {
+test('ensure uri/url are stripped by query arguments in the right way', (t) => {
   t.plan(22)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
@@ -537,5 +537,37 @@ test('ensure uri/url are stripped by arguments in the right way', (t) => {
     const url = T.uriStripArguments('/path/nested?param1=value1&param2=&param3=Test', { strict: true })
     t.ok(V.isString(url))
     t.strictSame(url, '/path/nested')
+  }
+})
+
+/** @test {Transformer} */
+test('ensure objects are merged in the right way', (t) => {
+  t.plan(8)
+
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  t.ok(V.isFunction(T))
+  t.ok(V.isFunction(T.mergeObjects))
+
+  t.throws(function () {
+    const obj = T.mergeObjects()
+    assert(obj === null) // never executed
+  }, Error, 'Expected exception when merging an undefined reference to object with another undefined reference')
+  t.throws(function () {
+    const obj = T.mergeObjects(null)
+    assert(obj === null) // never executed
+  }, Error, 'Expected exception when merging null reference to object with another undefined reference')
+
+  {
+    const base = {}
+    const obj = T.mergeObjects(base)
+    t.ok(V.isObject(obj))
+    t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
+  }
+  {
+    const base = { bVal: 1, bName: 'Base' }
+    const obj = T.mergeObjects(base, { ext1Val: 10, ext1Name: 'Extension1' }, { ext2Val: 20, ext2Name: 'Extension2' })
+    // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'merged')}`)
+    t.ok(V.isObject(obj))
+    t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
   }
 })
