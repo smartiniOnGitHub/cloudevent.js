@@ -324,16 +324,7 @@ class CloudEvent {
     if (!V.isStringNotEmpty(encodedData)) {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contentType}'.`)
     }
-    /*
-    // TODO: change with the new method in Transformer ... ok
-    const newEvent = {
-      ...event,
-      data: encodedData,
-      __proto__: CloudEvent.prototype // set the right prototype in the clone
-    }
-     */
     const newEvent = T.mergeObjects(event, { data: encodedData })
-    // console.log(`DEBUG - event details: ${T.dumpObject(newEvent, 'newEvent')}`)
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return JSON.stringify(newEvent)
     } else {

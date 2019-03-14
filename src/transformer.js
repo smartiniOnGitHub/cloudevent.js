@@ -249,20 +249,7 @@ class Transformer {
     if (!V.isObject(base)) {
       throw new Error(`Missing or wrong argument: '${base}' must be an object and not a: '${typeof base}'.`)
     }
-    /*
-    const merged = {
-      ...base,
-      ...others || {}
-      // __proto__: CloudEvent.prototype // set the right prototype in the clone
-      // TODO: better, use the prototype of the given base (to avoid direct references to CloudEvent) ... ok
-      // __proto__: base.prototype // set the prototype of the first argument in the clone
-      // TODO: set the prototype but not in a deprecated way ... ok
-    }
-     */
-    // Object.setPrototypeOf(merged, base.prototype) // set the prototype of the first argument in the clone
-    // TODO: use the following version ... ok
     const baseProto = Object.getPrototypeOf(base)
-    // return Object.assign(Object.create(baseProto), merged) // set the prototype of the first argument in the clone
     return Object.assign(Object.create(baseProto), base, ...others) // set the prototype of the first argument in the clone
   }
 }
