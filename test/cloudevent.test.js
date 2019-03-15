@@ -309,7 +309,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataUndefined.isValid({ strict: false }))
     t.strictSame(ceFullDataUndefined.validate(), [])
     t.strictSame(ceFullDataUndefined.validate({ strict: false }).length, 0)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataUndefinedStrict = new CloudEvent('1/full/undefined-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -349,7 +349,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataNull.isValid({ strict: false }))
     t.strictSame(ceFullDataNull.validate(), [])
     t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -393,7 +393,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataString.validate(), [])
     t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
     t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -439,7 +439,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataMap.isValid({ strict: false }))
     t.strictSame(ceFullDataMap.validate(), []) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
       ceNamespace,
       ceServerUrl,

@@ -148,7 +148,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -315,7 +315,7 @@ test('serialize a CloudEvent instance with a non default contentType and empty s
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -490,7 +490,7 @@ test('serialize a CloudEvent instance with a non default contentType and right s
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contentType/sample-data/strict',
       ceNamespace,
       ceServerUrl,
@@ -658,7 +658,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
       ceNamespace,
       ceServerUrl,
@@ -815,7 +815,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const serialized = ceNestedFullStrictSerializedJson
     // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
@@ -1020,7 +1020,7 @@ test('deserialize a CloudEvent instance with a non default contentType and right
   }
 
   {
-    // the same with with strict mode enabled ...
+    // the same but with strict mode enabled ...
     const serialized = ceFullOtherContentTypeStrictSerializedJson
     // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
