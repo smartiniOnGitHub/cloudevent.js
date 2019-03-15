@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.4.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.4.0) (unreleased)
+## [0.4.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.4.0) (2019-03-15)
 Summary Changelog:
 - Updated dependencies for the development environment
 - Remove unused dev dependencies
@@ -13,6 +13,10 @@ Summary Changelog:
 - in Transformer, add utility static method 'uriStripArguments', to return the given URI/URL string 
   but without arguments (if any); note that this would be useful to cleanup given url (sometimes 
   returned by frameworks as requested by web clients), to put into the 'source' attribute
+- in Transformer, add utility static method 'mergeObjects', to merge the given objects 
+  and return the merged one (but with the same prototype of the first object); 
+  note that this is useful to merge a CloudEvent instance with other objects 
+  containing attribute values to merge in it
 - Achieve 100% test code coverage
 
 ## [0.3.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.3.0) (2019-02-12)
