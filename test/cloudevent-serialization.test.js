@@ -880,13 +880,13 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: 'decoderSample'
+        decoder: 'decoderSample' // bad decoder function
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: true
+        decodedData: true // bad decoded data
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -895,15 +895,15 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
         decodedData: `<data "hello"="world" "year"="2018" />`,
         onlyValid: false
       })
-      assert(ceFullOtherContentTypeDeserialized === null) // never executed
-    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
+    }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: `<data "hello"="world" "year"="2018" />`,
         onlyValid: true
       })
-      assert(ceFullOtherContentTypeDeserialized === null) // never executed
-    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
+    }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
         decodedData: `<data "hello"="world" "year"="2018" />`,
@@ -921,6 +921,7 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
   }
 
   {
+    // the same but with strict mode enabled ...
     const serialized = ceFullOtherContentTypeStrictSerializedJson
     // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
@@ -935,13 +936,13 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: 'decoderSample'
+        decoder: 'decoderSample' // bad decoder function
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: true
+        decodedData: true // bad decoder data
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -950,15 +951,15 @@ test('deserialize a CloudEvent instance with a non default contentType and empty
         decodedData: `<data "hello"="world" "year"="2018" />`,
         onlyValid: false
       })
-      assert(ceFullOtherContentTypeDeserialized === null) // never executed
-    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
+    }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: `<data "hello"="world" "year"="2018" />`,
         onlyValid: true
       })
-      assert(ceFullOtherContentTypeDeserialized === null) // never executed
-    }, Error, 'Expected exception when deserializing the current CloudEvent instance')
+      assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
+    }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
         decodedData: `<data "hello"="world" "year"="2018" />`,
@@ -984,7 +985,7 @@ function decoderSample () {
 
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contentType and right deserialization options, expect success', (t) => {
-  t.plan(14)
+  t.plan(18)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
@@ -1017,6 +1018,18 @@ test('deserialize a CloudEvent instance with a non default contentType and right
       decodedData: fixedDecodedData
     })
     t.ok(ceFullOtherContentTypeDeserialized3)
+    const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      decodedData: fixedDecodedData,
+      onlyValid: false
+    })
+    t.ok(ceFullOtherContentTypeDeserialized4)
+    const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      decodedData: fixedDecodedData,
+      onlyValid: true
+    })
+    t.ok(ceFullOtherContentTypeDeserialized5)
   }
 
   {
@@ -1045,5 +1058,17 @@ test('deserialize a CloudEvent instance with a non default contentType and right
       decodedData: fixedDecodedData
     })
     t.ok(ceFullOtherContentTypeDeserialized3)
+    const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      decodedData: fixedDecodedData,
+      onlyValid: false
+    })
+    t.ok(ceFullOtherContentTypeDeserialized4)
+    const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
+      decoder: decoderSample,
+      decodedData: fixedDecodedData,
+      onlyValid: true
+    })
+    t.ok(ceFullOtherContentTypeDeserialized5)
   }
 })
