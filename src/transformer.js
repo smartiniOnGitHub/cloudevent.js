@@ -103,20 +103,25 @@ class Transformer {
 
   /**
    * Utility function that return a string representation
-   * (compatible with the CloudEvent standard) of the given timestamp (Date).
+   * (compatible with the CloudEvent standard)
+   * of the given timestamp (Date), or the current one will be used.
    *
    * Note that the value returned is in the UTC format.
    *
    * @static
-   * @param {!object} obj the timestamp/date to convert
+   * @param {object} obj the timestamp/date to convert, or the current one
    * @return {string} the string representation of the object
    * @throws {Error} if obj is undefined or null, or is not a Date instance
    */
   static timestampToString (obj) {
-    if (!V.isDateValid(obj)) {
-      throw new Error(`Missing or wrong timestamp: '${obj}' must be a date and not a: '${typeof obj}'.`)
+    let timestamp = obj
+    if (V.isUndefinedOrNull(timestamp)) {
+      timestamp = new Date()
     }
-    return obj.toISOString()
+    if (!V.isDateValid(timestamp)) {
+      throw new Error(`Missing or wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
+    }
+    return timestamp.toISOString()
   }
 
   /**
