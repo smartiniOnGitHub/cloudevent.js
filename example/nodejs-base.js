@@ -49,11 +49,11 @@ const ceCommonOptions = {
   time: new Date(),
   extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
+  schemaurl: 'http://my-schema.localhost.localdomain/v1/',
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2019 }
 

@@ -52,11 +52,11 @@ const ceCommonOptions = {
   time: new Date(),
   extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
+  schemaurl: 'http://my-schema.localhost.localdomain/v1/',
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2019 }
 
@@ -212,6 +212,13 @@ See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
 In the past the name for this package was 'cloudevent.js', but it has been deprecated now 
 and changed to the simpler 'cloudevent', so it will be easier to get it at npm.
+
+Since v0.2 of the spec, there is no more a standard attribute to specify the version 
+of any specific event type, so the best if to follow their recommendations, 
+and for example add a version in the 'type' attribute 
+(for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
+or into the 'schemaurl' attribute but only its major version 
+(like '-v1' or '/v1/' at the end).
 
 
 ## Contributing
