@@ -47,36 +47,38 @@ const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not val
 const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false }) // expected success
 const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true }) // expected failure, so ceMinimalMandatoryUndefinedStrict will not be defined
 
+// define some common attributes
+const ceCommonOptions = {
+  time: new Date(),
+  extensions: { 'exampleExtension': 'value' },
+  contenttype: 'application/json',
+  schemaurl: 'http://my-schema.localhost.localdomain',
+  strict: false // same as default
+}
+const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+const ceServerUrl = '/test'
+const ceCommonData = { 'hello': 'world', year: 2019 }
+
 // create some sample minimal instances, good even for validation ...
-const ceMinimal = new CloudEvent('1', // eventID
-  'com.github.smartiniOnGitHub.cloudeventjs.testevent', // eventType
+const ceMinimal = new CloudEvent('1', // id
+  ceNamespace, // type
   '/', // source
   {} // data (empty) // optional, but useful the same in this sample usage
 )
 
-// create some instance with all attributes ...
-// define some common attributes
-const ceCommonOptions = {
-  eventTypeVersion: '1.0.0',
-  eventTime: new Date(),
-  extensions: { 'exampleExtension': 'value' },
-  contentType: 'application/json',
-  schemaURL: 'http://my-schema.localhost.localdomain',
-  strict: false // same as default
-}
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 // create some instances with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
 // note that null values are not handled by default values, only undefined values ...
 const ceFull = new CloudEvent('1/full',
-  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  '/test',
-  { 'hello': 'world', year: 2018 }, // data
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData, // data
   ceCommonOptions
 )
 const ceFullStrict = new CloudEvent('2/full-strict',
-  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  '/test',
-  { 'hello': 'world', year: 2018 }, // data
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData, // data
   ceCommonOptionsStrict // use common options, but set strict mode to true
 )
 assert(ceFullStrict.isStrict)
@@ -91,8 +93,8 @@ const errorToData = T.errorToData(error, {
   addTimestamp: true
 })
 const ceErrorStrict = new CloudEvent('2/error-strict',
-  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  '/test',
+  ceNamespace,
+  ceServerUrl,
   errorToData, // data
   ceCommonOptionsStrict // use common options, but set strict mode to true
 )
@@ -102,10 +104,10 @@ assert(!ceErrorStrict.isStrict) // ensure common options object has not been cha
 assert(!CloudEvent.isStrictEvent(ceErrorStrict)) // the same, but using static method
 // create an instance with a different content type
 const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
-  'com.github.smartiniOnGitHub.cloudeventjs.testevent',
-  '/test',
-  { 'hello': 'world', year: 2018 }, // data
-  { ...ceCommonOptionsStrict, contentType: 'application/xml' } // use common strict options, but set strict mode to true
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData, // data
+  { ...ceCommonOptionsStrict, contenttype: 'application/xml' } // use common strict options, but set strict mode to true
 )
 assert(ceFullStrictOtherContentType !== null)
 assert(ceFullStrictOtherContentType.isStrict)
@@ -134,21 +136,21 @@ console.log(`Validation output for ceEmpty, force strict mode to true is size: $
 serialization examples:
 
 ```js
-// default contentType
+// default contenttype
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 const ceFullSerialized = ceFull.serialize()
 console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
 const ceFullStrictSerialized = ceFullStrict.serialize()
 console.log(`Serialization output for ceFullStrict, details:\n` + ceFullStrictSerialized)
-// non default contentType
+// non default contenttype
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
   // encoder: (data) => '<data "encoder"="sample" />',
-  encodedData: '<data "hello"="world" "year"="2018" />',
+  encodedData: '<data "hello"="world" "year"="2019" />',
   onlyValid: true
 })
 const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
   // encoder: (data) => '<data "encoder"="sample" />',
-  encodedData: '<data "hello"="world" "year"="2018" />',
+  encodedData: '<data "hello"="world" "year"="2019" />',
   onlyValid: true
 })
 console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
@@ -161,7 +163,7 @@ deserialization (parse) examples:
 
 ```js
 // deserialization examples
-// default contentType
+// default contenttype
 console.log(`\nSome deserialization/parse examples:`)
 const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
 assert(ceFullDeserialized !== null)
@@ -172,10 +174,10 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceFullDeserialized, 'ceFullDeserial
 const ceFullStrictDeserializedOnlyValid = CloudEvent.deserializeEvent(ceFullStrictSerialized, { onlyValid: true })
 assert(ceFullStrictDeserializedOnlyValid !== null)
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictDeserializedOnlyValid, 'ceFullStrictDeserializedOnlyValid')}`)
-// non default contentType
+// non default contenttype
 const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
   // decoder: (data) => { decoder: 'Sample' },
-  decodedData: { hello: 'world', year: 2018 },
+  decodedData: { hello: 'world', year: 2019 },
   onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeDeserialized !== null)
