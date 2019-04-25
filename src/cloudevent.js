@@ -392,6 +392,10 @@ class CloudEvent {
    * Get the JSON Schema for a CloudEvent.
    * Note that it's not used in standard serialization to JSON,
    * but only in some serialization libraries.
+   * Note that schema definitions for data and extensions are right,
+   * but I need to keep them commented here and to set the flag
+   * additionalProperties to true,
+   * or when used both data and extensions will be empty in JSON output.
    *
    * See JSON Schema.
    *
@@ -408,19 +412,17 @@ class CloudEvent {
         specversion: { type: 'string', minLength: 1 },
         id: { type: 'string', minLength: 1 },
         type: { type: 'string', minLength: 1 },
-        data: { type: ['object', 'string'] },
+        // data: { type: ['object', 'string'] },
         source: { type: 'string', format: 'uri-reference' },
         time: { type: 'string', format: 'date-time' },
-        extensions: { type: 'object' },
+        // extensions: { type: 'object' },
         contenttype: { type: 'string' },
         schemaurl: { type: 'string', format: 'uri-reference' }
       },
       required: [
         'specversion', 'id', 'type', 'source'
       ],
-      // additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
-      // TODO: check if this is a good default now ... wip
-      additionalProperties: false // to handle other attributes (non-standard) properties set to true if really needed
+      additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
     }
   }
 
