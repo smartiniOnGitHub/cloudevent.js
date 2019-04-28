@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.5.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.5.0) (2019-04-28)
+Summary Changelog:
+- Implement the [v0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.2) with all breaking changes since its v0.1
+- Updated dependencies for the development environment
+- Updated documentation and samples to describe/show changes and the new behavior
+- Updated Tap unit tests to always run in strict mode, and some refactoring
+- Clarify which CloudEvents Spec version is implemented in the current release
+
 ## [0.4.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.4.0) (2019-03-15)
 Summary Changelog:
 - Updated dependencies for the development environment

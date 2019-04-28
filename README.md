@@ -9,6 +9,8 @@
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
+Current release implements the v0.2 of the CloudEvents Spec.
+
 The purpose of this library is to create instances of CloudEvents in a simple way 
 (with some useful defaults), or in a full way (all attributes).
 Optional, it's possible to validate created instances to be sure they are compliant with the standard.
