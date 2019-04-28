@@ -47,7 +47,7 @@ class CloudEvent {
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
    * @param {(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
-   *        time (timestamp, default now),
+   *        time (timestamp/date, default now),
    *        extensions (object) optional but if given must contain at least 1 property (key/value),
    *        contenttype (string, default 'application/json') tell how the data attribute must be encoded,
    *        schemaurl (uri) optional,
@@ -113,10 +113,13 @@ class CloudEvent {
     /**
      * The event timestamp.
      * Copy the original object to avoid changing objects that could be shared.
-     * @type {timestamp}
+     * Note that here the object will be transformed into string when serialized.
+     * @type {object}
      * @private
      */
     this.time = new Date(time.valueOf())
+    // TODO: temp, check if it makes sense to do this change, to fix schema compilation errors (seen in external tests) on the object model ... it makes sense but maybe later
+    // this.time = T.timestampToString(time)
     /**
      * Extensions defined for the event.
      * Copy the original object to avoid changing objects that could be shared.
@@ -396,6 +399,9 @@ class CloudEvent {
    * but I need to keep them commented here and to set the flag
    * additionalProperties to true,
    * or when used both data and extensions will be empty in JSON output.
+   * Note that for time I had to keep its schema definition commented
+   * or schema validation on object instances would fail (because in the
+   * object model I store it as a timestamp/date currently and not as a string).
    *
    * See JSON Schema.
    *
@@ -414,7 +420,7 @@ class CloudEvent {
         type: { type: 'string', minLength: 1 },
         // data: { type: ['object', 'string'] },
         source: { type: 'string', format: 'uri-reference' },
-        time: { type: 'string', format: 'date-time' },
+        // time: { type: 'string', format: 'date-time' },
         // extensions: { type: 'object' },
         contenttype: { type: 'string' },
         schemaurl: { type: 'string', format: 'uri-reference' }
