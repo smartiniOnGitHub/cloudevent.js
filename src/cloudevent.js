@@ -118,8 +118,6 @@ class CloudEvent {
      * @private
      */
     this.time = new Date(time.valueOf())
-    // TODO: temp, check if it makes sense to do this change, to fix schema compilation errors (seen in external tests) on the object model ... it makes sense but maybe later
-    // this.time = T.timestampToString(time)
     /**
      * Extensions defined for the event.
      * Copy the original object to avoid changing objects that could be shared.
