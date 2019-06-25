@@ -43,22 +43,26 @@ class CloudEvent {
   /**
    * Create a new instance of a CloudEvent object.
    * @param {!string} id the ID of the event (unique), mandatory
-   * @param {!string} type the type of the event (usually), mandatory
+   * @param {!string} type the type of the event (usually prefixed with a reverse-DNS name), mandatory
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
    * @param {(object|Map|Set)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
    *        extensions (object) optional but if given must contain at least 1 property (key/value),
-   *        contenttype (string, default 'application/json') tell how the data attribute must be encoded,
+   *        datacontentencoding (string) optional in most cases here,
+   *        datacontenttype (string, default 'application/json') tell how the data attribute must be encoded,
    *        schemaurl (uri) optional,
+   *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
    * @throws {Error} if strict is true and id or type is undefined or null
    */
   constructor (id, type, source, data, {
     time = new Date(),
     extensions,
-    contenttype = CloudEvent.contenttypeDefault(),
+    datacontentencoding,
+    datacontenttype = CloudEvent.datacontenttypeDefault(),
     schemaurl,
+    subject,
     strict = false } = {}
   ) {
     if (strict === true) {
@@ -105,11 +109,20 @@ class CloudEvent {
      */
     this.specversion = this.constructor.version()
     /**
+     * The content encoding for the data attribute
+     * for when the data field must be encoded as a string.
+     * This must be set if the data attribute contains string-encoded binary data,
+     * otherwise it must not be set.
+     * @type {string}
+     * @private
+     */
+    this.datacontentencoding = datacontentencoding
+    /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
      * @private
      */
-    this.contenttype = contenttype
+    this.datacontenttype = datacontenttype
     /**
      * The event timestamp.
      * Copy the original object to avoid changing objects that could be shared.
@@ -131,6 +144,12 @@ class CloudEvent {
      * @private
      */
     this.schemaurl = schemaurl
+    /**
+     * The subject of the event in the context of the event producer.
+     * @type {string}
+     * @private
+     */
+    this.subject = subject
 
     // add strict to extensions, but only when defined
     if (strict === true) {
@@ -146,16 +165,16 @@ class CloudEvent {
    * @return {string} the value
    */
   static version () {
-    return '0.2'
+    return '0.3'
   }
 
   /**
-   * Return the default content Type for a CloudEvent
+   * Return the default data content Type for a CloudEvent
    *
    * @static
    * @return {string} the value
    */
-  static contenttypeDefault () {
+  static datacontenttypeDefault () {
     return 'application/json'
   }
 
@@ -167,6 +186,18 @@ class CloudEvent {
    */
   static mediaType () {
     return 'application/cloudevents+json'
+  }
+
+  /**
+   * Return the MIME Type for CloudEvent intances
+   * batched into a single JSON document (array),
+   * using the JSON Batch Format
+   *
+   * @static
+   * @return {string} the value
+   */
+  static mediaTypeBatchFormat () {
+    return 'application/cloudevents-batch+json'
   }
 
   /**
@@ -205,7 +236,7 @@ class CloudEvent {
 
     // standard validation
     // note that some properties are not checked here because I assign a default value, and I check them in strict mode, like:
-    // data, time, extensions, contenttype ...
+    // data, time, extensions, datacontenttype ...
     // ve.push(V.ensureIsStringNotEmpty(event.specversion, 'specversion')) // no more a public attribute
     ve.push(V.ensureIsStringNotEmpty(event.id, 'id'))
     ve.push(V.ensureIsStringNotEmpty(event.type, 'type'))
@@ -213,13 +244,16 @@ class CloudEvent {
     if (V.isDefinedAndNotNull(event.schemaurl)) {
       ve.push(V.ensureIsStringNotEmpty(event.schemaurl, 'schemaurl'))
     }
+    if (V.isDefinedAndNotNull(event.subject)) {
+      ve.push(V.ensureIsStringNotEmpty(event.subject, 'subject'))
+    }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
       ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (event.contenttype === CloudEvent.contenttypeDefault()) {
+        if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
           ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         } else {
           // even a string in this case would be good
@@ -235,7 +269,7 @@ class CloudEvent {
         }
       }
       ve.push(V.ensureIsDatePast(event.time, 'time'))
-      ve.push(V.ensureIsStringNotEmpty(event.contenttype, 'contenttype'))
+      ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
       ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
     }
 
@@ -280,7 +314,7 @@ class CloudEvent {
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
-   *        encodedData (string, no default) already encoded data (but consistency with the contenttype is not checked),
+   *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
@@ -289,7 +323,7 @@ class CloudEvent {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
-    if (event.contenttype === CloudEvent.contenttypeDefault()) {
+    if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         return JSON.stringify(event)
       } else {
@@ -305,11 +339,11 @@ class CloudEvent {
     } else {
       // encoder not defined, check encodedData
       if (!V.isDefinedAndNotNull(encodedData)) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
       }
     }
     if (!V.isStringNotEmpty(encodedData)) {
-      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given content type: '${event.contenttype}'.`)
+      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
     }
     const newEvent = T.mergeObjects(event, { data: encodedData })
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
@@ -327,7 +361,7 @@ class CloudEvent {
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
    * @param {object} options optional deserialization attributes:
    *        decoder (function, no default) a function that takes data and returns decoder data,
-   *        decodedData (object, no default) already decoded data (but consistency with the contenttype is not checked),
+   *        decodedData (object, no default) already decoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
@@ -355,29 +389,30 @@ class CloudEvent {
       { // options
         time: T.timestampFromString(parsed.time),
         extensions: parsed.extensions,
-        contenttype: parsed.contenttype,
+        datacontenttype: parsed.datacontenttype,
         schemaurl: parsed.schemaurl,
+        subject: parsed.subject,
         strict: parsed.strict
       }
     )
-    // depending on the contenttype, decode the data attribute (the payload)
-    if (parsed.contenttype === CloudEvent.contenttypeDefault()) {
+    // depending on the datacontenttype, decode the data attribute (the payload)
+    if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       return ce
     }
     // else
     if (V.isDefinedAndNotNull(decoder)) {
       if (!V.isFunction(decoder)) {
-        throw new Error(`Missing or wrong decoder function: '${decoder}' for the given content type: '${parsed.contenttype}'.`)
+        throw new Error(`Missing or wrong decoder function: '${decoder}' for the given data content type: '${parsed.datacontenttype}'.`)
       }
       decodedData = decoder(parsed.data)
     } else {
       // decoder not defined, check decodedData
       if (!V.isDefinedAndNotNull(decodedData)) {
-        throw new Error(`Missing decoder function: use decoder function or already decoded data with the given content type: '${parsed.contenttype}'.`)
+        throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
       }
     }
     if (!V.isObject(decodedData) && !V.isStringNotEmpty(decodedData)) {
-      throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given content type: '${parsed.contenttype}'.`)
+      throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
     }
     // overwrite data with decodedData before returning it
     ce.data = decodedData
@@ -420,7 +455,7 @@ class CloudEvent {
         source: { type: 'string', format: 'uri-reference' },
         // time: { type: 'string', format: 'date-time' },
         // extensions: { type: 'object' },
-        contenttype: { type: 'string' },
+        datacontenttype: { type: 'string' },
         schemaurl: { type: 'string', format: 'uri-reference' }
       },
       required: [
@@ -437,7 +472,7 @@ class CloudEvent {
    *
    * @param {object} options optional serialization attributes:
    *        encoder (function, default null) a function that takes data and returns encoded data,
-   *        encodedData (string, default null) already encoded data (but consistency with the contenttype is not checked),
+   *        encodedData (string, default null) already encoded data (but consistency with the datacontenttype is not checked),
    * @return {string} the serialized event, as a string
    */
   serialize ({ encoder, encodedData } = {}) {
