@@ -53,12 +53,12 @@ const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, u
 // define some common attributes
 const ceCommonOptions = {
   time: new Date(),
-  extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain/v1/',
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonExtensions = { 'exampleExtension': 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2019 }
@@ -76,13 +76,15 @@ const ceFull = new CloudEvent('1/full',
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  ceCommonOptions
+  ceCommonOptions,
+  ceCommonExtensions
 )
 const ceFullStrict = new CloudEvent('2/full-strict',
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  ceCommonOptionsStrict // use common options, but set strict mode to true
+  ceCommonOptionsStrict, // use common options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
@@ -99,7 +101,8 @@ const ceErrorStrict = new CloudEvent('2/error-strict',
   ceNamespace,
   ceServerUrl,
   errorToData, // data
-  ceCommonOptionsStrict // use common options, but set strict mode to true
+  ceCommonOptionsStrict, // use common options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceErrorStrict !== null)
 assert(ceErrorStrict.isStrict)
@@ -110,7 +113,8 @@ const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  { ...ceCommonOptionsStrict, contenttype: 'application/xml' } // use common strict options, but set strict mode to true
+  { ...ceCommonOptionsStrict, contenttype: 'application/xml' }, // use common strict options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceFullStrictOtherContentType !== null)
 assert(ceFullStrictOtherContentType.isStrict)
@@ -222,6 +226,10 @@ and for example add a version in the 'type' attribute
 (for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
 or into the 'schemaurl' attribute but only its major version 
 (like '-v1' or '/v1/' at the end).
+Since v0.3 of the spec, there is no more a standard attribute for extensions, 
+so they are merged into usual properties (but must not use names 
+of standard properties); a best practice is to use reverse-DNS name 
+but without dots, so like 'com_github_smartiniOnGitHub_cloudevent'.
 
 
 ## Contributing

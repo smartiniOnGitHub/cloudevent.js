@@ -47,12 +47,12 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceMinimalMandatoryUndefinedNoStrict
 // define some common attributes
 const ceCommonOptions = {
   time: new Date(),
-  extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain/v1/',
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonExtensions = { 'exampleExtension': 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { 'hello': 'world', year: 2019 }
@@ -72,7 +72,8 @@ const ceFull = new CloudEvent('1/full',
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  ceCommonOptions
+  ceCommonOptions,
+  ceCommonExtensions
 )
 assert(ceFull !== null)
 assert(!ceFull.isStrict)
@@ -81,7 +82,8 @@ const ceFullStrict = new CloudEvent('2/full-strict',
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  ceCommonOptionsStrict // use common options, but set strict mode to true
+  ceCommonOptionsStrict, // use common options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceFullStrict !== null)
 assert(ceFullStrict.isStrict)
@@ -100,7 +102,8 @@ const ceErrorStrict = new CloudEvent('2/error-strict',
   ceNamespace,
   ceServerUrl,
   errorToData, // data
-  ceCommonOptionsStrict // use common options, but set strict mode to true
+  ceCommonOptionsStrict, // use common options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceErrorStrict !== null)
 assert(ceErrorStrict.isStrict)
@@ -110,7 +113,8 @@ const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  { ...ceCommonOptionsStrict, contenttype: 'application/xml' } // use common strict options, but set strict mode to true
+  { ...ceCommonOptionsStrict, contenttype: 'application/xml' }, // use common strict options, but set strict mode to true
+  ceCommonExtensions
 )
 assert(ceFullStrictOtherContentType !== null)
 assert(ceFullStrictOtherContentType.isStrict)
