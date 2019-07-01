@@ -53,7 +53,7 @@ class CloudEvent {
    *        schemaurl (uri) optional,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
-   * @param {object[]} extensions (all other arguments, via rest parameters) as an array of (zero or more object/s) optional but if given any object must contain at least 1 property (key/value)
+   * @param {object} extensions optional contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
    * @throws {Error} if strict is true and id or type is undefined or null
    */
   constructor (id, type, source, data, {
@@ -63,7 +63,7 @@ class CloudEvent {
     schemaurl,
     subject,
     strict = false } = {},
-  ...extensions
+  extensions
   ) {
     if (strict === true) {
       if (!id || !type || !source) {
@@ -134,14 +134,15 @@ class CloudEvent {
     /**
      * Extensions defined for the event.
      * Copy the original object to avoid changing objects that could be shared.
+     * Filter out top level properties that has standard names (that can't be used inside extensions).
      * @type {object}
      * @private
      */
-    // this.extensions = { ...extensions }
-    // TODO: call a builder function ... ok but simpler, using filter
-    // TODO: then check if keep the extensions attribute, or if merge any (filtered) with this ... wip
-    this.extensions = extensions.filter(i => !doesObjectContainsStandardProperty(i))
-    // TODO: check if a Set must be used instead ... wip
+    this.extensions = { ...extensions }
+    if (V.isObject(extensions)) {
+      this.extensions = Object.entries(extensions).filter(i => !V.doesObjectContainsStandardProperty(i, CloudEvent.isStandardProperty))
+      console.log(`this.extensions = ${this.extensions}`) // TODO: temp ...
+    }
     /**
      * The URL of schema for the event, if any.
      * @type {uri}
@@ -157,13 +158,8 @@ class CloudEvent {
 
     // add strict to extensions, but only when defined
     if (strict === true) {
-      // this.extensions = this.extensions || {}
-      // this.extensions.strict = strict
-      // TODO: new implementation, to check/finish ... wip
-      this.extensions = this.extensions || []
-      // this.extensions.com_github_smartiniOnGitHub_cloudeventjs = { strict }
-      // TODO: instead of commented (draft implementation), check if do merge at top level instead ... wip
-      this.strict = strict
+      this.extensions = this.extensions || {}
+      this.extensions.com_github_smartiniOnGitHub_cloudevent = { strict: true }
     }
   }
 
@@ -222,8 +218,9 @@ class CloudEvent {
     if (!CloudEvent.isCloudEvent(event)) {
       throw new TypeError('The given event is not a CloudEvent instance')
     }
-    if (V.isDefinedAndNotNull(event.extensions)) {
-      return event.extensions.strict === true
+    if (V.isDefinedAndNotNull(event.extensions) &&
+      V.isDefinedAndNotNull(event.extensions.com_github_smartiniOnGitHub_cloudevent)) {
+      return event.extensions.com_github_smartiniOnGitHub_cloudevent.strict === true
     } else {
       return false
     }
@@ -270,17 +267,17 @@ class CloudEvent {
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
-      // TODO: change the implementation for extensions check ...
+      ve.push(V.ensureIsDatePast(event.time, 'time'))
+      ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
+      ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
       if (V.isDefinedAndNotNull(event.extensions)) {
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         const extensionsSize = V.getSize(event.extensions)
         if (extensionsSize < 1) {
           ve.push(new Error(`The object 'extensions' must contain at least 1 property`))
         }
+        // TODO: update implementation for (nested objects)checks ... wip
       }
-      ve.push(V.ensureIsDatePast(event.time, 'time'))
-      ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
-      ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
     }
 
     return ve.filter((i) => i)
@@ -398,12 +395,12 @@ class CloudEvent {
       parsed.data,
       { // options
         time: T.timestampFromString(parsed.time),
-        extensions: parsed.extensions,
         datacontenttype: parsed.datacontenttype,
         schemaurl: parsed.schemaurl,
         subject: parsed.subject,
         strict: parsed.strict
-      }
+      },
+      parsed.extensions
     )
     // depending on the datacontenttype, decode the data attribute (the payload)
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
@@ -581,40 +578,5 @@ CloudEvent.standardProps = [
   'time', 'datacontentencoding', 'datacontenttype',
   'schemaurl', 'subject'
 ]
-
-// TODO: move this function in validator, and pass standard props as additional argument ... wip
-// TODO: then create even ensureObjectNotContainsStandardProperty ... wip
-/**
- * Tell if the given object contains at least one propert
- * that has a standard CloudEvent property name.
- *
- * See {@link CloudEvent.standardProps}.
- *
- * @param {object} obj the object to check
- * @return {boolean} true if at least one property with a standard name is found, otherwise false
- */
-function doesObjectContainsStandardProperty (obj) {
-  if (!V.isObject(obj)) return false
-
-  let standardPropFound = false
-  for (const prop in obj) {
-    // console.log(`prop: ${prop}`)
-    const isStandardProp = CloudEvent.isStandardProperty(prop)
-    // console.log(`isStandardProperty("${prop}"): ${isStandardProp}`)
-    if (isStandardProp === true) {
-      standardPropFound = true
-      break
-    }
-  }
-
-  return standardPropFound
-}
-
-console.log(`extension contains standard prop: ${doesObjectContainsStandardProperty()}`) // temp, move to tests
-console.log(`extension contains standard prop: ${doesObjectContainsStandardProperty(null)}`) // temp, move to tests
-console.log(`extension contains standard prop: ${doesObjectContainsStandardProperty({})}`) // temp, move to tests
-console.log(`extension contains standard prop: ${doesObjectContainsStandardProperty({ custom: 'value' })}`) // temp, move to tests
-console.log(`extension contains standard prop: ${doesObjectContainsStandardProperty({ data: 'sample data' })}`) // temp, move to tests
-// TODO: cleanup comments,inline tests, etc ... wip
 
 module.exports = CloudEvent

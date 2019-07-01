@@ -348,6 +348,27 @@ class Validator {
   }
 
   /**
+   * Tell if the given object contains at least one propert
+   * that has a standard CloudEvent property name.
+   *
+   * @param {object} obj the object to check
+   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @return {boolean} true if at least one property with a standard name is found, otherwise false
+   */
+  static doesObjectContainsStandardProperty (obj, isPropStandard) {
+    if (!Validator.isObject(obj)) return false
+    if (!Validator.isFunction(isPropStandard)) return false
+    let standardPropFound = false
+    for (const prop in obj) {
+      if (isPropStandard(prop) === true) {
+        standardPropFound = true
+        break
+      }
+    }
+    return standardPropFound
+  }
+
+  /**
    * Ensure that the given argument is undefined.
    *
    * @static

@@ -19,7 +19,7 @@ const assert = require('assert')
 const test = require('tap').test
 
 /** @test {CloudEvent} */
-test('ensure serialization functions exists (heck only the static method here)', (t) => {
+test('ensure serialization functions exists (check only the static method here)', (t) => {
   t.plan(7)
 
   {
@@ -47,13 +47,14 @@ test('ensure serialization functions exists (heck only the static method here)',
 const commonEventTime = new Date()
 const ceCommonOptions = {
   time: commonEventTime,
-  extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create some common extensions, for better reuse in tests */
+const ceCommonExtensions = { 'exampleExtension': 'value' }
 /** create a sample namespace for events here, for better reuse in tests */
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
 /** create a sample common server URL, for better reuse in tests */
@@ -80,7 +81,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       ceNamespace,
       ceServerUrl,
       ceCommonData, // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFull !== null)
     t.ok(ceFull)
@@ -132,7 +134,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptions
+        ceCommonOptions,
+        ceCommonExtensions
       )
       assert(ceFullBad !== null)
       t.ok(ceFullBad)
@@ -152,7 +155,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       ceNamespace,
       ceServerUrl,
       ceCommonData, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullStrict !== null)
     t.ok(ceFullStrict)
@@ -204,7 +208,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         ceNamespace,
         ceServerUrl,
         ceCommonData, // data
-        ceCommonOptionsStrict
+        ceCommonOptionsStrict,
+        ceCommonExtensions
       )
       assert(ceFullStrictBad !== null)
       t.ok(ceFullStrictBad)
@@ -237,7 +242,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       {
         ...ceCommonOptions,
         contenttype: 'application/xml'
-      }
+      },
+      ceCommonExtensions
     )
     assert(ceFullOtherContentType !== null)
     t.ok(ceFullOtherContentType)
@@ -293,7 +299,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         {
           ...ceCommonOptions,
           contenttype: 'application/xml'
-        }
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentTypeBad !== null)
       t.ok(ceFullOtherContentTypeBad)
@@ -322,7 +329,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       {
         ...ceCommonOptionsStrict,
         contenttype: 'application/xml'
-      }
+      },
+      ceCommonExtensions
     )
     assert(ceFullOtherContentTypeStrict !== null)
     t.ok(ceFullOtherContentTypeStrict)
@@ -397,7 +405,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         {
           ...ceCommonOptions,
           contenttype: 'application/xml'
-        }
+        },
+        ceCommonExtensions
       )
       assert(ceFullOtherContentTypeStrictBad !== null)
       t.ok(ceFullOtherContentTypeStrictBad)
@@ -445,7 +454,8 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       {
         ...ceCommonOptions,
         contenttype: 'application/xml'
-      }
+      },
+      ceCommonExtensions
     )
     assert(ceFullOtherContentType !== null)
     t.ok(ceFullOtherContentType)
@@ -497,7 +507,8 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       {
         ...ceCommonOptionsStrict,
         contenttype: 'application/xml'
-      }
+      },
+      ceCommonExtensions
     )
     assert(ceFullOtherContentTypeStrict !== null)
     t.ok(ceFullOtherContentTypeStrict)
@@ -559,7 +570,8 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
     ceNamespace,
     ceServerUrl,
     ceCommonData, // data
-    ceCommonOptionsStrict
+    ceCommonOptionsStrict,
+    ceCommonExtensions
   )
   assert(ceFullStrict !== null)
   t.ok(ceFullStrict)
@@ -603,7 +615,8 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       ceNamespace,
       ceServerUrl,
       ceCommonNestedData, // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFull !== null)
     t.ok(ceFull)
@@ -662,7 +675,8 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
       ceNamespace,
       ceServerUrl,
       ceCommonNestedData, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullStrict !== null)
     t.ok(ceFullStrict)

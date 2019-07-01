@@ -21,13 +21,16 @@ const test = require('tap').test
 /** create some common options, for better reuse in tests */
 const ceCommonOptions = {
   time: new Date(),
-  extensions: { 'exampleExtension': 'value' },
   contenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create some common extensions, for better reuse in tests */
+const ceCommonExtensions = { 'exampleExtension': 'value' }
+/** create a common extension only for the strict mode, for better reuse in tests */
+const ceExtensionStrict = { 'com_github_smartiniOnGitHub_cloudevent': { 'strict': true } }
 /** create a sample namespace for events here, for better reuse in tests */
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
 /** create a sample common server URL, for better reuse in tests */
@@ -245,7 +248,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptions
+    ceCommonOptions,
+    ceCommonExtensions
   )
   t.ok(ceFull1)
   t.ok(CloudEvent.isValidEvent(ceFull1))
@@ -263,7 +267,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptions
+    ceCommonOptions,
+    ceCommonExtensions
   )
   t.ok(ceFull1Clone)
   t.ok(CloudEvent.isValidEvent(ceFull1Clone))
@@ -295,7 +300,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       undefined, // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFullDataUndefined !== null)
     t.ok(ceFullDataUndefined)
@@ -313,7 +319,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       undefined, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullDataUndefinedStrict !== null)
     t.ok(ceFullDataUndefinedStrict)
@@ -335,7 +342,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       null, // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFullDataNull !== null)
     t.ok(ceFullDataNull)
@@ -353,7 +361,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       null, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullDataNullStrict !== null)
     t.ok(ceFullDataNullStrict)
@@ -374,7 +383,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       'data as a string, bad here', // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFullDataString !== null)
     t.ok(ceFullDataString)
@@ -397,7 +407,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       'data as a string, bad here', // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullDataStringStrict !== null)
     t.ok(ceFullDataStringStrict)
@@ -425,7 +436,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       ceMapData, // data
-      ceCommonOptions
+      ceCommonOptions,
+      ceCommonExtensions
     )
     assert(ceFullDataMap !== null)
     t.ok(ceFullDataMap)
@@ -443,7 +455,8 @@ test('create CloudEvent instances with different kind of data attribute, and ens
       ceNamespace,
       ceServerUrl,
       ceMapData, // data
-      ceCommonOptionsStrict
+      ceCommonOptionsStrict,
+      ceCommonExtensions
     )
     assert(ceFullDataMapStrict !== null)
     t.ok(ceFullDataMapStrict)
@@ -565,7 +578,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(base)
     t.ok(base.isValid({ strict: false })) // strict false here because base is missing some attribute, for the test
     t.ok(!base.isStrict)
-    const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, { extensions: { strict: true } })
+    const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, { extensions: ceExtensionStrict })
     // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'obj')}`)
     t.ok(obj)
     t.ok(V.isObject(obj))
