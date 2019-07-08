@@ -578,7 +578,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(base)
     t.ok(base.isValid({ strict: false })) // strict false here because base is missing some attribute, for the test
     t.ok(!base.isStrict)
-    const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, { extensions: ceExtensionStrict })
+    const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, ceExtensionStrict)
     // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'obj')}`)
     t.ok(obj)
     t.ok(V.isObject(obj))

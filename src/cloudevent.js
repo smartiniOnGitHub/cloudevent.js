@@ -53,7 +53,7 @@ class CloudEvent {
    *        schemaurl (uri) optional,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
-   * @param {object} extensions optional contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
+   * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
    * @throws {Error} if strict is true and id or type is undefined or null
    */
   constructor (id, type, source, data, {
@@ -132,18 +132,6 @@ class CloudEvent {
      */
     this.time = new Date(time.valueOf())
     /**
-     * Extensions defined for the event.
-     * Copy the original object to avoid changing objects that could be shared.
-     * Filter out top level properties that has standard names (that can't be used inside extensions).
-     * @type {object}
-     * @private
-     */
-    this.extensions = { ...extensions }
-    if (V.isObject(extensions)) {
-      this.extensions = Object.entries(extensions).filter(i => !V.doesObjectContainsStandardProperty(i, CloudEvent.isStandardProperty))
-      console.log(`this.extensions = ${this.extensions}`) // TODO: temp ...
-    }
-    /**
      * The URL of schema for the event, if any.
      * @type {uri}
      * @private
@@ -156,13 +144,20 @@ class CloudEvent {
      */
     this.subject = subject
 
+    // TODO: cleanup ...
+    const assert = require('assert')
     // add strict to extensions, but only when defined
     if (strict === true) {
-      // this.extensions = this.extensions || {}
-      // this.extensions.com_github_smartiniOnGitHub_cloudevent = { strict: true }
-      // TODO: check if it's good ... wip
-      this.extensions = this.constructor.setStrictInExtensions(this.extensions, strict)
+      // this.extensions = this.constructor.setStrictInExtensions(this.extensions, strict)
+      this.constructor.setStrictInExtensions(this, strict)
+      assert(this !== null) // TODO: temp ...
+      assert(this.com_github_smartiniOnGitHub_cloudevent !== null) // TODO: temp ...
+      assert(this.com_github_smartiniOnGitHub_cloudevent.strict === true) // TODO: temp ...
     }
+
+    // set extensions
+    this.constructor.setExtensions(this, extensions)
+    // TODO: get add a get method for extensions ...
   }
 
   /**
@@ -220,9 +215,8 @@ class CloudEvent {
     if (!CloudEvent.isCloudEvent(event)) {
       throw new TypeError('The given event is not a CloudEvent instance')
     }
-    if (V.isDefinedAndNotNull(event.extensions) &&
-      V.isDefinedAndNotNull(event.extensions.com_github_smartiniOnGitHub_cloudevent)) {
-      return event.extensions.com_github_smartiniOnGitHub_cloudevent.strict === true
+    if (V.isDefinedAndNotNull(event.com_github_smartiniOnGitHub_cloudevent)) {
+      return event.com_github_smartiniOnGitHub_cloudevent.strict === true
     } else {
       return false
     }
@@ -232,23 +226,49 @@ class CloudEvent {
    * Set the strict flag into the given extensions object.
    *
    * @static
-   * @param {object} extensions the extensions to fill (maybe already populated)
+   * @param {object} obj the object with extensions to fill (maybe already populated), that will be enhanced inplace
    * @param {boolean} strict, the flag to set (default false)
-   * @return {object} the extensions object (a copy of it) with inside the strict flag (true or false)
-   * @throws {TypeError} if extensions is not an object, or strict is not a flag
-   * @throws {Error} if extensions is undefined or null, or strict is undefined or null
+   * @throws {TypeError} if obj is not an object, or strict is not a flag
+   * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
-  static setStrictInExtensions (extensions = {}, strict = false) {
-    if (!V.isObject(extensions)) {
+  static setStrictInExtensions (obj = {}, strict = false) {
+    if (!V.isObject(obj)) {
       throw new TypeError('The given extensions is not an object instance')
     }
     if (!V.isBoolean(strict)) {
       throw new TypeError('The given strict flag is not a boolean instance')
     }
-    const exts = { ...extensions }
-    exts.com_github_smartiniOnGitHub_cloudevent = {}
-    exts.com_github_smartiniOnGitHub_cloudevent.strict = strict
-    return exts
+    obj.com_github_smartiniOnGitHub_cloudevent = {}
+    obj.com_github_smartiniOnGitHub_cloudevent.strict = strict
+  }
+
+  /**
+   * Set all extensions into the given object.
+   *
+   * @static
+   * @param {object} obj the object with extensions to fill, that will be enhanced inplace
+   * @param {object} extensions the extensions to fill (maybe already populated)
+   * @throws {TypeError} if obj is not an object, or strict is not a flag
+   * @throws {Error} if obj is undefined or null, or strict is undefined or null
+   */
+  static setExtensions (obj = {}, extensions = null) {
+    if (!V.isObject(obj)) {
+      throw new TypeError('The given obj is not an object instance')
+    }
+    if (!V.isDefinedAndNotNull(extensions)) {
+      return
+    }
+    if (V.isObject(extensions)) {
+      const exts = Object.entries(extensions).filter(i => !V.doesObjectContainsStandardProperty(i, CloudEvent.isStandardProperty))
+      // console.log(`exts = ${exts}`) // TODO: temp ...
+      // add filtered extensions to the given obj
+      for (const [key, value] of exts) {
+        // console.log(`${key}: ${value}`) // TODO: temp ...
+        obj[key] = value
+      }
+    } else {
+      throw new TypeError('Unsupported extensions: not an object or a string')
+    }
   }
 
   /**
@@ -357,11 +377,28 @@ class CloudEvent {
     }
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
+        /*
         // return JSON.stringify(event)
-        // TODO: check how to serialize extensions here ... wip
+        // TODO: temp, using merge of objects (not the best approach) ... wip
         const newEvent = T.mergeObjects(event, event.extensions)
-        delete newEvent.extensions
-        return JSON.stringify(newEvent)
+        // delete newEvent.extensions
+        // return JSON.stringify(newEvent)
+        // serialize extensions here by using a json replacement function
+        // but before, merge extensions to top level in a new object and serialize it
+        // TODO: implement ... wip
+        // return JSON.stringify(event, function replacer(key, value) {
+        return JSON.stringify(newEvent, function replacer (key, value) {
+          // filtering out top level extensions
+          if (key === 'extensions') return undefined
+          return value
+        }
+        // TODO: commit the current (partially implemented) behavior, but then change it with a simpler approach: in the constructor do not assign anymore extensions to an extensions object but directly at top level, and provide a getter methos to retrieve them ... wip
+         */
+        return JSON.stringify(event, function replacer (key, value) {
+          // filtering out top level extensions (if any)
+          if (key === 'extensions') return undefined
+          return value
+        })
       } else {
         throw new Error(`Unable to serialize a not valid CloudEvent.`)
       }
@@ -369,7 +406,7 @@ class CloudEvent {
     // else
     if (V.isDefinedAndNotNull(encoder)) {
       if (!V.isFunction(encoder)) {
-        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.contenttype}'.`)
+        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
       }
       encodedData = encoder(event.payload)
     } else {
@@ -381,7 +418,6 @@ class CloudEvent {
     if (!V.isStringNotEmpty(encodedData)) {
       throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
     }
-    // TODO: check how to serialize extensions here ... wip
     const newEvent = T.mergeObjects(event, { data: encodedData })
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       return JSON.stringify(newEvent)
@@ -500,13 +536,13 @@ class CloudEvent {
         // time: { type: 'string', format: 'date-time' },
         // extensions: { type: 'object' },
         datacontenttype: { type: 'string' },
-        schemaurl: { type: 'string', format: 'uri-reference' }
-        // TODO: update with the new schema for spec v0.3 ... wip
+        schemaurl: { type: 'string', format: 'uri-reference' },
+        subject: { type: 'string', minLength: 1 }
       },
       required: [
         'specversion', 'id', 'type', 'source'
       ],
-      additionalProperties: true // to handle data, extensions, and maybe other (non-standard) properties
+      additionalProperties: true // to handle data, and maybe other (non-standard) properties (extensions)
     }
   }
 

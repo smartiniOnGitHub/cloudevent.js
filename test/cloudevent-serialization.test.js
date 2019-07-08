@@ -49,6 +49,7 @@ const ceCommonOptions = {
   time: commonEventTime,
   contenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain',
+  subject: 'subject',
   strict: false
 }
 /** create some common options with strict flag enabled, for better reuse in tests */
@@ -118,10 +119,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
     t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-    const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","contenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","schemaurl":"http://my-schema.localhost.localdomain"}`
+    const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
 
     const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
@@ -192,10 +194,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-    const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","contenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
+    const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFullStrict, ceFullStrictDeserialized)
 
     const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
@@ -280,17 +283,15 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 
     {
       const ce = ceFullOtherContentType
-      // ce.extensions = { strict: false }
-      // TODO: check if it's good ... wip
-      ce.extensions = CloudEvent.setStrictInExtensions({}, false)
+      CloudEvent.setStrictInExtensions(ce, false)
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, false)
     }
     {
       const ce = ceFullOtherContentType
-      delete ce.extensions
+      CloudEvent.setStrictInExtensions(ce, true)
       const flag = CloudEvent.isStrictEvent(ce)
-      t.strictSame(flag, false)
+      t.strictSame(flag, true)
     }
 
     {
@@ -388,17 +389,15 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 
     {
       const ce = ceFullOtherContentTypeStrict
-      // ce.extensions = { strict: true }
-      // TODO: check if it's good ... wip
-      ce.extensions = CloudEvent.setStrictInExtensions({}, false)
+      CloudEvent.setStrictInExtensions(ce, false)
       const flag = CloudEvent.isStrictEvent(ce)
-      t.strictSame(flag, true)
+      t.strictSame(flag, false)
     }
     {
       const ce = ceFullOtherContentTypeStrict
-      delete ce.extensions
+      CloudEvent.setStrictInExtensions(ce, true)
       const flag = CloudEvent.isStrictEvent(ce)
-      t.strictSame(flag, false)
+      t.strictSame(flag, true)
     }
 
     {
@@ -600,12 +599,12 @@ const ceCommonNestedData = { ...ceCommonData,
 }
 
 const { CloudEventTransformer: T } = require('../src/')
-const ceNestedFullSerializedJson = `{"id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"0.3","contenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","schemaurl":"http://my-schema.localhost.localdomain"}`
-const ceNestedFullStrictSerializedJson = `{"id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"0.3","contenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
-const ceFullOtherContentTypeSerializedJson = `{"id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2019' />","specversion":"2","contenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","schemaurl":"http://my-schema.localhost.localdomain"}`
-const ceFullOtherContentTypeStrictSerializedJson = `{"id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2019' />","specversion":"0.2","contenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
-const ceFullOtherContentTypeSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2019' />","contenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value"}`
-const ceFullOtherContentTypeStrictSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2019' />","contenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true}}`
+const ceNestedFullSerializedJson = `{"id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
+const ceNestedFullStrictSerializedJson = `{"id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2019,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
+const ceFullOtherContentTypeSerializedJson = `{"id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2019' />","specversion":"0.3","datacontenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","schemaurl":"http://my-schema.localhost.localdomain"}`
+const ceFullOtherContentTypeStrictSerializedJson = `{"id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":"<data 'hello'='world' 'year'='2019' />","specversion":"0.3","datacontenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"schemaurl":"http://my-schema.localhost.localdomain"}`
+const ceFullOtherContentTypeSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2019' />","datacontenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value"}`
+const ceFullOtherContentTypeStrictSerializedBadJson = `{"data":"<data 'hello'='world' 'year'='2019' />","datacontenttype":"application/xml","time":"${T.timestampToString(commonEventTime)}","exampleExtension":"value","com_github_smartiniOnGitHub_cloudevent":{"strict":true}}`
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
@@ -656,6 +655,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
 
     // ensure payload data is a copy of event data
@@ -716,6 +716,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamo attribute in the deserialized object
+    ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFullStrict, ceFullStrictDeserialized)
 
     // ensure payload data is a copy of event data
