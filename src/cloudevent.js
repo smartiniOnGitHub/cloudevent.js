@@ -144,20 +144,13 @@ class CloudEvent {
      */
     this.subject = subject
 
-    // TODO: cleanup ...
-    const assert = require('assert')
     // add strict to extensions, but only when defined
     if (strict === true) {
-      // this.extensions = this.constructor.setStrictInExtensions(this.extensions, strict)
-      this.constructor.setStrictInExtensions(this, strict)
-      assert(this !== null) // TODO: temp ...
-      assert(this.com_github_smartiniOnGitHub_cloudevent !== null) // TODO: temp ...
-      assert(this.com_github_smartiniOnGitHub_cloudevent.strict === true) // TODO: temp ...
+      this.constructor.setStrictExtensionInEvent(this, strict)
     }
 
     // set extensions
-    this.constructor.setExtensions(this, extensions)
-    // TODO: get add a get method for extensions ...
+    this.constructor.setExtensionsInEvent(this, extensions)
   }
 
   /**
@@ -224,14 +217,16 @@ class CloudEvent {
 
   /**
    * Set the strict flag into the given extensions object.
+   * Should not be used outside CloudEvent constructor.
    *
+   * @private
    * @static
    * @param {object} obj the object with extensions to fill (maybe already populated), that will be enhanced inplace
    * @param {boolean} strict, the flag to set (default false)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
-  static setStrictInExtensions (obj = {}, strict = false) {
+  static setStrictExtensionInEvent (obj = {}, strict = false) {
     if (!V.isObject(obj)) {
       throw new TypeError('The given extensions is not an object instance')
     }
@@ -244,14 +239,16 @@ class CloudEvent {
 
   /**
    * Set all extensions into the given object.
+   * Should not be used outside CloudEvent constructor.
    *
+   * @private
    * @static
-   * @param {object} obj the object with extensions to fill, that will be enhanced inplace
+   * @param {object} obj the object to fill, that will be enhanced inplace
    * @param {object} extensions the extensions to fill (maybe already populated)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
-  static setExtensions (obj = {}, extensions = null) {
+  static setExtensionsInEvent (obj = {}, extensions = null) {
     if (!V.isObject(obj)) {
       throw new TypeError('The given obj is not an object instance')
     }
@@ -260,16 +257,16 @@ class CloudEvent {
     }
     if (V.isObject(extensions)) {
       const exts = Object.entries(extensions).filter(i => !V.doesObjectContainsStandardProperty(i, CloudEvent.isStandardProperty))
-      // console.log(`exts = ${exts}`) // TODO: temp ...
       // add filtered extensions to the given obj
       for (const [key, value] of exts) {
-        // console.log(`${key}: ${value}`) // TODO: temp ...
         obj[key] = value
       }
     } else {
       throw new TypeError('Unsupported extensions: not an object or a string')
     }
   }
+
+  // TODO: add a static getExtensionsOfEvent method, and even a normal one, better a getter (get extensions()) ... wip
 
   /**
    * Validate the given CloudEvent.
@@ -321,7 +318,7 @@ class CloudEvent {
         if (extensionsSize < 1) {
           ve.push(new Error(`The object 'extensions' must contain at least 1 property`))
         }
-        // TODO: update implementation for (nested objects)checks ... wip
+        // TODO: update implementation for (nested objects) checks ... wip
       }
     }
 
@@ -363,6 +360,7 @@ class CloudEvent {
    * Note that here standard serialization to JSON is used (no additional libraries).
    * Note that the result of encoder function is assigned to encoded data.
    *
+   * @static
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data,
@@ -377,23 +375,6 @@ class CloudEvent {
     }
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
-        /*
-        // return JSON.stringify(event)
-        // TODO: temp, using merge of objects (not the best approach) ... wip
-        const newEvent = T.mergeObjects(event, event.extensions)
-        // delete newEvent.extensions
-        // return JSON.stringify(newEvent)
-        // serialize extensions here by using a json replacement function
-        // but before, merge extensions to top level in a new object and serialize it
-        // TODO: implement ... wip
-        // return JSON.stringify(event, function replacer(key, value) {
-        return JSON.stringify(newEvent, function replacer (key, value) {
-          // filtering out top level extensions
-          if (key === 'extensions') return undefined
-          return value
-        }
-        // TODO: commit the current (partially implemented) behavior, but then change it with a simpler approach: in the constructor do not assign anymore extensions to an extensions object but directly at top level, and provide a getter methos to retrieve them ... wip
-         */
         return JSON.stringify(event, function replacer (key, value) {
           // filtering out top level extensions (if any)
           if (key === 'extensions') return undefined
@@ -431,6 +412,7 @@ class CloudEvent {
    * Note that here standard parse from JSON is used (no additional libraries).
    * Note that the result of decoder function is assigned to decoded data.
    *
+   * @static
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
    * @param {object} options optional deserialization attributes:
    *        decoder (function, no default) a function that takes data and returns decoder data,
@@ -454,6 +436,9 @@ class CloudEvent {
       throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
     }
 
+    // TODO: fill parsed strict here ... wip
+    // TODO: fill parsed extensions here with all non standard properties ... wip
+
     // fill a new CludEvent instance with parsed data
     const ce = new CloudEvent(parsed.id,
       parsed.type,
@@ -469,7 +454,6 @@ class CloudEvent {
       },
       parsed.extensions
     )
-    // TODO: check how to fill extensions here (move all non standard properties into extensions) ... wip
     // depending on the datacontenttype, decode the data attribute (the payload)
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       return ce
@@ -499,7 +483,13 @@ class CloudEvent {
     }
   }
 
-  // TODO: add comments etc ... wip
+  /**
+   * Tell the given property, if it's a standard CloudEvent property/attribute.
+   *
+   * @static
+   * @param {!string} property the property/attribute to check
+   * @return {boolean} true if it's standard otherwise false
+   */
   static isStandardProperty (property) {
     return CloudEvent.standardProps.includes(property)
   }
@@ -518,6 +508,7 @@ class CloudEvent {
    *
    * See JSON Schema.
    *
+   * @static
    * @return {object} the JSON Schema
    */
   static getJSONSchema () {

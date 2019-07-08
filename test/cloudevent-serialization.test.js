@@ -283,13 +283,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 
     {
       const ce = ceFullOtherContentType
-      CloudEvent.setStrictInExtensions(ce, false)
+      CloudEvent.setStrictExtensionInEvent(ce, false)
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, false)
     }
     {
       const ce = ceFullOtherContentType
-      CloudEvent.setStrictInExtensions(ce, true)
+      CloudEvent.setStrictExtensionInEvent(ce, true)
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, true)
     }
@@ -389,13 +389,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 
     {
       const ce = ceFullOtherContentTypeStrict
-      CloudEvent.setStrictInExtensions(ce, false)
+      CloudEvent.setStrictExtensionInEvent(ce, false)
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, false)
     }
     {
       const ce = ceFullOtherContentTypeStrict
-      CloudEvent.setStrictInExtensions(ce, true)
+      CloudEvent.setStrictExtensionInEvent(ce, true)
       const flag = CloudEvent.isStrictEvent(ce)
       t.strictSame(flag, true)
     }
