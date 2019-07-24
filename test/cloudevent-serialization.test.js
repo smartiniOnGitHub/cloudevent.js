@@ -55,13 +55,13 @@ const ceCommonOptions = {
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 /** create some common extensions, for better reuse in tests */
-const ceCommonExtensions = { 'exampleExtension': 'value' }
+const ceCommonExtensions = { exampleExtension: 'value' }
 /** create a sample namespace for events here, for better reuse in tests */
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
-const ceCommonData = { 'hello': 'world', year: 2019 }
+const ceCommonData = { hello: 'world', year: 2019 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])

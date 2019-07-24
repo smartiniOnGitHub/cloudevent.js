@@ -280,7 +280,7 @@ class CloudEvent {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
-    let ve = [] // validation errors
+    const ve = [] // validation errors
 
     // standard validation
     // note that some properties are not checked here because I assign a default value, and I check them in strict mode, like:
