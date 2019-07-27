@@ -466,11 +466,15 @@ class CloudEvent {
    *        decoder (function, no default) a function that takes data and returns decoder data,
    *        decodedData (object, no default) already decoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        applyTimezoneOffset (boolean, default false) to apply current timezone offset
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    */
-  static deserializeEvent (ser, { decoder, decodedData, onlyValid = false } = {}) {
+  static deserializeEvent (ser, {
+    decoder, decodedData, onlyValid = false,
+    applyTimezoneOffset = false
+  } = {}) {
     if (V.isUndefinedOrNull(ser)) {
       throw new Error('Serialized CloudEvent undefined or null')
     }
@@ -493,7 +497,7 @@ class CloudEvent {
       parsed.source,
       parsed.data,
       { // options
-        time: T.timestampFromString(parsed.time),
+        time: T.timestampFromString(parsed.time, applyTimezoneOffset),
         datacontentencoding: parsed.datacontentencoding,
         datacontenttype: parsed.datacontenttype,
         schemaurl: parsed.schemaurl,
@@ -691,6 +695,11 @@ class CloudEvent {
   }
 }
 
+/**
+ * Utility variable that returns all standard property names, in an array.
+ *
+ * @static
+ */
 CloudEvent.standardProps = [
   'specversion',
   'id', 'type', 'source', 'data',

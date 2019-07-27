@@ -784,7 +784,7 @@ test('deserialize generic strings (not JSON representation for an Object) into a
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
   t.plan(54)
 
-  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
   {
     const serialized = ceNestedFullSerializedJson
@@ -804,6 +804,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(ceDeserialized.isValid())
     t.ok(ceDeserialized.validate().length === 0)
     t.ok(ceDeserialized.validate({ strict: false }).length === 0)
+    // console.log(`ceDeserialized.time = ${ceDeserialized.time}`) // TODO: temp
+    // console.log(`serialized = ${serialized}`) // TODO: temp
     t.ok(ceDeserialized.validate({ strict: true }).length === 0)
     t.ok(CloudEvent.isValidEvent(ceDeserialized))
     t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
@@ -816,7 +818,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.time))
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
-    t.strictSame(ceDeserialized.time.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+    t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
     t.notStrictEqual(ceDeserialized.time, commonEventTime)
     t.notEqual(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
@@ -863,7 +865,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDate(ceDeserialized.time))
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
-    t.strictSame(ceDeserialized.time.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+    t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
     t.notStrictEqual(ceDeserialized.time, commonEventTime)
     t.notEqual(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)

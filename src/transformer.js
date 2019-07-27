@@ -72,33 +72,25 @@ class Transformer {
   }
 
   /**
-   * Utility function that returns the timezone offset value, in msec.
-   *
-   * @static
-   * @return {number} the timezone offset, in msec
-   */
-  static get timezoneOffsetMsec () {
-    return new Date().getTimezoneOffset() * 60 * 1000
-  }
-
-  /**
    * Utility function that parse a string representation
    * (compatible with the CloudEvent standard) of the given timestamp (Date)
    * and returns it (if possible).
    *
-   * Note that the value returned has already been adjusted with the current timezone offset.
+   * Note that the value returned could be adjusted with the current timezone offset.
    *
    * @static
    * @param {!string} obj the timestamp/date to parse (as a string)
+   * @param {boolean} applyTimezoneOffset flag to apply current timezone offset (default false)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {Error} if obj is undefined or null, or is not a string
    */
-  static timestampFromString (obj) {
+  static timestampFromString (obj, applyTimezoneOffset = false) {
     if (!V.isStringNotEmpty(obj)) {
       throw new Error(`Missing or wrong timestamp: '${obj}' must be a string and not a: '${typeof obj}'.`)
     }
     const timestampMsec = Date.parse(obj)
-    return new Date(timestampMsec + Transformer.timezoneOffsetMsec)
+    const offsetMsec = (applyTimezoneOffset === false) ? 0 : Transformer.timezoneOffsetMsec
+    return new Date(timestampMsec + offsetMsec)
   }
 
   /**
@@ -129,18 +121,20 @@ class Transformer {
    * of the given timestamp (Date)
    * and returns it (if possible).
    *
-   * Note that the value returned has already been adjusted with the current timezone offset.
+   * Note that the value returned could be adjusted with the current timezone offset.
    *
    * @static
    * @param {!number} obj the timestamp/date to parse (as a number)
+   * @param {boolean} applyTimezoneOffset flag to apply current timezone offset (default false)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {Error} if obj is undefined or null, or is not a number
    */
-  static timestampFromNumber (obj) {
+  static timestampFromNumber (obj, applyTimezoneOffset = false) {
     if (!V.isNumber(obj)) {
       throw new Error(`Missing or wrong timestamp: '${obj}' must be a number and not a: '${typeof obj}'.`)
     }
-    return new Date(obj + Transformer.timezoneOffsetMsec)
+    const offsetMsec = (applyTimezoneOffset === false) ? 0 : Transformer.timezoneOffsetMsec
+    return new Date(obj + offsetMsec)
   }
 
   /**
@@ -258,5 +252,12 @@ class Transformer {
     return Object.assign(Object.create(baseProto), base, ...others) // set the prototype of the first argument in the clone
   }
 }
+
+/**
+ * Utility variable that returns the timezone offset value, in msec.
+ *
+ * @static
+ */
+Transformer.timezoneOffsetMsec = new Date().getTimezoneOffset() * 60 * 1000
 
 module.exports = Transformer

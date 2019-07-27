@@ -191,7 +191,7 @@ test('ensure the current timestamp is transformed to string and back as date in 
   // console.log(`current timestamp from string (with timezone offset): '${timestampFromString}'`)
 
   // ensure both timestamps have the same value, but they are different object references
-  t.strictSame(timestampFromString.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+  t.strictSame(timestampFromString.getTime(), commonEventTime.getTime())
   t.notStrictEqual(timestampFromString, commonEventTime)
   t.notEqual(timestampFromString, commonEventTime)
 })
@@ -295,7 +295,7 @@ test('ensure the current timestamp is transformed to number and back as date in 
   // console.log(`timestamp from number: '${timestampFromNumber}'`)
 
   // ensure both timestamps have the same value, but they are different object references
-  t.strictSame(timestampFromNumber.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
+  t.strictSame(timestampFromNumber.getTime(), commonEventTime.getTime())
   t.notStrictEqual(timestampFromNumber, commonEventTime)
   t.notEqual(timestampFromNumber, commonEventTime)
 })
