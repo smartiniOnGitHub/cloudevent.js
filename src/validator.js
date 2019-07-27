@@ -142,7 +142,7 @@ class Validator {
    * @return {boolean} true if it's a valid date in the past (or now), false otherwise
    */
   static isDatePast (arg) {
-    return (Validator.isDateValid(arg) && arg <= Date.now())
+    return (Validator.isDateValid(arg) && arg.getTime() <= Date.now())
   }
 
   /**
@@ -348,7 +348,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given object contains at least one propert
+   * Tell if the given object contains at least one property
    * that has a standard CloudEvent property name.
    *
    * @param {object} obj the object to check
@@ -364,6 +364,23 @@ class Validator {
         standardPropFound = true
         break
       }
+    }
+    return standardPropFound
+  }
+
+  /**
+   * Tell if the given string has a standard CloudEvent property name.
+   *
+   * @param {string} str the string to check
+   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @return {boolean} true if the given string has a standard name, otherwise false
+   */
+  static doesStringIsStandardProperty (str, isPropStandard) {
+    if (!Validator.isStringNotEmpty(str)) return false
+    if (!Validator.isFunction(isPropStandard)) return false
+    let standardPropFound = false
+    if (isPropStandard(str) === true) {
+      standardPropFound = true
     }
     return standardPropFound
   }
