@@ -131,9 +131,6 @@ class CloudEvent {
      * @private
      */
     this.time = new Date(time.valueOf())
-    // TODO: temp, commit then cleanup ...
-    // this.time = new Date()
-    // this.time.setTime(time.getTime())
     /**
      * The URL of schema for the event, if any.
      * @type {uri}
@@ -147,21 +144,13 @@ class CloudEvent {
      */
     this.subject = subject
 
-    // TODO: temp, do not commit ...
-    // console.log(`constructor: time = ${time}, typeof time = ${typeof time}`)
-    // console.log(`constructor: this.time = ${this.time}, typeof this.time = ${typeof this.time}`)
-
     // add strict to extensions, but only when defined
     if (strict === true) {
       this.constructor.setStrictExtensionInEvent(this, strict)
     }
-    // TODO: temp, do not commit ...
-    // console.log(`constructor: this.time = ${this.time}, typeof this.time = ${typeof this.time}`)
 
     // set extensions
     this.constructor.setExtensionsInEvent(this, extensions)
-    // TODO: temp, do not commit ...
-    // console.log(`constructor: this.time = ${this.time}, typeof this.time = ${typeof this.time}`)
   }
 
   /**
@@ -297,7 +286,6 @@ class CloudEvent {
       // add filtered extensions to the given obj
       for (const [key, value] of exts) {
         obj[key] = value
-        // console.log(`setExtensionsInEvent: [key, value] = [${key}, ${value}]`) // TODO: temp ...
       }
     } else {
       throw new TypeError('Unsupported extensions: not an object or a string')
@@ -322,15 +310,12 @@ class CloudEvent {
       // add filtered extensions to the given extensions
       for (const [key, value] of exts) {
         extensions[key] = value
-        // console.log(`getExtensionsOfEvent: [key, value] = [${key}, ${value}]`) // TODO: temp ...
       }
     } else {
       throw new TypeError('Unsupported extensions: not an object or a string')
     }
     return extensions
   }
-  // TODO: getExtensionsOfEvent, ensure implementation is right ... ok, but do cleanup after the commit
-  // TODO: then add even a getter (get extensions()), but under ... wip
 
   /**
    * Validate the given CloudEvent.
@@ -382,7 +367,6 @@ class CloudEvent {
         if (extensionsSize < 1) {
           ve.push(new Error(`The object 'extensions' must contain at least 1 property`))
         }
-        // TODO: update implementation for (nested objects) checks ... wip
       }
     }
 
@@ -500,12 +484,7 @@ class CloudEvent {
       throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
     }
 
-    // TODO: fill parsed strict here ... wip
-    // console.log(`parsed = ${JSON.stringify(parsed)}`) // temp
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
-    // console.log(`strict = ${JSON.stringify(strict)}`) // temp
-    // TODO: fill parsed extensions here with all non standard properties ... wip
-    // console.log(`typeof T.timestampFromString(parsed.time) = ${typeof T.timestampFromString(parsed.time)}`) // TODO: temp
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
 
     // fill a new CludEvent instance with parsed data
@@ -676,6 +655,17 @@ class CloudEvent {
    */
   get payload () {
     return { ...this.data }
+  }
+
+  /**
+   * Getter method to return a copy of CloudEvent extensions.
+   *
+   * See {@link CloudEvent.getExtensionsOfEvent}.
+   *
+   * @type {object}
+   */
+  get extensions () {
+    return this.constructor.getExtensionsOfEvent(this)
   }
 
   /**
