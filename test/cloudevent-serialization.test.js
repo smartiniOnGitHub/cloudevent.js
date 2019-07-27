@@ -804,8 +804,6 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(ceDeserialized.isValid())
     t.ok(ceDeserialized.validate().length === 0)
     t.ok(ceDeserialized.validate({ strict: false }).length === 0)
-    // console.log(`ceDeserialized.time = ${ceDeserialized.time}`) // TODO: temp
-    // console.log(`serialized = ${serialized}`) // TODO: temp
     t.ok(ceDeserialized.validate({ strict: true }).length === 0)
     t.ok(CloudEvent.isValidEvent(ceDeserialized))
     t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
