@@ -7,6 +7,7 @@
     "dependency:log": "npm list > ./temp/dependencies.log",
     "docs": "npx esdoc",
     "example": "node example/nodejs-base",
+    "example:debug": "node --inspect-brk example/nodejs-base",
     "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
     "lint:log": "npm run lint > ./temp/lint-standard.log",
     "license-check": "npx legally",
