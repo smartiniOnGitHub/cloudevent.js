@@ -147,6 +147,9 @@ class CloudEvent {
     // add strict to extensions, but only when defined
     if (strict === true) {
       this.constructor.setStrictExtensionInEvent(this, strict)
+      if (V.doesObjectContainsStandardProperty(extensions, CloudEvent.isStandardProperty)) {
+        throw new Error('Unable to create CloudEvent instance, extensions contains standard properties')
+      }
     }
 
     // set extensions

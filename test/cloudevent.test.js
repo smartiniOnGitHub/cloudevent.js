@@ -279,11 +279,12 @@ test('ensure strict mode is managed in the right way', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure extensions are managed in the right way', (t) => {
-  t.plan(12)
+  t.plan(18)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
   const sampleExtensions = { exampleExtension: 'value' }
+  const sampleExtensionsWithStandardProperties = { ...sampleExtensions, id: 'myId' }
 
   t.ok(!CloudEvent.setExtensionsInEvent()) // ok but no return value
   t.ok(!CloudEvent.setExtensionsInEvent(undefined, undefined)) // ok but no return value
@@ -309,6 +310,30 @@ test('ensure extensions are managed in the right way', (t) => {
     CloudEvent.getExtensionsOfEvent('bad extension')
     assert(true) // never executed
   }, TypeError, 'Expected exception when getting bad extensions')
+
+  // ensure no instance will be created if extensions contains standard properties, but only in strict mode
+  const ceFull = new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData,
+    ceCommonOptions,
+    sampleExtensionsWithStandardProperties
+  )
+  t.ok(ceFull)
+  t.ok(CloudEvent.isValidEvent(ceFull))
+  t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+  t.strictSame(CloudEvent.validateEvent(ceFull), [])
+  t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
+  t.throws(function () {
+    const ceFullStrict = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData,
+      ceCommonOptionsStrict,
+      sampleExtensionsWithStandardProperties
+    )
+    assert(ceFullStrict === undefined) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with extensions containing standard prioperties, in strict mode')
 })
 
 /** @test {CloudEvent} */
