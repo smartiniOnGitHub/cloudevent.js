@@ -285,3 +285,35 @@ test('ensure some (less used) validation functions are right', (t) => {
     }, Error, 'Expected exception when trying to get the size of a bad object')
   }
 })
+
+/** @test {CloudEvent} */
+test('ensure validation functions on standard properties are right', (t) => {
+  t.plan(18)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(CloudEvent)
+  t.ok(V)
+
+  // sample function that tell if the given property name is standard
+  function isPropStandard (prop) {
+    return prop === 'standard'
+  }
+
+  t.ok(!V.doesStringIsStandardProperty())
+  t.ok(!V.doesStringIsStandardProperty(undefined, undefined))
+  t.ok(!V.doesStringIsStandardProperty(null, null))
+  t.ok(!V.doesStringIsStandardProperty({}, isPropStandard))
+  t.ok(!V.doesStringIsStandardProperty('non_standard', isPropStandard))
+  t.ok(V.doesStringIsStandardProperty('standard', isPropStandard))
+  t.ok(!V.doesStringIsStandardProperty('property', {}))
+  t.ok(!V.doesStringIsStandardProperty('standard', {}))
+
+  t.ok(!V.doesObjectContainsStandardProperty())
+  t.ok(!V.doesObjectContainsStandardProperty(undefined, undefined))
+  t.ok(!V.doesObjectContainsStandardProperty(null, null))
+  t.ok(!V.doesObjectContainsStandardProperty({}, isPropStandard))
+  t.ok(!V.doesObjectContainsStandardProperty({ non_standard: 'value' }, isPropStandard))
+  t.ok(V.doesObjectContainsStandardProperty({ standard: 'value' }, isPropStandard))
+  t.ok(!V.doesObjectContainsStandardProperty({ property: 'value' }, {}))
+  t.ok(!V.doesObjectContainsStandardProperty({ standard: 'value' }, {}))
+})
