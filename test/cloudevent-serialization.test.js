@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
-  t.plan(7)
+  t.plan(8)
 
   {
     const { CloudEvent } = require('../src/') // get references via destructuring
@@ -30,10 +30,12 @@ test('ensure serialization functions exists (check only the static method here)'
     assert.strictEqual(typeof CloudEvent, 'function')
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    assert.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
 
     const ceSerialize = CloudEvent.serializeEvent
     assert(ceSerialize !== null)
@@ -70,7 +72,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(52)
+  t.plan(56)
 
   const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
@@ -149,6 +151,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
+
+    // test to ensure that old style extensions are not serialized
+    const ceFullSerializedStaticWithoutExtensionsProperty = CloudEvent.serializeEvent({ ...ceFull, extensions: { exampleExtensionToSkip: 'valueToSkip' } })
+    t.ok(ceFullSerializedStaticWithoutExtensionsProperty)
+    t.strictSame(ceFullSerializedStaticWithoutExtensionsProperty.search('exampleExtensionToSkip'), -1)
   }
 
   {
@@ -225,6 +232,11 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
+
+    // test to ensure that old style extensions are not serialized
+    const ceFullStrictSerializedStaticWithoutExtensionsProperty = CloudEvent.serializeEvent({ ...ceFullStrict, extensions: { exampleExtensionToSkip: 'valueToSkip' } })
+    t.ok(ceFullStrictSerializedStaticWithoutExtensionsProperty)
+    t.strictSame(ceFullStrictSerializedStaticWithoutExtensionsProperty.search('exampleExtensionToSkip'), -1)
   }
 })
 

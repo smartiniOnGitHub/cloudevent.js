@@ -45,7 +45,7 @@ ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(13)
+  t.plan(14)
 
   {
     const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
@@ -55,6 +55,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     assert.strictEqual(typeof CloudEvent, 'function')
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    assert.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
     t.ok(V)
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(typeof V, 'function')
@@ -64,6 +65,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimal = new CloudEvent('1', // id
@@ -234,6 +236,79 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       assert(ceMinimalMandatoryNullStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   }
+})
+
+/** @test {CloudEvent} */
+test('ensure strict mode is managed in the right way', (t) => {
+  t.plan(16)
+  const { CloudEvent } = require('../src/')
+  t.ok(CloudEvent)
+
+  t.ok(!CloudEvent.setStrictExtensionInEvent()) // ok but no return value
+  t.ok(!CloudEvent.setStrictExtensionInEvent(undefined, undefined)) // ok but no return value
+  t.throws(function () {
+    CloudEvent.setStrictExtensionInEvent(null, true)
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when setting a strict extension flag into a null object')
+  t.ok(!CloudEvent.setStrictExtensionInEvent({}, false)) // ok but no return value
+  t.ok(!CloudEvent.setStrictExtensionInEvent({}, true)) // ok but no return value
+  t.throws(function () {
+    CloudEvent.setStrictExtensionInEvent({}, 'bad flag')
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when setting a bad strict extension flag into an object')
+
+  t.ok(!CloudEvent.getStrictExtensionOfEvent()) // ok but false return value
+  t.ok(!CloudEvent.getStrictExtensionOfEvent(undefined)) // ok but false return value
+  t.throws(function () {
+    CloudEvent.getStrictExtensionOfEvent(null)
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when getting a strict extension flag from a null object')
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({})) // ok but false return value
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: {} })) // ok but false return value
+  t.throws(function () {
+    CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: 'bad value' })
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when getting a strict extension flag from a wrong property for my custom extensions object')
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: false } })) // ok but false return value
+  t.ok(CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: true } })) // ok and true return value
+  t.throws(function () {
+    CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: 'bad flag' } })
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when getting a bad strict extension flag from my custom extensions object')
+})
+
+/** @test {CloudEvent} */
+test('ensure extensions are managed in the right way', (t) => {
+  t.plan(12)
+  const { CloudEvent } = require('../src/')
+  t.ok(CloudEvent)
+
+  const sampleExtensions = { exampleExtension: 'value' }
+
+  t.ok(!CloudEvent.setExtensionsInEvent()) // ok but no return value
+  t.ok(!CloudEvent.setExtensionsInEvent(undefined, undefined)) // ok but no return value
+  t.throws(function () {
+    CloudEvent.setExtensionsInEvent(null, sampleExtensions)
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when setting extensions into a null object')
+  t.ok(!CloudEvent.setExtensionsInEvent({}, sampleExtensions)) // ok but no return value
+  t.throws(function () {
+    CloudEvent.setExtensionsInEvent({}, 'bad extension')
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when setting bad extensions into an object')
+
+  t.ok(CloudEvent.getExtensionsOfEvent()) // empty object as return value
+  t.ok(CloudEvent.getExtensionsOfEvent(undefined)) // empty object as return value
+  t.throws(function () {
+    CloudEvent.getExtensionsOfEvent(null)
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when getting extensions from a null object')
+  t.ok(CloudEvent.getExtensionsOfEvent({})) // empty object as return value
+  t.ok(CloudEvent.getExtensionsOfEvent(sampleExtensions))
+  t.throws(function () {
+    CloudEvent.getExtensionsOfEvent('bad extension')
+    assert(true) // never executed
+  }, TypeError, 'Expected exception when getting bad extensions')
 })
 
 /** @test {CloudEvent} */
