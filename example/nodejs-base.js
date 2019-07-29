@@ -47,7 +47,7 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceMinimalMandatoryUndefinedNoStrict
 // define some common attributes
 const ceCommonOptions = {
   time: new Date(),
-  contenttype: 'application/json',
+  datacontenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain/v1/',
   strict: false // same as default
 }
@@ -113,7 +113,7 @@ const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
-  { ...ceCommonOptionsStrict, contenttype: 'application/xml' }, // use common strict options, but set strict mode to true
+  { ...ceCommonOptionsStrict, datacontenttype: 'application/xml' }, // use common strict options, but set strict mode to true
   ceCommonExtensions
 )
 assert(ceFullStrictOtherContentType !== null)

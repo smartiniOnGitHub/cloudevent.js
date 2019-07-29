@@ -21,7 +21,7 @@ const test = require('tap').test
 /** create some common options, for better reuse in tests */
 const ceCommonOptions = {
   time: new Date(),
-  contenttype: 'application/json',
+  datacontenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain',
   strict: false
 }

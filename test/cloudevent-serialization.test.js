@@ -49,7 +49,7 @@ test('ensure serialization functions exists (check only the static method here)'
 const commonEventTime = new Date()
 const ceCommonOptions = {
   time: commonEventTime,
-  contenttype: 'application/json',
+  datacontenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain',
   subject: 'subject',
   strict: false
@@ -256,7 +256,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       ceCommonData, // data
       {
         ...ceCommonOptions,
-        contenttype: 'application/xml'
+        datacontenttype: 'application/xml'
       },
       ceCommonExtensions
     )
@@ -313,7 +313,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         ceCommonData, // data
         {
           ...ceCommonOptions,
-          contenttype: 'application/xml'
+          datacontenttype: 'application/xml'
         },
         ceCommonExtensions
       )
@@ -343,7 +343,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       ceCommonData, // data
       {
         ...ceCommonOptionsStrict,
-        contenttype: 'application/xml'
+        datacontenttype: 'application/xml'
       },
       ceCommonExtensions
     )
@@ -419,7 +419,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
         ceCommonData, // data
         {
           ...ceCommonOptions,
-          contenttype: 'application/xml'
+          datacontenttype: 'application/xml'
         },
         ceCommonExtensions
       )
@@ -468,7 +468,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       ceCommonData, // data
       {
         ...ceCommonOptions,
-        contenttype: 'application/xml'
+        datacontenttype: 'application/xml'
       },
       ceCommonExtensions
     )
@@ -521,7 +521,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
       ceCommonData, // data
       {
         ...ceCommonOptionsStrict,
-        contenttype: 'application/xml'
+        datacontenttype: 'application/xml'
       },
       ceCommonExtensions
     )
