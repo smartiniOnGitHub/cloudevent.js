@@ -686,6 +686,24 @@ class Validator {
     // else
     throw new TypeError(`Unable to calculate the size of the argument '${arg}'.`)
   }
+
+  /**
+   * Tell the size in bytes of the given string
+   *
+   * @static
+   * @param {string} str the string to check
+   * @return {number} the size if it's a string, nothing otherwise
+   */
+  static getSizeInBytes (str) {
+    if ((str === undefined || str === null)) {
+      return
+    }
+    if (typeof str === 'string') {
+      return Buffer.from(str).length
+    }
+    // else
+    throw new TypeError(`Unable to calculate the size in bytes of the argument '${str}'.`)
+  }
 }
 
 module.exports = Validator

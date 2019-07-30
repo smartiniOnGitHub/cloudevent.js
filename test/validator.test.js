@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {CloudEvent} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(86)
+  t.plan(94)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -283,6 +283,22 @@ test('ensure some (less used) validation functions are right', (t) => {
       const size = V.getSize(otherBadBoolean)
       assert(size !== null) // never executed
     }, Error, 'Expected exception when trying to get the size of a bad object')
+  }
+
+  {
+    // test getSizeInBytes with different argument types
+    t.ok(V.isUndefined(V.getSizeInBytes(null)))
+    t.strictSame(V.getSizeInBytes(null), undefined)
+    t.throws(function () {
+      const size = V.getSizeInBytes({})
+      assert(size !== null) // never executed
+    }, Error, 'Expected exception when trying to get the size in bytes of not a string')
+    const str = '12345 67890 '
+    t.ok(V.isNumber(V.getSizeInBytes(str)))
+    t.strictSame(V.getSizeInBytes(str), 12)
+    t.strictSame(V.getSizeInBytes(str), V.getSize(str))
+    t.ok(V.isNumber(V.getSizeInBytes('π')))
+    t.strictSame(V.getSizeInBytes('π'), 2)
   }
 })
 
