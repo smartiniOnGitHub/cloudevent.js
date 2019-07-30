@@ -321,7 +321,7 @@ test('ensure the current timestamp is transformed to number and back as date in 
     const timestampFromNumber = T.timestampFromNumber(timestampAsNumber)
     t.ok(timestampFromNumber)
     t.ok(V.isDateValid(timestampFromNumber))
-    console.log(`timestamp from number (without timezone offset): '${timestampFromNumber}'`)
+    // console.log(`timestamp from number (without timezone offset): '${timestampFromNumber}'`)
     // ensure both timestamps have the same value, but they are different object references
     t.strictSame(timestampFromNumber.getTime(), commonEventTime.getTime())
     t.notStrictEqual(timestampFromNumber, commonEventTime)
@@ -332,7 +332,7 @@ test('ensure the current timestamp is transformed to number and back as date in 
     const timestampFromNumber = T.timestampFromNumber(timestampAsNumber, T.timezoneOffsetMsec)
     t.ok(timestampFromNumber)
     t.ok(V.isDateValid(timestampFromNumber))
-    console.log(`timestamp from number (with timezone offset): '${timestampFromNumber}'`)
+    // console.log(`timestamp from number (with timezone offset): '${timestampFromNumber}'`)
     // ensure both timestamps have the same value, but they are different object references
     t.strictSame(timestampFromNumber.getTime(), commonEventTime.getTime() + T.timezoneOffsetMsec)
     t.notStrictEqual(timestampFromNumber, commonEventTime)
