@@ -80,17 +80,16 @@ class Transformer {
    *
    * @static
    * @param {!string} obj the timestamp/date to parse (as a string)
-   * @param {boolean} applyTimezoneOffset flag to apply current timezone offset (default false)
+   * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {Error} if obj is undefined or null, or is not a string
    */
-  static timestampFromString (obj, applyTimezoneOffset = false) {
+  static timestampFromString (obj, timezoneOffset = 0) {
     if (!V.isStringNotEmpty(obj)) {
       throw new Error(`Missing or wrong timestamp: '${obj}' must be a string and not a: '${typeof obj}'.`)
     }
     const timestampMsec = Date.parse(obj)
-    const offsetMsec = (applyTimezoneOffset === false) ? 0 : Transformer.timezoneOffsetMsec
-    return new Date(timestampMsec + offsetMsec)
+    return new Date(timestampMsec + timezoneOffset)
   }
 
   /**
@@ -125,16 +124,15 @@ class Transformer {
    *
    * @static
    * @param {!number} obj the timestamp/date to parse (as a number)
-   * @param {boolean} applyTimezoneOffset flag to apply current timezone offset (default false)
+   * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {Error} if obj is undefined or null, or is not a number
    */
-  static timestampFromNumber (obj, applyTimezoneOffset = false) {
+  static timestampFromNumber (obj, timezoneOffset = 0) {
     if (!V.isNumber(obj)) {
       throw new Error(`Missing or wrong timestamp: '${obj}' must be a number and not a: '${typeof obj}'.`)
     }
-    const offsetMsec = (applyTimezoneOffset === false) ? 0 : Transformer.timezoneOffsetMsec
-    return new Date(obj + offsetMsec)
+    return new Date(obj + timezoneOffset)
   }
 
   /**
