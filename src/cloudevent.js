@@ -417,20 +417,29 @@ class CloudEvent {
    *        encoder (function, no default) a function that takes data and returns encoded data,
    *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
-  static serializeEvent (event, { encoder, encodedData, onlyValid = false } = {}) {
+  static serializeEvent (event, {
+    encoder, encodedData,
+    onlyValid = false, onlyIfLessThan64KB = false
+  } = {}) {
     if (V.isUndefinedOrNull(event)) {
       throw new Error('CloudEvent undefined or null')
     }
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
-        return JSON.stringify(event, function replacer (key, value) {
+        const ser = JSON.stringify(event, function replacer (key, value) {
           // filtering out top level extensions (if any)
           if (key === 'extensions') return undefined
           return value
         })
+        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
+          return ser
+        } else {
+          throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
+        }
       } else {
         throw new Error(`Unable to serialize a not valid CloudEvent.`)
       }
@@ -452,7 +461,12 @@ class CloudEvent {
     }
     const newEvent = T.mergeObjects(event, { data: encodedData })
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
-      return JSON.stringify(newEvent)
+      const ser = JSON.stringify(newEvent)
+      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
+        return ser
+      } else {
+        throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
+      }
     } else {
       throw new Error(`Unable to serialize a not valid CloudEvent.`)
     }
@@ -468,14 +482,16 @@ class CloudEvent {
    * @param {object} options optional deserialization attributes:
    *        decoder (function, no default) a function that takes data and returns decoder data,
    *        decodedData (object, no default) already decoded data (but consistency with the datacontenttype is not checked),
-   *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        onlyValid (boolean, default false) to deserialize only if it's a valid instance,
+   *        onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
    *        timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    */
   static deserializeEvent (ser, {
-    decoder, decodedData, onlyValid = false,
+    decoder, decodedData,
+    onlyValid = false, onlyIfLessThan64KB = false,
     timezoneOffset = 0
   } = {}) {
     if (V.isUndefinedOrNull(ser)) {
@@ -532,7 +548,11 @@ class CloudEvent {
     ce.data = decodedData
     // return ce, depending on its validation option
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
-      return ce
+      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
+        return ce
+      } else {
+        throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
+      }
     } else {
       throw new Error(`Unable to deserialize a not valid CloudEvent.`)
     }
