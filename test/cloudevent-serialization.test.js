@@ -1102,3 +1102,196 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     t.ok(ceFullOtherContentTypeDeserialized5)
   }
 })
+
+// sample function to calculate a random string, given the length, to use in tests here
+function getRandomString (length) {
+  let str = Math.random().toString(36).substr(2)
+  while (str.length < length) {
+    str += Math.random().toString(36).substr(2)
+  }
+  return str.substr(0, length)
+}
+
+/** @test {CloudEvent} */
+test('serialize and deserialize a big CloudEvent instance (more than 64 KB), expect success', (t) => {
+  t.plan(55)
+
+  const { CloudEvent } = require('../src/') // get references via destructuring
+  t.ok(CloudEvent)
+
+  const size = 100000
+  const ceBigString = getRandomString(size) // a random string with n chars
+  t.ok(ceBigString)
+  t.strictSame(ceBigString.length, size)
+
+  {
+    const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      { random: ceBigString }, // data
+      ceCommonOptions,
+      ceCommonExtensions
+    )
+    assert(ceFull !== null)
+    t.ok(ceFull)
+    t.ok(ceFull.isValid())
+    t.ok(ceFull.validate().length === 0)
+    t.ok(ceFull.validate({ strict: false }).length === 0)
+    t.ok(ceFull.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFull))
+    t.ok(CloudEvent.validateEvent(ceFull).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+
+    // with defaults
+    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+    t.ok(ceFullSerializedStatic)
+    const ceFullDeserializedStatic = CloudEvent.deserializeEvent(ceFullSerializedStatic)
+    t.ok(ceFullDeserializedStatic)
+    const ceFullSerialized = ceFull.serialize()
+    t.ok(ceFullSerialized)
+    const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
+    t.ok(ceFullDeserialized)
+    assert(ceFullSerializedStatic === ceFullSerialized)
+    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+
+    // set some flags
+    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFull, { onlyValid: false, onlyIfLessThan64KB: false })
+    t.ok(ceFullSerializedOnlyValidFalse)
+    const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse)
+    t.ok(ceFullDeserializedOnlyValidFalse)
+    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFull, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceFullSerializedOnlyValidTrue)
+    const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue)
+    t.ok(ceFullDeserializedOnlyValidTrue)
+    t.strictSame(ceFullSerializedOnlyValidFalse, ceFullSerializedOnlyValidTrue)
+
+    // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
+    t.throws(function () {
+      const serialized = CloudEvent.serializeEvent(ceFull, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(serialized === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    t.throws(function () {
+      const serialized = CloudEvent.serializeEvent(ceFull, { onlyValid: true, onlyIfLessThan64KB: true })
+      assert(serialized === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    // deserialize instances just serialized, but now with the flag enabled, so expect errors here
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { onlyValid: true, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+  }
+
+  {
+    const ceFullBadBig = new CloudEvent(null,
+      ceNamespace,
+      ceServerUrl,
+      { random: ceBigString }, // data
+      ceCommonOptions,
+      ceCommonExtensions
+    )
+    assert(ceFullBadBig !== null)
+    t.ok(ceFullBadBig)
+    const serialized = CloudEvent.serializeEvent(ceFullBadBig, { onlyValid: false, onlyIfLessThan64KB: false })
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
+  }
+
+  {
+    // the same but with strict mode enabled ...
+    const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
+      ceNamespace,
+      ceServerUrl,
+      { random: ceBigString }, // data
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    assert(ceFullStrict !== null)
+    t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isValid())
+    t.ok(ceFullStrict.validate().length === 0)
+    t.ok(ceFullStrict.validate({ strict: false }).length === 0)
+    t.ok(ceFullStrict.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceFullStrict))
+    t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
+
+    // with defaults
+    const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+    t.ok(ceFullSerializedStatic)
+    const ceFullDeserializedStatic = CloudEvent.deserializeEvent(ceFullSerializedStatic)
+    t.ok(ceFullDeserializedStatic)
+    const ceFullSerialized = ceFullStrict.serialize()
+    t.ok(ceFullSerialized)
+    const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
+    t.ok(ceFullDeserialized)
+    assert(ceFullSerializedStatic === ceFullSerialized)
+    t.strictSame(ceFullSerializedStatic, ceFullSerialized)
+
+    // set some flags
+    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: false, onlyIfLessThan64KB: false })
+    t.ok(ceFullSerializedOnlyValidFalse)
+    const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse)
+    t.ok(ceFullDeserializedOnlyValidFalse)
+    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceFullSerializedOnlyValidTrue)
+    const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue)
+    t.ok(ceFullDeserializedOnlyValidTrue)
+    t.strictSame(ceFullSerializedOnlyValidFalse, ceFullSerializedOnlyValidTrue)
+
+    // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
+    t.throws(function () {
+      const serialized = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(serialized === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    t.throws(function () {
+      const serialized = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true, onlyIfLessThan64KB: true })
+      assert(serialized === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    // deserialize instances just serialized, but now with the flag enabled, so expect errors here
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { onlyValid: true, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+  }
+
+  {
+    // the same but with strict mode enabled ...
+    const ceFullBadBigStrict = new CloudEvent('1/full/sample-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      { random: ceBigString }, // data
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    assert(ceFullBadBigStrict !== null)
+    t.ok(ceFullBadBigStrict)
+    const serialized = CloudEvent.serializeEvent(ceFullBadBigStrict, { onlyValid: false, onlyIfLessThan64KB: false })
+    ceFullBadBigStrict.id = null // remove some mandatory attribute now, to let deserialization fail
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
+    t.throws(function () {
+      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(deserialized === null) // never executed
+    }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
+  }
+})
+
+// TODO: the same, but with a non default contenttype ...
