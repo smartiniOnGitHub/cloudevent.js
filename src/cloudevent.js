@@ -444,7 +444,7 @@ class CloudEvent {
         throw new Error(`Unable to serialize a not valid CloudEvent.`)
       }
     }
-    // else
+    // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(encoder)) {
       if (!V.isFunction(encoder)) {
         throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
@@ -527,9 +527,18 @@ class CloudEvent {
     )
     // depending on the datacontenttype, decode the data attribute (the payload)
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
-      return ce
+      // return ce, depending on its validation option
+      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
+        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
+          return ce
+        } else {
+          throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
+        }
+      } else {
+        throw new Error(`Unable to deserialize a not valid CloudEvent.`)
+      }
     }
-    // else
+    // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(decoder)) {
       if (!V.isFunction(decoder)) {
         throw new Error(`Missing or wrong decoder function: '${decoder}' for the given data content type: '${parsed.datacontenttype}'.`)
