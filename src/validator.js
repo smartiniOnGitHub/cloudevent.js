@@ -351,6 +351,7 @@ class Validator {
    * Tell if the given object contains at least one property
    * that has a standard CloudEvent property name.
    *
+   * @static
    * @param {object} obj the object to check
    * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
    * @return {boolean} true if at least one property with a standard name is found, otherwise false
@@ -371,6 +372,7 @@ class Validator {
   /**
    * Tell if the given string has a standard CloudEvent property name.
    *
+   * @static
    * @param {string} str the string to check
    * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
    * @return {boolean} true if the given string has a standard name, otherwise false
@@ -388,6 +390,8 @@ class Validator {
   /**
    * Ensure that the given argument is undefined.
    *
+   * See {@link Validator.isUndefined}.
+   *
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
@@ -401,6 +405,8 @@ class Validator {
 
   /**
    * Ensure that the given argument is null.
+   *
+   * See {@link Validator.isNull}.
    *
    * @static
    * @param {object} arg the object to check
@@ -416,6 +422,8 @@ class Validator {
   /**
    * Ensure that the given argument is undefined or null.
    *
+   * See {@link Validator.isUndefinedOrNull}.
+   *
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
@@ -428,7 +436,25 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is defined and not null.
+   *
+   * See {@link Validator.isDefinedAndNotNull}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not undefined or null, nothing otherwise
+   */
+  static ensureIsDefinedAndNotNull (arg, name) {
+    if (!Validator.isDefinedAndNotNull(arg)) {
+      return new TypeError(`The argument '${name}' must be defined and not null, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
    * Ensure that the given argument is a boolean.
+   *
+   * See {@link Validator.isBoolean}.
    *
    * @static
    * @param {object} arg the object to check
@@ -444,6 +470,8 @@ class Validator {
   /**
    * Ensure that the given argument is an instance of the given class reference.
    *
+   * See {@link Validator.isClass}.
+   *
    * @static
    * @param {object} arg the object to check
    * @param {object} classReference the class that should be implemented/extended
@@ -458,6 +486,8 @@ class Validator {
 
   /**
    * Ensure that the given argument is a function.
+   *
+   * See {@link Validator.isFunction}.
    *
    * @static
    * @param {object} arg the object to check
@@ -660,6 +690,24 @@ class Validator {
   static ensureIsURI (arg, base, name) {
     if (!Validator.isURI(arg, base)) {
       return new Error(`The object '${name}' must be an URI or URL string, and not '${arg}', '${base}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given object does not contain any property
+   * that has a standard CloudEvent property name.
+   *
+   * See {@link Validator.doesObjectContainsStandardProperty}.
+   *
+   * @static
+   * @param {object} obj the object to check
+   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @param {string} name the name to use in generated error (if any)
+   * @return {Error} if at least one property with a standard name is found, nothing otherwise
+   */
+  static ensureObjectDoesNotContainStandardProperty (obj, isPropStandard, name) {
+    if (Validator.doesObjectContainsStandardProperty(obj, isPropStandard)) {
+      return new Error(`The object with name '${name}' contains at least one property with a standard name`)
     }
   }
 

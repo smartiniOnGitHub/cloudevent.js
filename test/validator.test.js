@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {CloudEvent} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(94)
+  t.plan(102)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -129,11 +129,13 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.strictSame(V.ensureIsUndefined(undefinedGood, 'test'), undefined) // no error returned
     t.ok(V.isUndefinedOrNull(undefinedGood))
     t.strictSame(V.ensureIsUndefinedOrNull(undefinedGood, 'test'), undefined) // no error returned
+    t.strictSame(V.ensureIsDefinedAndNotNull(undefinedGood, 'test') instanceof Error, true) // expected error returned
     const undefinedBad = 'defined'
     t.ok(!V.isUndefined(undefinedBad))
     t.strictSame(V.ensureIsUndefined(undefinedBad, 'test') instanceof Error, true) // expected error returned
     t.ok(!V.isUndefinedOrNull(undefinedBad))
     t.strictSame(V.ensureIsUndefinedOrNull(undefinedBad, 'test') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsDefinedAndNotNull(undefinedBad, 'test'), undefined) // no error returned
   }
 
   {
@@ -142,11 +144,22 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.strictSame(V.ensureIsNull(nullGood, 'test'), undefined) // no error returned
     t.ok(V.isUndefinedOrNull(nullGood))
     t.strictSame(V.ensureIsUndefinedOrNull(nullGood, 'test'), undefined) // no error returned
+    t.strictSame(V.ensureIsDefinedAndNotNull(nullGood, 'test') instanceof Error, true) // expected error returned
     const nullBad = 'defined'
     t.ok(!V.isNull(nullBad))
     t.strictSame(V.ensureIsNull(nullBad, 'test') instanceof Error, true) // expected error returned
     t.ok(!V.isUndefinedOrNull(nullBad))
     t.strictSame(V.ensureIsUndefinedOrNull(nullBad, 'test') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsDefinedAndNotNull(nullBad, 'test'), undefined) // no error returned
+  }
+
+  {
+    const errorGood = new Error('Sample error')
+    t.ok(V.isError(errorGood))
+    t.strictSame(V.ensureIsError(errorGood, 'test'), undefined) // no error returned
+    const errorBad = 'Error string'
+    t.ok(!V.isError(errorBad))
+    t.strictSame(V.ensureIsError(errorBad, 'test') instanceof Error, true) // expected error returned
   }
 
   {
@@ -179,7 +192,7 @@ test('ensure some (less used) validation functions are right', (t) => {
   }
 
   {
-    const objectGood = { name: 'Name', age: 20, note: null }
+    const objectGood = { name: 'Name', age: 100, note: null }
     t.ok(V.isObject(objectGood))
     t.ok(!V.isString(objectGood))
     t.ok(!V.ensureIsObjectOrCollection(objectGood, 'object')) // no error returned
@@ -189,7 +202,7 @@ test('ensure some (less used) validation functions are right', (t) => {
   }
 
   {
-    const objectAsStringGood = '{ name: "Name", age: 20, note: null }'
+    const objectAsStringGood = '{ name: "Name", age: 100, note: null }'
     t.ok(!V.isObject(objectAsStringGood))
     t.ok(V.isString(objectAsStringGood))
     t.ok(V.ensureIsObjectOrCollection(objectAsStringGood, 'string')) // expected error returned
@@ -304,7 +317,7 @@ test('ensure some (less used) validation functions are right', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure validation functions on standard properties are right', (t) => {
-  t.plan(18)
+  t.plan(20)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -332,4 +345,7 @@ test('ensure validation functions on standard properties are right', (t) => {
   t.ok(V.doesObjectContainsStandardProperty({ standard: 'value' }, isPropStandard))
   t.ok(!V.doesObjectContainsStandardProperty({ property: 'value' }, {}))
   t.ok(!V.doesObjectContainsStandardProperty({ standard: 'value' }, {}))
+
+  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ property: 'value' }, isPropStandard, 'test'), undefined) // no error returned
+  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard, 'test') instanceof Error, true) // expected error returned
 })
