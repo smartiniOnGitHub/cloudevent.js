@@ -55,6 +55,7 @@ class CloudEvent {
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
    * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
    * @throws {Error} if strict is true and id or type is undefined or null
+   * @throws {Error} if datacontentencoding is defined and data is not a string or if encoding is not 'base64'
    */
   constructor (id, type, source, data, {
     time = new Date(),
@@ -113,10 +114,23 @@ class CloudEvent {
      * for when the data field must be encoded as a string.
      * This must be set if the data attribute contains string-encoded binary data,
      * otherwise it must not be set.
+     * As (arbitrary) limitation, only 'base64' encoding is supported here.
      * @type {string}
      * @private
      */
     this.datacontentencoding = datacontentencoding
+    if (V.isDefinedAndNotNull(datacontentencoding)) {
+      if (!V.isStringNotEmpty(this.data)) {
+        throw new Error('Unable to create CloudEvent instance, datacontentencoding wrong for data not a string')
+      }
+      // encode the given data
+      if (datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
+        this.data = Buffer.from(this.data).toString('base64')
+        // TODO: move implementation to to/from base64 into transformer ... wip
+      } else {
+        throw new Error('Unable to create CloudEvent instance, datacontentencoding not supported')
+      }
+    }
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
@@ -509,6 +523,16 @@ class CloudEvent {
 
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
+
+    if (V.isDefinedAndNotNull(parsed.datacontentencoding)) {
+      if (V.isStringNotEmpty(this.data)) {
+        // decode the given data
+        if (parsed.datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
+          parsed.data = Buffer.from(this.data, 'base64').toString('utf8')
+          // TODO: move implementation to to/from base64 into transformer ... wip
+        }
+      }
+    }
 
     // fill a new CludEvent instance with parsed data
     const ce = new CloudEvent(parsed.id,
