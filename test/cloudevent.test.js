@@ -127,6 +127,9 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
+  // note that when creating an instance with an undefined mandatory argument (without a default value), but with strict flag disabled: expected success ...
+  // note that null values are not handled by default values, only undefined values ...
+
   {
     // create an instance without mandatory arguments (but no strict mode): expected success ...
     const ceEmpty = new CloudEvent()
@@ -237,7 +240,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
   {
     // create an instance with a mandatory argument null (but no strict mode): expected success ...
-    // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
+    // note that only undefined arguments will be assigned a default value (if set), so all will be good the same here ...
     const ceMinimalMandatoryNullNoStrict = new CloudEvent(null, null, null, null, { strict: false })
     assert(ceMinimalMandatoryNullNoStrict !== null)
     t.ok(ceMinimalMandatoryNullNoStrict)
@@ -363,8 +366,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
-  // create an instance with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
-  // note that null values are not handled by default values, only undefined values ...
+  // create an instance with some common options, but with strict flag disabled: expected success ...
   const ceFull1 = new CloudEvent('1/full',
     ceNamespace,
     ceServerUrl,
@@ -707,4 +709,69 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(obj.isValid({ strict: true }))
     t.ok(obj.isStrict)
   }
+})
+
+/** @test {CloudEvent} */
+test('ensure CloudEvent with datacontentencoding are managed in the right way', (t) => {
+  t.plan(18)
+
+  const { CloudEvent, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+
+  const ceOptionsWithDataEncoding = { ...ceCommonOptions, datacontentencoding: 'Base64' }
+  const ceDataAsString = 'Hello World, 2019'
+  const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMTk='
+
+  t.throws(function () {
+    const ceFull = new CloudEvent('1/full',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData,
+      ceOptionsWithDataEncoding,
+      ceCommonExtensions
+    )
+    assert(ceFull === undefined) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding and data not as a string')
+  t.throws(function () {
+    const ceFull = new CloudEvent('1/full',
+      ceNamespace,
+      ceServerUrl,
+      ceDataAsString,
+      { ...ceCommonOptions, datacontentencoding: 'Custom encoding' },
+      ceCommonExtensions
+    )
+    assert(ceFull === undefined) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding wrong')
+
+  const ceFull = new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    ceDataAsString,
+    ceOptionsWithDataEncoding,
+    ceCommonExtensions
+  )
+  t.ok(ceFull)
+  t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+  t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
+  t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
+  t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
+  t.strictSame(ceFull.data, ceDataEncoded)
+  t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+  t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+
+  // the same but with strict mode: expected success ...
+  const ceFullStrict = new CloudEvent('1/full-strict',
+    ceNamespace,
+    ceServerUrl,
+    ceDataAsString,
+    { ...ceOptionsWithDataEncoding, strict: true },
+    ceCommonExtensions
+  )
+  t.ok(ceFullStrict)
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: false }))
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: true }))
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length, 0)
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
+  t.strictSame(ceFullStrict.data, ceDataEncoded)
+  t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+  t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
 })
