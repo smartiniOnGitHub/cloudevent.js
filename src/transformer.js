@@ -82,11 +82,11 @@ class Transformer {
    * @param {!string} obj the timestamp/date to parse (as a string)
    * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
-   * @throws {Error} if obj is undefined or null, or is not a string
+   * @throws {TypeError} if obj is undefined or null, or is not a string
    */
   static timestampFromString (obj, timezoneOffset = 0) {
     if (!V.isStringNotEmpty(obj)) {
-      throw new Error(`Missing or wrong timestamp: '${obj}' must be a string and not a: '${typeof obj}'.`)
+      throw new TypeError(`Missing or wrong timestamp: '${obj}' must be a string and not a: '${typeof obj}'.`)
     }
     const timestampMsec = Date.parse(obj)
     return new Date(timestampMsec + timezoneOffset)
@@ -102,7 +102,7 @@ class Transformer {
    * @static
    * @param {object} obj the timestamp/date to convert, or the current one
    * @return {string} the string representation of the object
-   * @throws {Error} if obj is undefined or null, or is not a Date instance
+   * @throws {TypeError} if obj is undefined or null, or is not a Date instance
    */
   static timestampToString (obj) {
     let timestamp = obj
@@ -110,7 +110,7 @@ class Transformer {
       timestamp = new Date()
     }
     if (!V.isDateValid(timestamp)) {
-      throw new Error(`Missing or wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
+      throw new TypeError(`Missing or wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
     }
     return timestamp.toISOString()
   }
@@ -126,11 +126,11 @@ class Transformer {
    * @param {!number} obj the timestamp/date to parse (as a number)
    * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
-   * @throws {Error} if obj is undefined or null, or is not a number
+   * @throws {TypeError} if obj is undefined or null, or is not a number
    */
   static timestampFromNumber (obj, timezoneOffset = 0) {
     if (!V.isNumber(obj)) {
-      throw new Error(`Missing or wrong timestamp: '${obj}' must be a number and not a: '${typeof obj}'.`)
+      throw new TypeError(`Missing or wrong timestamp: '${obj}' must be a number and not a: '${typeof obj}'.`)
     }
     return new Date(obj + timezoneOffset)
   }
@@ -144,7 +144,7 @@ class Transformer {
    * @static
    * @param {object} obj the timestamp/date to convert, or the current one
    * @return {number} the number representation of the object
-   * @throws {Error} if obj is not a Date instance
+   * @throws {TypeError} if obj is not a Date instance
    */
   static timestampToNumber (obj) {
     let timestamp = obj
@@ -152,9 +152,50 @@ class Transformer {
       timestamp = new Date()
     }
     if (!V.isDateValid(timestamp)) {
-      throw new Error(`Wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
+      throw new TypeError(`Wrong timestamp: '${timestamp}' must be a date and not a: '${typeof timestamp}'.`)
     }
     return timestamp.getTime()
+  }
+
+  /**
+   * Utility function that encodes a string
+   * in base64 (compatible with the CloudEvent standard).
+   *
+   * @static
+   * @param {string} obj the string to encode, or '' by default
+   * @return {string} the string encoded in base64
+   * @throws {TypeError} if str is not a string instance
+   */
+  static stringToBase64 (obj) {
+    let str = obj
+    if (V.isUndefinedOrNull(obj)) {
+      str = ''
+    }
+    if (!V.isString(str)) {
+      throw new TypeError(`Missing or wrong argument: '${str}' must be a string and not a: '${typeof str}'.`)
+    }
+    return Buffer.from(str).toString('base64')
+  }
+
+  /**
+   * Utility function that decodes a base64 string
+   * into a normal string using 'utf8' encoding
+   * (compatible with the CloudEvent standard).
+   *
+   * @static
+   * @param {string} obj the string to decode, or '' by default
+   * @return {string} the string decoded from base64
+   * @throws {TypeError} if str is not a string instance
+   */
+  static stringFromBase64 (obj) {
+    let str = obj
+    if (V.isUndefinedOrNull(obj)) {
+      str = ''
+    }
+    if (!V.isString(str)) {
+      throw new TypeError(`Missing or wrong argument: '${str}' must be a string and not a: '${typeof str}'.`)
+    }
+    return Buffer.from(str, 'base64').toString('utf8')
   }
 
   /**
@@ -168,7 +209,7 @@ class Transformer {
    *        addStatus flag (default true) to add a 'status' attribute into the object to return,
    *        addTimestamp flag (default false) to add the current 'timestamp' as attribute into the object to return,
    * @return {object} the object representation of the error
-   * @throws {Error} if err is undefined or null, or is not an Error instance
+   * @throws {TypeError} if err is undefined or null, or is not an Error instance
    */
   static errorToData (err, {
     includeStackTrace = false,
@@ -177,7 +218,7 @@ class Transformer {
   } = {}
   ) {
     if (!V.isError(err)) {
-      throw new Error(`Missing or wrong argument: '${err}' must be an Error and not a: '${typeof err}'.`)
+      throw new TypeError(`Missing or wrong argument: '${err}' must be an Error and not a: '${typeof err}'.`)
     }
     const data = {
       name: err.name,
@@ -218,15 +259,15 @@ class Transformer {
    * @param {!string} url the URI/URL (as a string)
    * @param {object} options containing: strict (boolean, default false) to check it in a more strict way
    * @return {string} the parsed version, but without arguments (if any)
-   * @throws {Error} if url is undefined or null, or is not a string
+   * @throws {TypeError} if url is undefined or null, or is not a string
    */
   static uriStripArguments (url, { strict = false } = {}) {
     if (!V.isString(url)) {
-      throw new Error(`Missing or wrong URL: '${url}' must be a string and not a: '${typeof url}'.`)
+      throw new TypeError(`Missing or wrong URL: '${url}' must be a string and not a: '${typeof url}'.`)
     }
     if (strict === true) {
       if (!V.isURI(url)) {
-        throw new Error(`Missing or wrong URL: '${url}'`)
+        throw new TypeError(`Missing or wrong URL: '${url}'`)
       }
     }
     return url.split('?')[0]
@@ -240,11 +281,11 @@ class Transformer {
    * @param {!object} base the first object to merge
    * @param {object} others all other(s) object to merge (at least one)
    * @return {object} the new object
-   * @throws {Error} if base is undefined or null, or is not an object
+   * @throws {TypeError} if base is undefined or null, or is not an object
    */
   static mergeObjects (base, ...others) {
     if (!V.isObject(base)) {
-      throw new Error(`Missing or wrong argument: '${base}' must be an object and not a: '${typeof base}'.`)
+      throw new TypeError(`Missing or wrong argument: '${base}' must be an object and not a: '${typeof base}'.`)
     }
     const baseProto = Object.getPrototypeOf(base)
     return Object.assign(Object.create(baseProto), base, ...others) // set the prototype of the first argument in the clone

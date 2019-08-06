@@ -342,7 +342,7 @@ test('ensure the current timestamp is transformed to number and back as date in 
 
 /** @test {Transformer} */
 test('ensure errors are transformed into data attribute in the right way', (t) => {
-  t.plan(51)
+  t.plan(60)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -462,6 +462,26 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     delete data.code // delete the attribute to simplify next comparison
     delete data.timestamp // delete the attribute to simplify next comparison
     t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, status: 'error' })
+  }
+
+  {
+    const error = new TypeError('sample type error')
+    t.ok(V.isError(error))
+    error.code = '1000' // add a sample error code, as string
+    t.ok(V.isString(error.code))
+    const data = T.errorToData(error, {
+      includeStackTrace: true,
+      addStatus: false,
+      addTimestamp: false
+    })
+    t.ok(data)
+    t.ok(V.isObject(data))
+    t.ok(data.stack)
+    t.ok(V.isString(data.stack))
+    data.stack = null // empty the attribute to simplify next comparison
+    t.ok(!data.status)
+    t.ok(!data.timestamp)
+    t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, code: '1000' })
   }
 })
 
@@ -610,4 +630,33 @@ test('ensure objects are merged in the right way', (t) => {
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
   }
+})
+
+/** @test {Transformer} */
+test('ensure strings are encoded/decoded in th right way in base64', (t) => {
+  t.plan(13)
+
+  const { CloudEventTransformer: T } = require('../src/') // get references via destructuring
+
+  t.strictSame(T.stringToBase64(), '')
+  t.strictSame(T.stringToBase64(undefined), '')
+  t.strictSame(T.stringToBase64(null), '')
+  t.strictSame(T.stringToBase64(''), '')
+  t.throws(function () {
+    const base64 = T.stringToBase64({}) // not a string
+    assert(base64 === null) // never executed
+  }, Error, 'Expected exception when transforming not a right string to a base64 (String)')
+  t.strictSame(T.stringToBase64('Hello World, 2019'), 'SGVsbG8gV29ybGQsIDIwMTk=')
+
+  t.strictSame(T.stringFromBase64(), '')
+  t.strictSame(T.stringFromBase64(undefined), '')
+  t.strictSame(T.stringFromBase64(null), '')
+  t.strictSame(T.stringFromBase64(''), '')
+  t.throws(function () {
+    const base64 = T.stringFromBase64({}) // not a string
+    assert(base64 === null) // never executed
+  }, Error, 'Expected exception when transforming not a right string from a base64 (String)')
+  t.strictSame(T.stringFromBase64('SGVsbG8gV29ybGQsIDIwMTk='), 'Hello World, 2019')
+
+  t.strictSame(T.stringFromBase64(T.stringToBase64('Hello World, 2019')), 'Hello World, 2019')
 })

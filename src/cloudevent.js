@@ -125,8 +125,7 @@ class CloudEvent {
       }
       // encode the given data
       if (datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
-        this.data = Buffer.from(this.data).toString('base64')
-        // TODO: move implementation to to/from base64 into transformer ... wip
+        this.data = T.stringToBase64(this.data)
       } else {
         throw new Error('Unable to create CloudEvent instance, datacontentencoding not supported')
       }
@@ -528,8 +527,7 @@ class CloudEvent {
       if (V.isStringNotEmpty(this.data)) {
         // decode the given data
         if (parsed.datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
-          parsed.data = Buffer.from(this.data, 'base64').toString('utf8')
-          // TODO: move implementation to to/from base64 into transformer ... wip
+          parsed.data = T.stringFromBase64(this.data)
         }
       }
     }
