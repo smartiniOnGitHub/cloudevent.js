@@ -45,7 +45,7 @@ class CloudEvent {
    * @param {!string} id the ID of the event (unique), mandatory
    * @param {!string} type the type of the event (usually prefixed with a reverse-DNS name), mandatory
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
-   * @param {(object|Map|Set)} data the real event data
+   * @param {(object|Map|Set|string)} data the real event data
    * @param {object} options optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
    *        datacontentencoding (string) optional in most cases here,
@@ -92,7 +92,7 @@ class CloudEvent {
     this.source = source
     /**
      * The real event data.
-     * Usually it's an object, but could be even a Map or a Set.
+     * Usually it's an object, but could be even a Map or a Set, or a string.
      * Copy the original object to avoid changing objects that could be shared.
      * @type {(object|Map|Set)}
      * @private
@@ -366,7 +366,8 @@ class CloudEvent {
       ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+        if (V.isUndefinedOrNull(event.datacontentencoding) &&
+          event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
           ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         } else {
           // even a string in this case would be good
