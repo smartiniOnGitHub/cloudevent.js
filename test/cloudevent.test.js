@@ -740,7 +740,7 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
       ceCommonExtensions
     )
     assert(ceFull === undefined) // never executed
-  }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding wrong')
+  }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding not supported')
 
   const ceFull = new CloudEvent('1/full',
     ceNamespace,

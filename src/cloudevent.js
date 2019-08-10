@@ -127,7 +127,7 @@ class CloudEvent {
       if (datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
         this.data = T.stringToBase64(this.data)
       } else {
-        throw new Error('Unable to create CloudEvent instance, datacontentencoding not supported')
+        throw new Error(`Unable to create CloudEvent instance, datacontentencoding '${datacontentencoding}' not supported`)
       }
     }
     /**
@@ -525,10 +525,10 @@ class CloudEvent {
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
 
     if (V.isDefinedAndNotNull(parsed.datacontentencoding)) {
-      if (V.isStringNotEmpty(this.data)) {
+      if (V.isStringNotEmpty(parsed.data)) {
         // decode the given data
         if (parsed.datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
-          parsed.data = T.stringFromBase64(this.data)
+          parsed.data = T.stringFromBase64(parsed.data)
         }
       }
     }
