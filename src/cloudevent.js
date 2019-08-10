@@ -713,6 +713,11 @@ class CloudEvent {
    * @type {(object|Map|Set)}
    */
   get payload () {
+    if (V.isString(this.data)) {
+      // handle an edge case: if data is a String, I need to clone in a different way ...
+      return this.data.slice()
+    }
+    // else
     return { ...this.data }
   }
 
