@@ -134,7 +134,7 @@ assert(ceErrorStrict.isValid())
 assert(ceFullStrictOtherContentType.isValid())
 // etc ...
 
-console.log(`Validation on ceEmpty: isValid: ${ceEmpty.isValid()}, `)
+console.log(`Validation on ceEmpty: isValid: ${ceEmpty.isValid()}`)
 
 console.log(`Validation output for ceEmpty, default strict mode is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
@@ -146,9 +146,9 @@ serialization examples:
 // default contenttype
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 const ceFullSerialized = ceFull.serialize()
-console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
+console.log('Serialization output for ceFull, details:\n' + ceFullSerialized)
 const ceFullStrictSerialized = ceFullStrict.serialize()
-console.log(`Serialization output for ceFullStrict, details:\n` + ceFullStrictSerialized)
+console.log('Serialization output for ceFullStrict, details:\n' + ceFullStrictSerialized)
 // non default contenttype
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
   // encoder: (data) => '<data "encoder"="sample" />',
@@ -160,7 +160,7 @@ const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.seri
   encodedData: '<data "hello"="world" "year"="2019" />',
   onlyValid: true
 })
-console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
+console.log('Serialization output for ceFullStrictOtherContentType, details:\n' + ceFullStrictOtherContentTypeSerialized)
 
 // then use (send/store/etc) serialized instances ...
 
@@ -171,7 +171,7 @@ deserialization (parse) examples:
 ```js
 // deserialization examples
 // default contenttype
-console.log(`\nSome deserialization/parse examples:`)
+console.log('\nSome deserialization/parse examples:')
 const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
 assert(ceFullDeserialized !== null)
 assert(ceFullDeserialized.isValid())
