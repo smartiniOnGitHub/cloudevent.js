@@ -119,17 +119,6 @@ class CloudEvent {
      * @private
      */
     this.datacontentencoding = datacontentencoding
-    if (V.isDefinedAndNotNull(datacontentencoding)) {
-      if (!V.isStringNotEmpty(this.data)) {
-        throw new Error('Unable to create CloudEvent instance, datacontentencoding wrong for data not a string')
-      }
-      // encode the given data
-      if (datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
-        this.data = T.stringToBase64(this.data)
-      } else {
-        throw new Error(`Unable to create CloudEvent instance, datacontentencoding '${datacontentencoding}' not supported`)
-      }
-    }
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
@@ -360,6 +349,9 @@ class CloudEvent {
     if (V.isDefinedAndNotNull(event.subject)) {
       ve.push(V.ensureIsStringNotEmpty(event.subject, 'subject'))
     }
+    if (V.isDefinedAndNotNull(event.datacontentencoding)) {
+      ve.push(V.ensureIsStringNotEmpty(event.datacontentencoding, 'datacontentencoding'))
+    }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
@@ -370,8 +362,8 @@ class CloudEvent {
           event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
           ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         } else {
-          // even a string in this case would be good
-          ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
+          // ensure data is a string in this case
+          ve.push(V.ensureIsString(event.data, 'data'))
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
@@ -428,7 +420,7 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to serialize
    * @param {object} options optional serialization attributes:
-   *        encoder (function, no default) a function that takes data and returns encoded data,
+   *        encoder (function, no default) a function that takes data and returns encoded data as a string,
    *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
    *        onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
@@ -439,51 +431,42 @@ class CloudEvent {
     encoder, encodedData,
     onlyValid = false, onlyIfLessThan64KB = false
   } = {}) {
-    if (V.isUndefinedOrNull(event)) {
-      throw new Error('CloudEvent undefined or null')
-    }
+    if (V.isUndefinedOrNull(event)) throw new Error('CloudEvent undefined or null')
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         const ser = JSON.stringify(event, function replacer (key, value) {
-          // filtering out top level extensions (if any)
-          if (key === 'extensions') return undefined
-          return value
+          switch (key) {
+            case 'data':
+              // return data as is, or encoded or nothing (if not supported)
+              if (V.isUndefinedOrNull(event.datacontentencoding)) return value
+              if (event.datacontentencoding === 'Base64') return T.stringToBase64(this.data)
+              else return undefined
+            case 'extensions':
+              // filtering out top level extensions (if any)
+              return undefined
+            default:
+              return value
+          }
         })
-        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
-          return ser
-        } else {
-          throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
-        }
-      } else {
-        throw new Error(`Unable to serialize a not valid CloudEvent.`)
-      }
+        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
+        else throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
+      } else throw new Error(`Unable to serialize a not valid CloudEvent.`)
     }
     // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(encoder)) {
-      if (!V.isFunction(encoder)) {
-        throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
-      }
+      if (!V.isFunction(encoder)) throw new Error(`Missing or wrong encoder function: '${encoder}' for the given content type: '${event.datacontenttype}'.`)
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
-      if (!V.isDefinedAndNotNull(encodedData)) {
-        throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
-      }
+      if (!V.isDefinedAndNotNull(encodedData)) throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
     }
-    if (!V.isStringNotEmpty(encodedData)) {
-      throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
-    }
+    if (!V.isStringNotEmpty(encodedData)) throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
     const newEvent = T.mergeObjects(event, { data: encodedData })
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       const ser = JSON.stringify(newEvent)
-      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
-        return ser
-      } else {
-        throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
-      }
-    } else {
-      throw new Error(`Unable to serialize a not valid CloudEvent.`)
-    }
+      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
+      else throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
+    } else throw new Error(`Unable to serialize a not valid CloudEvent.`)
   }
 
   /**
@@ -494,8 +477,8 @@ class CloudEvent {
    * @static
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
    * @param {object} options optional deserialization attributes:
-   *        decoder (function, no default) a function that takes data and returns decoder data,
-   *        decodedData (object, no default) already decoded data (but consistency with the datacontenttype is not checked),
+   *        decoder (function, no default) a function that takes data and returns decoder data as a string,
+   *        decodedData (string, no default) already decoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to deserialize only if it's a valid instance,
    *        onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
    *        timezoneOffset (number, default 0) to apply a different timezone offset
@@ -508,18 +491,12 @@ class CloudEvent {
     onlyValid = false, onlyIfLessThan64KB = false,
     timezoneOffset = 0
   } = {}) {
-    if (V.isUndefinedOrNull(ser)) {
-      throw new Error('Serialized CloudEvent undefined or null')
-    }
-    if (!V.isStringNotEmpty(ser)) {
-      throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
-    }
+    if (V.isUndefinedOrNull(ser)) throw new Error('Serialized CloudEvent undefined or null')
+    if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
     // deserialize standard attributes, always in JSON format
     const parsed = JSON.parse(ser)
     // ensure it's an object (single), and not a string neither a collection or an array
-    if (!V.isObject(parsed) || V.isArray(parsed)) {
-      throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
-    }
+    if (!V.isObject(parsed) || V.isArray(parsed)) throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
 
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
@@ -527,9 +504,7 @@ class CloudEvent {
     if (V.isDefinedAndNotNull(parsed.datacontentencoding)) {
       if (V.isStringNotEmpty(parsed.data)) {
         // decode the given data
-        if (parsed.datacontentencoding.toLowerCase() === 'Base64'.toLowerCase()) {
-          parsed.data = T.stringFromBase64(parsed.data)
-        }
+        if (parsed.datacontentencoding === 'Base64') parsed.data = T.stringFromBase64(parsed.data)
       }
     }
 
@@ -552,42 +527,26 @@ class CloudEvent {
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       // return ce, depending on its validation option
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
-        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
-          return ce
-        } else {
-          throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
-        }
-      } else {
-        throw new Error(`Unable to deserialize a not valid CloudEvent.`)
-      }
+        if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
+        else throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
+      } else throw new Error(`Unable to deserialize a not valid CloudEvent.`)
     }
     // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(decoder)) {
-      if (!V.isFunction(decoder)) {
-        throw new Error(`Missing or wrong decoder function: '${decoder}' for the given data content type: '${parsed.datacontenttype}'.`)
-      }
+      if (!V.isFunction(decoder)) throw new Error(`Missing or wrong decoder function: '${decoder}' for the given data content type: '${parsed.datacontenttype}'.`)
       decodedData = decoder(parsed.data)
     } else {
-      // decoder not defined, check decodedData
-      if (!V.isDefinedAndNotNull(decodedData)) {
-        throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
-      }
+      // decoder not defined, so decodedData must be defined
+      if (!V.isDefinedAndNotNull(decodedData)) throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
     }
-    if (!V.isObject(decodedData) && !V.isStringNotEmpty(decodedData)) {
-      throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
-    }
+    if (!V.isStringNotEmpty(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
     // overwrite data with decodedData before returning it
     ce.data = decodedData
     // return ce, depending on its validation option
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
-      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) {
-        return ce
-      } else {
-        throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
-      }
-    } else {
-      throw new Error(`Unable to deserialize a not valid CloudEvent.`)
-    }
+      if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
+      else throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
+    } else throw new Error(`Unable to deserialize a not valid CloudEvent.`)
   }
 
   /**
