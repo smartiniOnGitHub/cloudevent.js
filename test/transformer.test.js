@@ -500,7 +500,7 @@ test('ensure dumpObject works in the right way', (t) => {
   t.ok(T.dumpObject([1, 2, 3, null], 'array'))
   t.ok(T.dumpObject(new Map([['key-1', 'value 1'], ['key-2', 'value 2']]), 'map'))
   t.ok(T.dumpObject(new Set([['key-1', 'value 1'], ['key-2', 'value 2']]), 'set'))
-  t.ok(T.dumpObject(`12345 67890 `, 'string'))
+  t.ok(T.dumpObject('12345 67890 ', 'string'))
   t.ok(T.dumpObject(1234567890, 'number'))
   t.ok(T.dumpObject(true, 'boolean'))
 })

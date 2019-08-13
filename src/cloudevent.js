@@ -374,7 +374,7 @@ class CloudEvent {
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         const extensionsSize = V.getSize(event.extensions)
         if (extensionsSize < 1) {
-          ve.push(new Error(`The object 'extensions' must contain at least 1 property`))
+          ve.push(new Error('The object \'extensions\' must contain at least 1 property'))
         }
       }
     }
@@ -449,8 +449,8 @@ class CloudEvent {
           }
         })
         if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
-        else throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
-      } else throw new Error(`Unable to serialize a not valid CloudEvent.`)
+        else throw new Error('Unable to return a serialized CloudEvent bigger than 64 KB.')
+      } else throw new Error('Unable to serialize a not valid CloudEvent.')
     }
     // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(encoder)) {
@@ -465,8 +465,8 @@ class CloudEvent {
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
       const ser = JSON.stringify(newEvent)
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
-      else throw new Error(`Unable to return a serialized CloudEvent bigger than 64 KB.`)
-    } else throw new Error(`Unable to serialize a not valid CloudEvent.`)
+      else throw new Error('Unable to return a serialized CloudEvent bigger than 64 KB.')
+    } else throw new Error('Unable to serialize a not valid CloudEvent.')
   }
 
   /**
@@ -528,8 +528,8 @@ class CloudEvent {
       // return ce, depending on its validation option
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
         if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
-        else throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
-      } else throw new Error(`Unable to deserialize a not valid CloudEvent.`)
+        else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
+      } else throw new Error('Unable to deserialize a not valid CloudEvent.')
     }
     // else (non defaut datacontenttype)
     if (V.isDefinedAndNotNull(decoder)) {
@@ -545,8 +545,8 @@ class CloudEvent {
     // return ce, depending on its validation option
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
-      else throw new Error(`Unable to return a deserialized CloudEvent bigger than 64 KB.`)
-    } else throw new Error(`Unable to deserialize a not valid CloudEvent.`)
+      else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
+    } else throw new Error('Unable to deserialize a not valid CloudEvent.')
   }
 
   /**

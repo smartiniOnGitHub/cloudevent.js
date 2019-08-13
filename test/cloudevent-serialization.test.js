@@ -70,7 +70,7 @@ const ceMapData = new Map() // empty Map
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 /** sample data as an xml string */
-const ceDataAsXmlString = `<data "hello"="world" "year"="2019" />`
+const ceDataAsXmlString = '<data "hello"="world" "year"="2019" />'
 /** create a sample string big (more than 64 KB) */
 const ceBigStringLength = 100000
 const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
@@ -462,7 +462,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 // sample encoding function, to use in tests here
 function encoderSample () {
   // return ceDataAsXmlString
-  return `<data encoder="sample" />`
+  return '<data encoder="sample" />'
 }
 
 /** @test {CloudEvent} */
@@ -503,7 +503,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     })
     t.ok(cceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const fixedEncodedData = `<data "fixed"="encoded" />`
+    const fixedEncodedData = '<data "fixed"="encoded" />'
     const cceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
       encoder: encoderSample,
       // encodedData: undefined
@@ -558,7 +558,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     })
     t.ok(ceFullOtherContentTypeStrictSerialized2)
     t.ok(!CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-    const fixedEncodedData = `<data "fixed"="encoded" />`
+    const fixedEncodedData = '<data "fixed"="encoded" />'
     const ceFullOtherContentTypeStrictSerialized3 = ceFullOtherContentTypeStrict.serialize({
       encoder: encoderSample,
       // encodedData: undefined
@@ -1029,7 +1029,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
 // sample decoding function, to use in tests here
 function decoderSample () {
   // return ceCommonData
-  return `<data "decoded"="Sample" />`
+  return '<data "decoded"="Sample" />'
 }
 
 /** @test {CloudEvent} */
@@ -1054,7 +1054,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
       decoder: decoderSample
     })
     t.ok(ceFullOtherContentTypeDeserialized1)
-    const fixedDecodedData = `<data "fixed"="decoded" />`
+    const fixedDecodedData = '<data "fixed"="decoded" />'
     const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
       decodedData: fixedDecodedData
     })
@@ -1094,7 +1094,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
       decoder: decoderSample
     })
     t.ok(ceFullOtherContentTypeDeserialized1)
-    const fixedDecodedData = `<data "fixed"="decoded" />`
+    const fixedDecodedData = '<data "fixed"="decoded" />'
     const ceFullOtherContentTypeDeserialized2 = CloudEvent.deserializeEvent(serialized, {
       decodedData: fixedDecodedData
     })

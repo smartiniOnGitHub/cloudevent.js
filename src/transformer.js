@@ -48,7 +48,7 @@ class Transformer {
    * @throws {Error} because instancing not allowed for this class
    */
   constructor () {
-    throw new Error(`Instancing not allowed for this class`)
+    throw new Error('Instancing not allowed for this class')
   }
 
   /**

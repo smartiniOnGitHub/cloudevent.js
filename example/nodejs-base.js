@@ -21,7 +21,7 @@
 
 const assert = require('assert')
 
-console.log(`Sample script: start execution ...\n`)
+console.log('Sample script: start execution ...\n')
 
 // reference the library, not needed if using destructuring assignment, see below
 const CloudEventExports = require('../src/') // from local path
@@ -34,7 +34,7 @@ const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require
 assert(CloudEvent !== null && V !== null && T !== null)
 
 // create some sample instances but without mandatory fields (for validation) ...
-console.log(`\nCreation of some CloudEvent instances, and related diagnostics:`)
+console.log('\nCreation of some CloudEvent instances, and related diagnostics:')
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
 assert(ceEmpty !== null)
 console.log(`cloudEvent dump: ${T.dumpObject(ceEmpty, 'ceEmpty')}`)
@@ -153,22 +153,22 @@ assert(CloudEvent.validateEvent(ceFullStrictOtherContentType).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: false }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: true }).length === 0)
 // some diagnostic info
-console.log(`\nSome expected validation errors:`)
+console.log('\nSome expected validation errors:')
 console.log(`Validation output for ceEmpty (default strict mode) is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty (force strict mode to true) is: size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 
 // serialization examples
 // default contenttype
-console.log(`\nSome serialization examples:`)
+console.log('\nSome serialization examples:')
 const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
 assert(ceFullSerializedStatic !== null)
 const ceFullSerialized = ceFull.serialize()
 assert(ceFullSerialized !== null)
 assert(ceFullSerializedStatic === ceFullSerialized)
-console.log(`Serialization output for ceFull, details:\n` + ceFullSerialized)
+console.log('Serialization output for ceFull, details:\n' + ceFullSerialized)
 const ceFullStrictSerialized = ceFullStrict.serialize()
 assert(ceFullStrictSerialized !== null)
-console.log(`Serialization output for ceFullStrict, details:\n` + ceFullStrictSerialized)
+console.log('Serialization output for ceFullStrict, details:\n' + ceFullStrictSerialized)
 const ceFullStrictSerializedOnlyValid = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true })
 assert(ceFullStrictSerializedOnlyValid !== null)
 // non default contenttype
@@ -185,13 +185,13 @@ const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.seri
 })
 assert(ceFullStrictOtherContentTypeSerialized !== null)
 assert(ceFullStrictOtherContentTypeSerializedStatic === ceFullStrictOtherContentTypeSerialized)
-console.log(`Serialization output for ceFullStrictOtherContentType, details:\n` + ceFullStrictOtherContentTypeSerialized)
+console.log('Serialization output for ceFullStrictOtherContentType, details:\n' + ceFullStrictOtherContentTypeSerialized)
 
 // then use (send/store/etc) serialized instances ...
 
 // deserialization examples
 // default contenttype
-console.log(`\nSome deserialization/parse examples:`)
+console.log('\nSome deserialization/parse examples:')
 const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
 assert(ceFullDeserialized !== null)
 assert(ceFullDeserialized.isValid())
@@ -215,5 +215,5 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeseria
 
 // then use (validate/send/store/etc) deserialized instances ...
 
-console.log(`\nSample script: end execution.`)
+console.log('\nSample script: end execution.')
 // end of script
