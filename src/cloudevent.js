@@ -588,11 +588,10 @@ class CloudEvent {
         specversion: { type: 'string', minLength: 1 },
         id: { type: 'string', minLength: 1 },
         type: { type: 'string', minLength: 1 },
-        // data: { type: ['object', 'string'] },
         source: { type: 'string', format: 'uri-reference' },
-        // time: { type: 'string', format: 'date-time' },
-        // extensions: { type: 'object' },
         datacontenttype: { type: 'string' },
+        // data: { type: ['object', 'string'] },
+        // time: { type: 'string', format: 'date-time' },
         schemaurl: { type: 'string', format: 'uri-reference' },
         subject: { type: 'string', minLength: 1 }
       },
