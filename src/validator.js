@@ -264,6 +264,20 @@ class Validator {
   }
 
   /**
+   * Tell if the given argument is an object or a keyed collection, but not an array.
+   *
+   * See {@link Validator.isObjectOrCollection}.
+   * See {@link Validator.isArray}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @return {boolean} true if it's an object or a keyed collection but not an array, false otherwise
+   */
+  static isObjectOrCollectionNotArray (arg) {
+    return (Validator.isObjectOrCollection(arg) && !Validator.isArray(arg))
+  }
+
+  /**
    * Tell if the given argument is an object or a keyed collection, but not a string.
    *
    * See {@link Validator.isObjectOrCollection}.
@@ -452,6 +466,22 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is an array.
+   *
+   * See {@link Validator.isArray}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not an array, nothing otherwise
+   */
+  static ensureIsArray (arg, name) {
+    if (!Validator.isArray(arg)) {
+      return new TypeError(`The argument '${name}' must be an array, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
    * Ensure that the given argument is a boolean.
    *
    * See {@link Validator.isBoolean}.
@@ -544,7 +574,23 @@ class Validator {
    */
   static ensureIsObjectOrCollection (arg, name) {
     if (!Validator.isObjectOrCollection(arg)) {
-      return new TypeError(`The object '${name}' must be an object or a collection`)
+      return new TypeError(`The object '${name}' must be an object or a collection, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument ia an object or a collection, not an array.
+   *
+   * See {@link Validator.isObjectOrCollectionNotArray}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (if any)
+   * @return {TypeError} if it's not an object nor a collection but it's an array, nothing otherwise
+   */
+  static ensureIsObjectOrCollectionNotArray (arg, name) {
+    if (!Validator.isObjectOrCollectionNotArray(arg)) {
+      return new TypeError(`The object '${name}' must be an object or a collection and not an array, instead got a '${typeof arg}'`)
     }
   }
 
@@ -556,11 +602,11 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
-   * @return {TypeError} if it's not an object nor a collection, nothing otherwise
+   * @return {TypeError} if it's not an object nor a collection but it's a string, nothing otherwise
    */
   static ensureIsObjectOrCollectionNotString (arg, name) {
     if (!Validator.isObjectOrCollectionNotString(arg)) {
-      return new TypeError(`The object '${name}' must be an object or a collection, and not a string`)
+      return new TypeError(`The object '${name}' must be an object or a collection and not a string, instead got a '${typeof arg}'`)
     }
   }
 
@@ -576,7 +622,7 @@ class Validator {
    */
   static ensureIsObjectOrCollectionOrString (arg, name) {
     if (!Validator.isObjectOrCollectionOrString(arg)) {
-      return new TypeError(`The object '${name}' must be an object or a collection, or a string`)
+      return new TypeError(`The object '${name}' must be an object or a collection or a string, instead got a '${typeof arg}'`)
     }
   }
 
@@ -592,7 +638,7 @@ class Validator {
    */
   static ensureIsDate (arg, name) {
     if (!Validator.isDate(arg)) {
-      return new Error(`The object '${name}' must be a Date`)
+      return new Error(`The object '${name}' must be a Date, instead got a '${typeof arg}'`)
     }
   }
 
@@ -640,7 +686,7 @@ class Validator {
    */
   static ensureIsNumber (arg, name) {
     if (!Validator.isNumber(arg)) {
-      return new Error(`The object '${name}' must be a Number`)
+      return new Error(`The object '${name}' must be a Number, instead got a '${typeof arg}'`)
     }
   }
 
@@ -656,7 +702,7 @@ class Validator {
    */
   static ensureIsError (arg, name) {
     if (!Validator.isError(arg)) {
-      return new Error(`The object '${name}' must be an Error or a subclass of it`)
+      return new Error(`The object '${name}' must be an Error or a subclass of it, instead got a '${typeof arg}'`)
     }
   }
 

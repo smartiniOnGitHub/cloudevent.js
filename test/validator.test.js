@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {CloudEvent} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(102)
+  t.plan(109)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -230,6 +230,17 @@ test('ensure some (less used) validation functions are right', (t) => {
   }
 
   {
+    const arrayGood = []
+    t.ok(V.isArray(arrayGood))
+    t.strictSame(V.ensureIsArray(arrayGood, 'test'), undefined) // no error returned
+    const arrayBad = {}
+    t.ok(!V.isArray(arrayBad))
+    t.strictSame(V.ensureIsArray(arrayBad, 'test') instanceof Error, true) // expected error returned
+    t.ok(V.ensureIsObjectOrCollectionNotArray(arrayGood, 'array')) // expected error returned
+    t.strictSame(V.ensureIsObjectOrCollectionNotArray({}, 'test'), undefined) // no error returned
+  }
+
+  {
     const boolGood = true
     t.ok(V.isBoolean(boolGood))
     t.strictSame(V.ensureIsBoolean(boolGood, 'test'), undefined) // no error returned
@@ -237,6 +248,7 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.ok(!V.isBoolean(boolBad))
     t.strictSame(V.ensureIsBoolean(boolBad, 'test') instanceof Error, true) // expected error returned
     t.ok(V.ensureIsObjectOrCollectionOrString(boolGood, 'boolean')) // expected error returned
+    t.strictSame(V.ensureIsObjectOrCollectionOrString({}, 'test'), undefined) // no error returned
   }
 
   {
