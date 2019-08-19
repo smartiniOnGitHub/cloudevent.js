@@ -358,12 +358,16 @@ class CloudEvent {
       ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (V.isUndefinedOrNull(event.datacontentencoding) &&
-          event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
-          ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
-        } else {
+        if (V.isDefinedAndNotNull(event.datacontentencoding)) {
           // ensure data is a string in this case
           ve.push(V.ensureIsString(event.data, 'data'))
+        } else if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
+          // ensure data is object or collection, or even a string in this case
+          // because in serialization/deserialization some validation can occur on the transformed object
+          ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
+        } else {
+          // ensure data is object or collection, but not a string in this case
+          ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
@@ -539,7 +543,7 @@ class CloudEvent {
       // decoder not defined, so decodedData must be defined
       if (!V.isDefinedAndNotNull(decodedData)) throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
     }
-    if (!V.isStringNotEmpty(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
+    if (!V.isObjectOrCollectionOrString(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
     // overwrite data with decodedData before returning it
     ce.data = decodedData
     // return ce, depending on its validation option
