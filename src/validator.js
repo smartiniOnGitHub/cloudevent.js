@@ -363,7 +363,7 @@ class Validator {
 
   /**
    * Tell if the given object contains at least one property
-   * that has a standard CloudEvent property name.
+   * that has a standard (reserved) property name.
    *
    * @static
    * @param {object} obj the object to check
@@ -384,7 +384,7 @@ class Validator {
   }
 
   /**
-   * Tell if the given string has a standard CloudEvent property name.
+   * Tell if the given string has a standard (reserved) property name.
    *
    * @static
    * @param {string} str the string to check
@@ -741,7 +741,7 @@ class Validator {
 
   /**
    * Ensure that the given object does not contain any property
-   * that has a standard CloudEvent property name.
+   * that has a standard (reserved) property name.
    *
    * See {@link Validator.doesObjectContainsStandardProperty}.
    *
