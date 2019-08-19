@@ -49,6 +49,7 @@ const ceCommonOptions = {
   time: new Date(),
   datacontenttype: 'application/json',
   schemaurl: 'http://my-schema.localhost.localdomain/v1/',
+  subject: 'subject',
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
@@ -56,6 +57,7 @@ const ceCommonExtensions = { exampleExtension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { hello: 'world', year: 2019 }
+// const ceDataAsString = 'Hello World, 2019'
 
 // create some sample minimal instances, good even for validation ...
 const ceMinimal = new CloudEvent('1', // id
@@ -112,6 +114,7 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceErrorStrict, 'ceErrorStrict')}`)
 const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
   ceNamespace,
   ceServerUrl,
+  // ceDataAsString, // data
   ceCommonData, // data
   { ...ceCommonOptionsStrict, datacontenttype: 'application/xml' }, // use common strict options, but set strict mode to true
   ceCommonExtensions
@@ -216,4 +219,5 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeseria
 // then use (validate/send/store/etc) deserialized instances ...
 
 console.log('\nSample script: end execution.')
+assert(true) // all good here
 // end of script
