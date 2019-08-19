@@ -206,6 +206,27 @@ class CloudEvent {
   }
 
   /**
+   * Tell the data content Type for a CloudEvent,
+   * if is a JSON-derived format,
+   * so data must be encoded/decoded accordingly.
+   *
+   * @static
+   * @param {!object} event the CloudEvent to validate
+   * @return {boolean} true if data content type is JSON-like, otherwise false
+   * @throws {TypeError} if event is not a CloudEvent instance or subclass
+   * @throws {Error} if event is undefined or null
+   */
+  static isDatacontenttypeJSONEvent (event) {
+    if (!CloudEvent.isCloudEvent(event)) {
+      throw new TypeError('The given event is not a CloudEvent instance')
+    }
+    return (
+      (event.datacontenttype === CloudEvent.datacontenttypeDefault()) ||
+      (event.datacontenttype.includes('json'))
+    )
+  }
+
+  /**
    * Tell if the object has the strict flag enabled.
    *
    * @static
@@ -647,6 +668,18 @@ class CloudEvent {
    */
   isValid ({ strict = false } = {}) {
     return this.constructor.isValidEvent(this, { strict })
+  }
+
+  /**
+   * Getter method to tell if data content type is a JSON-derived format,
+   * so data must be encoded/decoded accordingly.
+   *
+   * See {@link CloudEvent.isDatacontenttypeJSONEvent}.
+   *
+   * @type {boolean}
+   */
+  get isDatacontenttypeJSON () {
+    return this.constructor.isDatacontenttypeJSONEvent(this)
   }
 
   /**

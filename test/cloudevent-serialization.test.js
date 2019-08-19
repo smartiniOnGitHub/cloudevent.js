@@ -71,6 +71,8 @@ ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 /** sample data as an xml string */
 const ceDataAsXmlString = '<data "hello"="world" "year"="2019" />'
+/** sample data as a json string */
+const ceDataAsJSONString = JSON.stringify(ceCommonData)
 /** create a sample string big (more than 64 KB) */
 const ceBigStringLength = 100000
 const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
@@ -86,7 +88,7 @@ function getRandomString (length) {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(56)
+  t.plan(60)
 
   const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
@@ -111,6 +113,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFull).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
+    t.strictEqual(ceFull.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFull))
 
     t.throws(function () {
       const ceFullSerialized = CloudEvent.serializeEvent(undefined)
@@ -191,6 +195,8 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
+    t.strictEqual(ceFullStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullStrict))
 
     t.throws(function () {
       const ceFullSerialized = CloudEvent.serializeEvent(undefined)
@@ -284,7 +290,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentType, {
-        encoder: 'encoderSample'
+        encoder: 'encoderToXmlSample'
       })
       assert(ceFullOtherContentTypeSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
@@ -392,7 +398,7 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-        encoder: 'encoderSample'
+        encoder: 'encoderToXmlSample'
       })
       assert(ceFullOtherContentTypeSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
@@ -460,8 +466,9 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
 })
 
 // sample encoding function, to use in tests here
-function encoderSample () {
+function encoderToXmlSample (data) {
   // return ceDataAsXmlString
+  // return data.toString()
   return '<data encoder="sample" />'
 }
 
@@ -471,9 +478,9 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
-  t.ok(encoderSample)
-  t.ok(V.isFunction(encoderSample))
-  t.ok(!V.ensureIsFunction(encoderSample, 'encoderSample')) // no error returned
+  t.ok(encoderToXmlSample)
+  t.ok(V.isFunction(encoderToXmlSample))
+  t.ok(!V.ensureIsFunction(encoderToXmlSample, 'encoderToXmlSample')) // no error returned
 
   {
     // create an instance with non default contenttype (other options default): expected success ...
@@ -494,7 +501,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
     const cceFullOtherContentTypeSerialized1 = ceFullOtherContentType.serialize({
-      encoder: encoderSample
+      encoder: encoderToXmlSample
     })
     t.ok(cceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
@@ -505,7 +512,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const fixedEncodedData = '<data "fixed"="encoded" />'
     const cceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       // encodedData: undefined
       // encodedData: null
       // encodedData: ceDataAsXmlString
@@ -514,14 +521,14 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(cceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
     t.ok(cceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
@@ -549,7 +556,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
     const ceFullOtherContentTypeStrictSerialized1 = ceFullOtherContentTypeStrict.serialize({
-      encoder: encoderSample
+      encoder: encoderToXmlSample
     })
     t.ok(ceFullOtherContentTypeStrictSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
@@ -560,7 +567,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const fixedEncodedData = '<data "fixed"="encoded" />'
     const ceFullOtherContentTypeStrictSerialized3 = ceFullOtherContentTypeStrict.serialize({
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       // encodedData: undefined
       // encodedData: null
       // encodedData: ceDataAsXmlString
@@ -569,20 +576,249 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(ceFullOtherContentTypeStrictSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const ceFullOtherContentTypeStrictSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
     t.ok(ceFullOtherContentTypeStrictSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const ceFullOtherContentTypeStrictSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-      encoder: encoderSample,
+      encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
     // note that onlyValid here is a check on transformed data ...
     t.ok(ceFullOtherContentTypeStrictSerialized5)
     t.ok(V.isStringNotEmpty(ceFullOtherContentTypeStrictSerialized5))
+  }
+})
+
+// sample encoding function to JSON, to use in tests here
+function encoderToJSON (data) {
+  // return ceDataAsJSONString
+  return JSON.stringify(data)
+}
+
+/** @test {CloudEvent} */
+test('serialize a CloudEvent instance with a non default contenttype (but in the JSON-like family) and right serialization options, expect success', (t) => {
+  t.plan(54)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
+  t.ok(CloudEvent)
+  t.ok(encoderToJSON)
+  t.ok(V.isFunction(encoderToJSON))
+  t.ok(!V.ensureIsFunction(encoderToJSON, 'encoderToJSON')) // no error returned
+
+  {
+    // create an instance with non default contenttype (other options default): expected success ...
+    const ceFullOtherContentTypeJSON = new CloudEvent('1/non-default-contenttype-but-json/sample-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData, // data
+      {
+        ...ceCommonOptions,
+        datacontenttype: 'text/json'
+      },
+      ceCommonExtensions
+    )
+    assert(ceFullOtherContentTypeJSON !== null)
+    t.ok(ceFullOtherContentTypeJSON)
+    t.ok(ceFullOtherContentTypeJSON.isValid())
+    t.ok(!ceFullOtherContentTypeJSON.isStrict)
+    t.notStrictEqual(ceFullOtherContentTypeJSON.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullOtherContentTypeJSON))
+
+    // improve coverage on that method
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(undefined)
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(null)
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent({})
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for for not a CloudEvent instance')
+    {
+      const ce = ceFullOtherContentTypeJSON
+      CloudEvent.setStrictExtensionInEvent(ce, false)
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(ce)
+      t.strictSame(dct, true)
+      t.strictSame(ce.isDatacontenttypeJSON, true)
+    }
+    {
+      const ce = ceFullOtherContentTypeJSON
+      CloudEvent.setStrictExtensionInEvent(ce, true)
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(ce)
+      t.strictSame(dct, true)
+      t.strictSame(ce.isDatacontenttypeJSON, true)
+    }
+
+    // when I try to serialize it without specifying serialization options, expect to have an error raised ...
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = ceFullOtherContentTypeJSON.serialize()
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+        encoder: 'encoderToJSON'
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+        encodedData: true
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+
+    // when I try to serialize specifying right serialization options, expect success ...
+    // test different combinations of serialization options
+    // note that if given, encoder function has priority over encoded data
+    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSON.serialize({
+      encoder: encoderToJSON
+    })
+    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
+    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSON.serialize({
+      encodedData: ceDataAsJSONString
+    })
+    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
+    const fixedEncodedData = { fixed: 'encoded' }
+    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSON.serialize({
+      encoder: encoderToJSON,
+      // encodedData: undefined
+      // encodedData: null
+      // encodedData: ceDataAsJSONString
+      encodedData: fixedEncodedData
+    })
+    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
+    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+      encoder: encoderToJSON,
+      encodedData: fixedEncodedData,
+      onlyValid: false
+    })
+    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
+    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+      encoder: encoderToJSON,
+      encodedData: fixedEncodedData,
+      onlyValid: true
+    })
+    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
+
+    // the same for deserializtion ...
+  }
+
+  {
+    // create an instance with non default contenttype (other options default): expected success ...
+    const ceFullOtherContentTypeJSONStrict = new CloudEvent('1/non-default-contenttype-but-json/sample-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData, // data
+      {
+        ...ceCommonOptionsStrict,
+        datacontenttype: 'text/json'
+      },
+      ceCommonExtensions
+    )
+    assert(ceFullOtherContentTypeJSONStrict !== null)
+    t.ok(ceFullOtherContentTypeJSONStrict)
+    t.ok(ceFullOtherContentTypeJSONStrict.isValid())
+    t.ok(ceFullOtherContentTypeJSONStrict.isStrict)
+    t.notStrictEqual(ceFullOtherContentTypeJSONStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullOtherContentTypeJSONStrict))
+
+    // improve coverage on that method
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(undefined)
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(null)
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for an undefined/null CloudEvent instance')
+    t.throws(function () {
+      const dct = CloudEvent.isDatacontenttypeJSONEvent({})
+      assert(dct === false) // never executed
+    }, Error, 'Expected exception when trying to get the data content type for for not a CloudEvent instance')
+    {
+      const ce = ceFullOtherContentTypeJSONStrict
+      CloudEvent.setStrictExtensionInEvent(ce, false)
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(ce)
+      t.strictSame(dct, true)
+      t.strictSame(ce.isDatacontenttypeJSON, true)
+    }
+    {
+      const ce = ceFullOtherContentTypeJSONStrict
+      CloudEvent.setStrictExtensionInEvent(ce, true)
+      const dct = CloudEvent.isDatacontenttypeJSONEvent(ce)
+      t.strictSame(dct, true)
+      t.strictSame(ce.isDatacontenttypeJSON, true)
+    }
+
+    // when I try to serialize it without specifying serialization options, expect to have an error raised ...
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = ceFullOtherContentTypeJSONStrict.serialize()
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+        encoder: 'encoderToJSON'
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+    t.throws(function () {
+      const ceFullOtherContentTypeSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+        encodedData: true
+      })
+      assert(ceFullOtherContentTypeSerialized === null) // never executed
+    }, Error, 'Expected exception when serializing the current CloudEvent instance')
+
+    // when I try to serialize specifying right serialization options, expect success ...
+    // test different combinations of serialization options
+    // note that if given, encoder function has priority over encoded data
+    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSONStrict.serialize({
+      encoder: encoderToJSON
+    })
+    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
+    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSONStrict.serialize({
+      encodedData: ceDataAsJSONString
+    })
+    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
+    const fixedEncodedData = { fixed: 'encoded' }
+    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSONStrict.serialize({
+      encoder: encoderToJSON,
+      // encodedData: undefined
+      // encodedData: null
+      // encodedData: ceDataAsJSONString
+      encodedData: fixedEncodedData
+    })
+    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
+    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+      encoder: encoderToJSON,
+      encodedData: fixedEncodedData,
+      onlyValid: false
+    })
+    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
+    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+      encoder: encoderToJSON,
+      encodedData: fixedEncodedData,
+      onlyValid: true
+    })
+    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
+
+    // the same for deserializtion ...
   }
 })
 
@@ -929,7 +1165,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: 'decoderSample' // bad decoder function
+        decoder: 'decoderFromXmlSample' // bad decoder function
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -985,7 +1221,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: 'decoderSample' // bad decoder function
+        decoder: 'decoderFromXmlSample' // bad decoder function
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -1027,8 +1263,9 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
 })
 
 // sample decoding function, to use in tests here
-function decoderSample () {
+function decoderFromXmlSample (data) {
   // return ceCommonData
+  // return data.toString()
   return '<data "decoded"="Sample" />'
 }
 
@@ -1038,9 +1275,9 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
-  t.ok(decoderSample)
-  t.ok(V.isFunction(decoderSample))
-  t.ok(!V.ensureIsFunction(decoderSample, 'decoderSample')) // no error returned
+  t.ok(decoderFromXmlSample)
+  t.ok(V.isFunction(decoderFromXmlSample))
+  t.ok(!V.ensureIsFunction(decoderFromXmlSample, 'decoderFromXmlSample')) // no error returned
 
   {
     const serialized = ceFullOtherContentTypeSerializedJson
@@ -1051,7 +1288,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     // test different combinations of deserialization options
     // note that if given, decoder function has priority over decoded data
     const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample
+      decoder: decoderFromXmlSample
     })
     t.ok(ceFullOtherContentTypeDeserialized1)
     const fixedDecodedData = '<data "fixed"="decoded" />'
@@ -1060,7 +1297,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     })
     t.ok(ceFullOtherContentTypeDeserialized2)
     const ceFullOtherContentTypeDeserialized3 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       // decodedData: undefined
       // decodedData: null
       // decodedData: ceCommonData
@@ -1068,13 +1305,13 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     })
     t.ok(ceFullOtherContentTypeDeserialized3)
     const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
       onlyValid: false
     })
     t.ok(ceFullOtherContentTypeDeserialized4)
     const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
       onlyValid: true
     })
@@ -1091,7 +1328,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     // test different combinations of deserialization options
     // note that if given, decoder function has priority over decoded data
     const ceFullOtherContentTypeDeserialized1 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample
+      decoder: decoderFromXmlSample
     })
     t.ok(ceFullOtherContentTypeDeserialized1)
     const fixedDecodedData = '<data "fixed"="decoded" />'
@@ -1100,7 +1337,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     })
     t.ok(ceFullOtherContentTypeDeserialized2)
     const ceFullOtherContentTypeDeserialized3 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       // decodedData: undefined
       // decodedData: null
       // decodedData: ceCommonData
@@ -1108,13 +1345,13 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     })
     t.ok(ceFullOtherContentTypeDeserialized3)
     const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
       onlyValid: false
     })
     t.ok(ceFullOtherContentTypeDeserialized4)
     const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
-      decoder: decoderSample,
+      decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
       onlyValid: true
     })
