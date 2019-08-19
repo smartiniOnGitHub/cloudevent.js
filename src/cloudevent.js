@@ -97,10 +97,15 @@ class CloudEvent {
      * @type {(object|Map|Set)}
      * @private
      */
-    this.data = { ...data }
     if (V.isString(data)) {
       // handle an edge case: if the given data is a String, I need to clone in a different way ...
       this.data = data.slice()
+    } else if (V.isObjectOrCollectionOrString(data)) {
+      // normal case
+      this.data = { ...data }
+    } else {
+      // anything other, assign as is (and let validator complain later if needed)
+      this.data = data
     }
 
     /**
