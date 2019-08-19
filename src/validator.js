@@ -554,7 +554,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
-   * @return {Error} if it's not a not empty string, nothing otherwise
+   * @return {Error} if it's not a string not empty, nothing otherwise
    */
   static ensureIsStringNotEmpty (arg, name) {
     if (!Validator.isStringNotEmpty(arg)) {
@@ -586,7 +586,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
-   * @return {TypeError} if it's not an object nor a collection but it's an array, nothing otherwise
+   * @return {TypeError} if it's not an object nor a collection or it's an array, nothing otherwise
    */
   static ensureIsObjectOrCollectionNotArray (arg, name) {
     if (!Validator.isObjectOrCollectionNotArray(arg)) {
@@ -602,7 +602,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {string} name the name to use in generated error (if any)
-   * @return {TypeError} if it's not an object nor a collection but it's a string, nothing otherwise
+   * @return {TypeError} if it's not an object nor a collection or it's a string, nothing otherwise
    */
   static ensureIsObjectOrCollectionNotString (arg, name) {
     if (!Validator.isObjectOrCollectionNotString(arg)) {
