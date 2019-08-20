@@ -54,17 +54,16 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
   assert.strictEqual(typeof CloudEvent, 'function')
   assert(new CloudEvent() instanceof CloudEvent)
   assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-  assert.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
   t.ok(V)
   t.strictEqual(typeof CloudEvent, 'function')
   t.strictEqual(typeof V, 'function')
   t.strictEqual(typeof T, 'function')
   t.ok(V.isFunction(CloudEvent))
   t.ok(V.isFunction(V))
+  t.ok(V.isFunction(T))
   t.strictEqual(typeof CloudEvent, 'function')
   t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
   t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-  t.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...

@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
-  t.plan(8)
+  t.plan(7)
 
   {
     const { CloudEvent } = require('../src/') // get references via destructuring
@@ -30,12 +30,10 @@ test('ensure serialization functions exists (check only the static method here)'
     assert.strictEqual(typeof CloudEvent, 'function')
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-    assert.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
     t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
     t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-    t.strictEqual(CloudEvent.mediaTypeBatchFormat(), 'application/cloudevents-batch+json')
 
     const ceSerialize = CloudEvent.serializeEvent
     assert(ceSerialize !== null)

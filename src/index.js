@@ -23,6 +23,13 @@
 const cloudEventDefinition = require('./cloudevent')
 
 /**
+ * Get a reference to JSONBatch class definition.
+ *
+ * See {@link JSONBatch}.
+ */
+const jsonBatchDefinition = require('./jsonbatch')
+
+/**
  * Get a reference to cloudevent class Validator.
  *
  * See {@link Validator}.
@@ -38,6 +45,7 @@ const cloudEventTransformer = require('./transformer')
 
 module.exports = {
   CloudEvent: cloudEventDefinition,
+  JSONBatch: jsonBatchDefinition,
   CloudEventValidator: cloudEventValidator,
   CloudEventTransformer: cloudEventTransformer
 }

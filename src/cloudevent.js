@@ -194,18 +194,6 @@ class CloudEvent {
   }
 
   /**
-   * Return the MIME Type for CloudEvent intances
-   * batched into a single JSON document (array),
-   * using the JSON Batch Format
-   *
-   * @static
-   * @return {string} the value
-   */
-  static mediaTypeBatchFormat () {
-    return 'application/cloudevents-batch+json'
-  }
-
-  /**
    * Tell the data content Type for a CloudEvent,
    * if is a JSON-derived format,
    * so data must be encoded/decoded accordingly.

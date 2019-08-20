@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure objects exported by index script, exists and are of the right type', (t) => {
-  t.plan(19)
+  t.plan(25)
 
   {
     const CloudEventExports = require('../src/') // reference the library
@@ -37,21 +37,28 @@ test('ensure objects exported by index script, exists and are of the right type'
     const CloudEventTransformer = CloudEventExports.CloudEventTransformer // reference the transformer class
     t.ok(CloudEventTransformer)
     t.strictEqual(typeof CloudEventTransformer, 'function')
+    const JSONBatchClass = CloudEventExports.JSONBatch // reference the implementation class
+    t.ok(JSONBatchClass)
+    t.strictEqual(typeof JSONBatchClass, 'function')
   }
 
   {
-    const { CloudEvent: CEClass, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
-    // const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+    const { CloudEvent: CEClass, JSONBatch: JSONBClass, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+    // const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
     t.strictEqual(typeof CEClass, 'function')
     t.strictEqual(typeof V.isClass, 'function')
     t.strictEqual(typeof T.dumpObject, 'function')
+    t.strictEqual(typeof JSONBClass, 'function')
     t.ok(V.isFunction(CEClass))
     t.ok(V.isFunction(V.isClass))
     t.ok(V.isFunction(T.dumpObject))
+    t.ok(V.isFunction(JSONBClass))
 
-    const { CloudEvent } = require('../src/') // get references via destructuring
+    const { CloudEvent, JSONBatch } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
     t.strictEqual(typeof CloudEvent, 'function')
+    t.ok(JSONBatch)
+    t.strictEqual(typeof JSONBatch, 'function')
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimal = new CEClass('1', // id
