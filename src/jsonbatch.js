@@ -22,6 +22,13 @@
  */
 
 /**
+ * Get a reference to cloudevent CloudEvent class.
+ *
+ * @see Validator
+ */
+const CloudEvent = require('./cloudevent') // get cloudevent from here
+
+/**
  * Get a reference to cloudevent Validator class.
  *
  * @see Validator
@@ -57,10 +64,68 @@ class JSONBatch {
     return 'application/cloudevents-batch+json'
   }
 
+  /**
+   * Validate the given JSONBatch.
+   *
+   * @static
+   * @param {!object} batch the JSONBatch to validate
+   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @return {object[]} an array of (non null) validation errors, or at least an empty array
+   */
+  static validateBatch (batch, { strict = false } = {}) {
+    if (V.isUndefinedOrNull(batch)) {
+      return [new Error('JSONBatch undefined or null')]
+    }
+    const ve = [] // validation errors
+
+    // standard validation
+    if (!V.isArray(batch) && !V.isObject(batch)) {
+      ve.push(new TypeError(`The argument 'batch' must be an array or an object, instead got a '${typeof batch}'`))
+    }
+
+    // additional validation if strict mode enabled
+    // TODO: check implementation ... wip
+    if (strict === true) {
+      if (V.isArray(batch)) {
+        // validate any not null item
+        const itemsValidation = batch.filter((i) => i
+        ).map((i) => {
+          return CloudEvent.validateEvent(i, { strict })
+        })
+        console.log(`DEBUG: itemsValidation = ${itemsValidation}`) // TODO: temp ...
+        ve.push(...itemsValidation)
+        // TODO: check if add index position in the name ... wip
+        // ve.push(V.ensureIsClass(batch, CloudEvent, 'CloudEvent_Subclass'))
+      } else if (V.isObject(batch)) {
+        // validate the given (single) object, but first ensure it's a CloudEvent instance or subclass
+        if (!V.isClass(batch, CloudEvent)) {
+          ve.push(new TypeError(`The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a '${typeof batch}'`))
+        } else {
+          ve.push(...CloudEvent.validateEvent(batch, { strict }))
+        }
+      }
+    }
+
+    return ve.filter((i) => i)
+  }
+
+  /**
+   * Tell the given JSONBatch, if it's valid.
+   *
+   * See {@link CloudEvent.validateBatch}.
+   *
+   * @static
+   * @param {!object} batch the JSONBatch to validate
+   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @return {boolean} true if valid, otherwise false
+   */
+  static isValidBatch (batch, { strict = false } = {}) {
+    const validationErrors = JSONBatch.validateBatch(batch, { strict })
+    const size = V.getSize(validationErrors)
+    return (size === 0)
+  }
+
   // TODO: implement other features ... wip
 }
-
-const assert = require('assert')
-assert(V !== null) // TODO: temp ...
 
 module.exports = JSONBatch

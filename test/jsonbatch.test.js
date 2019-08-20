@@ -22,8 +22,8 @@ const test = require('tap').test
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
 
 /** @test {CloudEvent} */
-test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(25)
+test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {
+  t.plan(26)
 
   const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -50,6 +50,11 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
   t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
   t.strictEqual(typeof JSONBatch, 'function')
   t.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+
+  t.throws(function () {
+    const jsonBatch = new JSONBatch()
+    assert(jsonBatch === null) // never executed
+  }, Error, 'Expected exception when creating a JSONBatch instance')
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
@@ -88,5 +93,67 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
   }
 })
+
+/** @test {JSONBatch} */
+test('ensure isValid and validate works good on undefined and null arguments, and even on empty and bad ones', (t) => {
+  t.plan(23)
+  const { JSONBatch } = require('../src/')
+  t.ok(JSONBatch)
+
+  // in following tests to simplify comparison of results, check only the  number of expected errors ...
+  {
+    // undefined
+    const arg = undefined
+    t.notOk()
+    t.notOk(JSONBatch.isValidBatch())
+    t.strictSame(JSONBatch.validateBatch(), [new Error('JSONBatch undefined or null')])
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+  }
+  {
+    // null
+    const arg = null
+    t.notOk(null)
+    t.notOk(JSONBatch.isValidBatch(arg))
+    t.strictSame(JSONBatch.validateBatch(arg), [new Error('JSONBatch undefined or null')])
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+  }
+  {
+    // empty array
+    const arg = []
+    t.strictSame(JSONBatch.validateBatch(arg), [])
+    t.strictSame(JSONBatch.validateBatch(arg).length, 0)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 0)
+  }
+  {
+    // empty object
+    const arg = {}
+    t.strictSame(JSONBatch.validateBatch(arg), [])
+    t.strictSame(JSONBatch.validateBatch(arg).length, 0)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+  }
+  {
+    // bad object type
+    const arg = 'Sample string'
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+  }
+  {
+    // bad object type
+    const arg = 1234567890
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+  }
+  {
+    // bad object type
+    const arg = new Date()
+    t.strictSame(JSONBatch.validateBatch(arg).length, 0) // not so good (should be 1 here), but maybe it's good the same in non strict mode ...
+    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arg, { strict: true })}`) // TODO: temp ...
+  }
+})
+
+// TODO: test JSONBatch.validateBatch with arrays containing different CloudEvent instances (and undefined and null references and others bad) ... wip
 
 // TODO: implement ... wip
