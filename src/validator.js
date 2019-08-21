@@ -226,7 +226,8 @@ class Validator {
   }
 
   /**
-   * Tell if the given argument is an object.
+   * Tell if the given argument is an object
+   * and is defined and not null.
    *
    * @static
    * @param {object} arg the object to check
@@ -518,12 +519,12 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @param {object} classReference the class that should be implemented/extended
-   * @param {string} name the name to use in generated error (if any)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
    */
   static ensureIsClass (arg, classReference, name) {
     if (!Validator.isClass(arg, classReference)) {
-      return new TypeError(`The argument '${name}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name || arguments[0]}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
     }
   }
 

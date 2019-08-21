@@ -117,7 +117,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {Validator} */
 test('ensure some (edge cases for) validation functions are right', (t) => {
-  t.plan(14)
+  t.plan(26)
 
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
@@ -140,13 +140,30 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
     t.strictSame(V.ensureIsUndefined(narg, 'test') instanceof Error, true) // expected error returned
     t.strictSame(V.ensureIsUndefined(narg, {}) instanceof Error, true) // expected error returned
   }
+  {
+    const arg = null
+    t.ok(V.isNull(arg))
+    t.strictSame(V.ensureIsNull(arg), undefined) // no error returned
+    t.strictSame(V.ensureIsNull(arg, undefined), undefined) // no error returned
+    t.strictSame(V.ensureIsNull(arg, null), undefined) // no error returned
+    t.strictSame(V.ensureIsNull(arg, 'test'), undefined) // no error returned
+    t.strictSame(V.ensureIsNull(arg, {}), undefined) // no error returned
+    // check what happens with opposite value instead
+    const narg = 'sample' // sample value
+    t.notOk(V.isNull(narg))
+    t.strictSame(V.ensureIsNull(narg) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsNull(narg, undefined) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsNull(narg, null) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsNull(narg, 'test') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsNull(narg, {}) instanceof Error, true) // expected error returned
+  }
 
   // similar tests for all other is / ensure methods ...
 })
 
 /** @test {Validator} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(108)
+  t.plan(136)
 
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
@@ -158,6 +175,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.ok(V.isUndefinedOrNull(undefinedGood))
     t.strictSame(V.ensureIsUndefinedOrNull(undefinedGood, 'test'), undefined) // no error returned
     t.strictSame(V.ensureIsDefinedAndNotNull(undefinedGood, 'test') instanceof Error, true) // expected error returned
+    t.ok(!V.isObject(undefinedGood))
+    t.ok(!V.isObjectPlain(undefinedGood))
+    t.ok(V.ensureIsObject(undefinedGood, 'test')) // expected error returned
+    t.ok(V.ensureIsObjectPlain(undefinedGood, 'test')) // expected error returned
     const undefinedBad = 'defined'
     t.ok(!V.isUndefined(undefinedBad))
     t.strictSame(V.ensureIsUndefined(undefinedBad, 'test') instanceof Error, true) // expected error returned
@@ -173,6 +194,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.ok(V.isUndefinedOrNull(nullGood))
     t.strictSame(V.ensureIsUndefinedOrNull(nullGood, 'test'), undefined) // no error returned
     t.strictSame(V.ensureIsDefinedAndNotNull(nullGood, 'test') instanceof Error, true) // expected error returned
+    t.ok(!V.isObject(nullGood))
+    t.ok(!V.isObjectPlain(nullGood))
+    t.ok(V.ensureIsObject(nullGood, 'test')) // expected error returned
+    t.ok(V.ensureIsObjectPlain(nullGood, 'test')) // expected error returned
     const nullBad = 'defined'
     t.ok(!V.isNull(nullBad))
     t.strictSame(V.ensureIsNull(nullBad, 'test') instanceof Error, true) // expected error returned
@@ -185,6 +210,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     const errorGood = new Error('Sample error')
     t.ok(V.isError(errorGood))
     t.strictSame(V.ensureIsError(errorGood, 'test'), undefined) // no error returned
+    t.ok(V.isObject(errorGood))
+    t.ok(!V.isObjectPlain(errorGood))
+    t.ok(!V.ensureIsObject(errorGood, 'error')) // no error returned
+    t.ok(V.ensureIsObjectPlain(errorGood, 'error')) // expected error returned
     const errorBad = 'Error string'
     t.ok(!V.isError(errorBad))
     t.strictSame(V.ensureIsError(errorBad, 'test') instanceof Error, true) // expected error returned
@@ -194,6 +223,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     const dateGood = new Date()
     t.ok(V.isDate(dateGood))
     t.strictSame(V.ensureIsDate(dateGood, 'test'), undefined) // no error returned
+    t.ok(V.isObject(dateGood))
+    t.ok(!V.isObjectPlain(dateGood))
+    t.ok(!V.ensureIsObject(dateGood, 'date')) // no error returned
+    t.ok(V.ensureIsObjectPlain(dateGood, 'date')) // expected error returned
     const dateBad = Date.now()
     t.ok(!V.isDate(dateBad))
     t.strictSame(V.ensureIsDate(dateBad, 'test') instanceof Error, true) // expected error returned
@@ -227,6 +260,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.strictSame(V.ensureIsObjectOrCollection(objectGood, 'object') instanceof Error, false) // no error returned
     t.ok(!V.ensureIsObjectOrCollectionNotString(objectGood, 'object')) // no error returned
     t.ok(!V.ensureIsObjectOrCollectionOrString(objectGood, 'object')) // no error returned
+    t.ok(V.isObject(objectGood))
+    t.ok(V.isObjectPlain(objectGood))
+    t.ok(!V.ensureIsObject(objectGood, 'object')) // no error returned
+    t.ok(!V.ensureIsObjectPlain(objectGood, 'object')) // no error returned
   }
 
   {
@@ -237,6 +274,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.strictSame(V.ensureIsObjectOrCollection(objectAsStringGood, 'string') instanceof Error, true) // expected error returned
     t.ok(V.ensureIsObjectOrCollectionNotString(objectAsStringGood, 'object')) // expected error returned
     t.ok(!V.ensureIsObjectOrCollectionOrString(objectAsStringGood, 'object')) // no error returned
+    t.ok(!V.isObject(objectAsStringGood))
+    t.ok(!V.isObjectPlain(objectAsStringGood))
+    t.ok(V.ensureIsObject(objectAsStringGood, 'string')) // expected error returned
+    t.ok(V.ensureIsObjectPlain(objectAsStringGood, 'string')) // expected error returned
   }
 
   {
@@ -261,6 +302,10 @@ test('ensure some (less used) validation functions are right', (t) => {
     const arrayGood = []
     t.ok(V.isArray(arrayGood))
     t.strictSame(V.ensureIsArray(arrayGood, 'test'), undefined) // no error returned
+    t.ok(V.isObject(arrayGood))
+    t.ok(!V.isObjectPlain(arrayGood))
+    t.ok(!V.ensureIsObject(arrayGood, 'array')) // no error returned
+    t.ok(V.ensureIsObjectPlain(arrayGood, 'array')) // expected error returned
     const arrayBad = {}
     t.ok(!V.isArray(arrayBad))
     t.strictSame(V.ensureIsArray(arrayBad, 'test') instanceof Error, true) // expected error returned
