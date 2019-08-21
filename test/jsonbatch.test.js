@@ -148,12 +148,11 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   {
     // bad object type
     const arg = new Date()
-    t.strictSame(JSONBatch.validateBatch(arg).length, 0) // not so good (should be 1 here), but maybe it's good the same in non strict mode ...
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
     t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
-    console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arg, { strict: true })}`) // TODO: temp ...
   }
 })
 
-// TODO: test JSONBatch.validateBatch with arrays containing different CloudEvent instances (and undefined and null references and others bad) ... wip
+// TODO: test JSONBatch.validateBatch with arrays containing different CloudEvent instances (and inside even undefined, null references and others bad items) ... wip
 
-// TODO: implement ... wip
+// TODO: test JSONBatch.validateBatch with plain object (normal, and even CloudEvent instance and CloudEvent subclasses and not) ... wip

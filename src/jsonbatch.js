@@ -79,8 +79,8 @@ class JSONBatch {
     const ve = [] // validation errors
 
     // standard validation
-    if (!V.isArray(batch) && !V.isObject(batch)) {
-      ve.push(new TypeError(`The argument 'batch' must be an array or an object, instead got a '${typeof batch}'`))
+    if (!V.isArray(batch) && !V.isObjectPlain(batch)) {
+      ve.push(new TypeError(`The argument 'batch' must be an array or a plain object, instead got a '${typeof batch}'`))
     }
 
     // additional validation if strict mode enabled
@@ -96,8 +96,8 @@ class JSONBatch {
         ve.push(...itemsValidation)
         // TODO: check if add index position in the name ... wip
         // ve.push(V.ensureIsClass(batch, CloudEvent, 'CloudEvent_Subclass'))
-      } else if (V.isObject(batch)) {
-        // validate the given (single) object, but first ensure it's a CloudEvent instance or subclass
+      } else if (V.isObjectPlain(batch)) {
+        // validate the given (single) plain object, but first ensure it's a CloudEvent instance or subclass
         if (!V.isClass(batch, CloudEvent)) {
           ve.push(new TypeError(`The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a '${typeof batch}'`))
         } else {
