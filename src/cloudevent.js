@@ -63,7 +63,8 @@ class CloudEvent {
     datacontenttype = CloudEvent.datacontenttypeDefault(),
     schemaurl,
     subject,
-    strict = false } = {},
+    strict = false
+  } = {},
   extensions
   ) {
     if (strict === true) {
