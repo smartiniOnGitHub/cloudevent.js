@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 
 /** create a sample namespace for events here, for better reuse in tests */

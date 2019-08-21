@@ -19,7 +19,7 @@
  * Sample Node.js script to show usage of CloudEvent library
  */
 
-const assert = require('assert')
+const assert = require('assert').strict
 
 console.log('Sample script: start execution ...\n')
 

@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 
 /** @test {CloudEvent} */
@@ -851,7 +851,8 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
 })
 
 /** create some common data with nested attributes, for better reuse in tests */
-const ceCommonNestedData = { ...ceCommonData,
+const ceCommonNestedData = {
+  ...ceCommonData,
   nested1: {
     level1attribute: 'level1attributeValue',
     nested2: {
