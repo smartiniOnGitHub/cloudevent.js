@@ -139,11 +139,6 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
     t.strictSame(V.ensureIsUndefined(narg, null) instanceof Error, true) // expected error returned
     t.strictSame(V.ensureIsUndefined(narg, 'test') instanceof Error, true) // expected error returned
     t.strictSame(V.ensureIsUndefined(narg, {}) instanceof Error, true) // expected error returned
-    // TODO: temp ...
-    console.log(`V.ensureIsUndefined(narg) = ${V.ensureIsUndefined(narg)}`)
-    console.log(`V.ensureIsUndefined(narg, undefined) = ${V.ensureIsUndefined(narg, undefined)}`)
-    console.log(`V.ensureIsUndefined(narg, 'test') = ${V.ensureIsUndefined(narg, 'test')}`)
-    console.log(`V.ensureIsUndefined(narg, {}) = ${V.ensureIsUndefined(narg, {})}`)
   }
 
   // similar tests for all other is / ensure methods ...
