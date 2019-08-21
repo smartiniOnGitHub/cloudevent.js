@@ -115,12 +115,45 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
   }
 })
 
-/** @test {CloudEvent} */
-test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(109)
+/** @test {Validator} */
+test('ensure some (edge cases for) validation functions are right', (t) => {
+  t.plan(14)
 
-  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
-  t.ok(CloudEvent)
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(V)
+
+  {
+    const arg = undefined
+    t.ok(V.isUndefined())
+    t.ok(V.isUndefined(arg))
+    t.strictSame(V.ensureIsUndefined(), undefined) // no error returned
+    t.strictSame(V.ensureIsUndefined(arg, undefined), undefined) // no error returned
+    t.strictSame(V.ensureIsUndefined(arg, null), undefined) // no error returned
+    t.strictSame(V.ensureIsUndefined(arg, 'test'), undefined) // no error returned
+    t.strictSame(V.ensureIsUndefined(arg, {}), undefined) // no error returned
+    // check what happens with opposite value instead
+    const narg = 'sample' // sample value
+    t.notOk(V.isUndefined(narg))
+    t.strictSame(V.ensureIsUndefined(narg) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsUndefined(narg, undefined) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsUndefined(narg, null) instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsUndefined(narg, 'test') instanceof Error, true) // expected error returned
+    t.strictSame(V.ensureIsUndefined(narg, {}) instanceof Error, true) // expected error returned
+    // TODO: temp ...
+    console.log(`V.ensureIsUndefined(narg) = ${V.ensureIsUndefined(narg)}`)
+    console.log(`V.ensureIsUndefined(narg, undefined) = ${V.ensureIsUndefined(narg, undefined)}`)
+    console.log(`V.ensureIsUndefined(narg, 'test') = ${V.ensureIsUndefined(narg, 'test')}`)
+    console.log(`V.ensureIsUndefined(narg, {}) = ${V.ensureIsUndefined(narg, {})}`)
+  }
+
+  // similar tests for all other is / ensure methods ...
+})
+
+/** @test {Validator} */
+test('ensure some (less used) validation functions are right', (t) => {
+  t.plan(108)
+
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
   {
@@ -327,12 +360,11 @@ test('ensure some (less used) validation functions are right', (t) => {
   }
 })
 
-/** @test {CloudEvent} */
+/** @test {Validator} */
 test('ensure validation functions on standard properties are right', (t) => {
-  t.plan(20)
+  t.plan(19)
 
-  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
-  t.ok(CloudEvent)
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
   // sample function that tell if the given property name is standard
