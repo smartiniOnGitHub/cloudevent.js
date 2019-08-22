@@ -427,11 +427,6 @@ class Validator {
    */
   static ensureIsUndefined (arg, name) {
     if (!Validator.isUndefined(arg)) {
-      // TODO: test results calling new methods ... but to remove later ...
-      // return new TypeError(`The argument '${name || Validator.getArgumentValue(arg)}' must be undefined, instead got a '${typeof arg}'`)
-      // return new TypeError(`The argument '${Validator.getOrElse(name, Validator.getArgumentValue(arg))}' must be undefined, instead got a '${typeof arg}'`)
-      // return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be undefined, instead got a '${typeof arg}'`)
-      // return new TypeError(`The argument '${Validator.getOrElse(name, Validator.getArgumentName({ arg }))}' must be undefined, instead got a '${typeof arg}'`)
       return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be undefined, instead got a '${typeof arg}'`)
     }
   }
@@ -905,10 +900,6 @@ class Validator {
    */
   static getOrElse (arg, def) {
     if (typeof arg !== 'undefined' && arg !== null) {
-      // TODO: cleanup ...
-      // * Copy the original object to avoid changing objects that could be shared.
-      // if (typeof arg === 'string') return arg.slice()
-      // else return { ...arg }
       return arg
     }
     // else

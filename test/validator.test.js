@@ -131,13 +131,6 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
     t.strictSame(V.ensureIsUndefined(arg, null), undefined) // no error returned
     t.strictSame(V.ensureIsUndefined(arg, 'test'), undefined) // no error returned
     t.strictSame(V.ensureIsUndefined(arg, {}), undefined) // no error returned
-    // TODO: temp ...
-    console.log(`DEBUG: V.ensureIsUndefined) = ${V.ensureIsUndefined()}`)
-    console.log(`DEBUG: V.ensureIsUndefined(arg) = ${V.ensureIsUndefined(arg)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(arg, undefined) = ${V.ensureIsUndefined(arg, undefined)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(arg, null) = ${V.ensureIsUndefined(arg, null)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(arg, 'test') = ${V.ensureIsUndefined(arg, 'test')}`)
-    console.log(`DEBUG: V.ensureIsUndefined(arg, {}) = ${V.ensureIsUndefined(arg, {})}`)
     // check what happens with opposite value instead
     const narg = 'sample' // sample value
     t.notOk(V.isUndefined(narg))
@@ -146,12 +139,6 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
     t.strictSame(V.ensureIsUndefined(narg, null) instanceof Error, true) // expected error returned
     t.strictSame(V.ensureIsUndefined(narg, 'test') instanceof Error, true) // expected error returned
     t.strictSame(V.ensureIsUndefined(narg, {}) instanceof Error, true) // expected error returned
-    // TODO: temp ...
-    console.log(`DEBUG: V.ensureIsUndefined(narg) = ${V.ensureIsUndefined(narg)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(narg, undefined) = ${V.ensureIsUndefined(narg, undefined)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(narg, null) = ${V.ensureIsUndefined(narg, null)}`)
-    console.log(`DEBUG: V.ensureIsUndefined(narg, 'test') = ${V.ensureIsUndefined(narg, 'test')}`)
-    console.log(`DEBUG: V.ensureIsUndefined(narg, {}) = ${V.ensureIsUndefined(narg, {})}`)
   }
   {
     const arg = null
@@ -431,14 +418,7 @@ test('ensure some (utility) functions are right', (t) => {
     t.strictSame(V.getArgumentValue(n), null)
     t.strictSame(V.getArgumentValue(s), s)
     t.strictSame(V.getArgumentValue(o), {})
-    /*
-    // TODO: remove ...
-    console.log(`V.getArgumentValue() = ${V.getArgumentValue()}`)
-    console.log(`V.getArgumentValue(u) = ${V.getArgumentValue(u)}`)
-    console.log(`V.getArgumentValue(n) = ${V.getArgumentValue(n)}`)
-    console.log(`V.getArgumentValue(s) = ${V.getArgumentValue(s)}`)
-    console.log(`V.getArgumentValue(o) = ${V.getArgumentValue(o)}`)
-     */
+
     t.strictSame(V.getArgumentName(), undefined) // no error returned
     t.strictSame(V.getArgumentName(u), undefined)
     t.strictSame(V.getArgumentName(n), undefined)
@@ -447,17 +427,7 @@ test('ensure some (utility) functions are right', (t) => {
     t.strictSame(V.getArgumentName({ u }), 'u')
     t.strictSame(V.getArgumentName({ n }), 'n')
     t.strictSame(V.getArgumentName({ s }), 's')
-    /*
-    // TODO: remove ...
-    console.log(`V.getArgumentName() = ${V.getArgumentName()}`)
-    console.log(`V.getArgumentName(u) = ${V.getArgumentName(u)}`)
-    console.log(`V.getArgumentName(n) = ${V.getArgumentName(n)}`)
-    console.log(`V.getArgumentName(s) = ${V.getArgumentName(s)}`)
-    console.log(`V.getArgumentName(o) = ${V.getArgumentName(o)}`)
-    console.log(`V.getArgumentName({ u }) = ${V.getArgumentName({ u })}`)
-    console.log(`V.getArgumentName({ n }) = ${V.getArgumentName({ n })}`)
-    console.log(`V.getArgumentName({ s }) = ${V.getArgumentName({ s })}`)
-     */
+
     t.strictSame(V.getOrElse(), undefined) // no error returned
     t.strictSame(V.getOrElse(u), undefined)
     t.strictSame(V.getOrElse(u, u), undefined)
@@ -472,23 +442,6 @@ test('ensure some (utility) functions are right', (t) => {
     t.strictSame(V.getOrElse(n, s), s)
     t.strictSame(V.getOrElse(u, o), o)
     t.strictSame(V.getOrElse(n, o), o)
-    /*
-    // TODO: remove ...
-    console.log(`V.getOrElse() = ${V.getOrElse()}`)
-    console.log(`V.getOrElse(u) = ${V.getOrElse(u)}`)
-    console.log(`V.getOrElse(u, u) = ${V.getOrElse(u, u)}`)
-    console.log(`V.getOrElse(u, n) = ${V.getOrElse(u, n)}`)
-    console.log(`V.getOrElse(n) = ${V.getOrElse(n)}`)
-    console.log(`V.getOrElse(n, u) = ${V.getOrElse(n, u)}`)
-    console.log(`V.getOrElse(n, n) = ${V.getOrElse(n, n)}`)
-    console.log(`V.getOrElse(s) = ${V.getOrElse(s)}`)
-    console.log(`V.getOrElse(s, s) = ${V.getOrElse(s, s)}`)
-    console.log(`V.getOrElse(s, o) = ${V.getOrElse(s, o)}`)
-    console.log(`V.getOrElse(u, s) = ${V.getOrElse(u, s)}`)
-    console.log(`V.getOrElse(n, s) = ${V.getOrElse(u, s)}`)
-    console.log(`V.getOrElse(u, o) = ${V.getOrElse(u, o)}`)
-    console.log(`V.getOrElse(n, o) = ${V.getOrElse(u, o)}`)
-     */
   }
 })
 
