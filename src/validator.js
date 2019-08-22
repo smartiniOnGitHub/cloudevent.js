@@ -524,7 +524,7 @@ class Validator {
    */
   static ensureIsClass (arg, classReference, name) {
     if (!Validator.isClass(arg, classReference)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
     }
   }
 

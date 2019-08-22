@@ -78,6 +78,17 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.ok(!V.ensureIsClass(ceMinimal, CEClass, 'ceMinimal')) // no error returned
     t.ok(V.isClass(V.ensureIsClass(ceMinimal, CESubclass, 'ceMinimal'), TypeError)) // expected error returned
     t.ok(V.isClass(V.ensureIsClass(ceMinimal, NotCESubclass, 'ceMinimal'), TypeError)) // expected error returned
+    /*
+    // TODO: temp ...
+    console.log(`V.ensureIsClass(ceMinimal, CESubclass, 'ceMinimal') = ${V.ensureIsClass(ceMinimal, CESubclass, 'ceMinimal')}`)
+    console.log(`V.ensureIsClass(ceMinimal, NotCESubclass, 'ceMinimal') = ${V.ensureIsClass(ceMinimal, NotCESubclass, 'ceMinimal')}`)
+    const e1 = V.ensureIsClass(ceMinimal, CESubclass, 'ceMinimal')
+    console.log(`e = ${e1}`)
+    console.log(`V.ensureIsClass(ceMinimal, CESubclass) = ${V.ensureIsClass(ceMinimal, CESubclass)}`)
+    console.log(`V.ensureIsClass(ceMinimal, NotCESubclass) = ${V.ensureIsClass(ceMinimal, NotCESubclass)}`)
+    const e2 = V.ensureIsClass(ceMinimal, CESubclass)
+    console.log(`e = ${e2}`)
+     */
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimalSubclass = new CESubclass('1EX', // id
