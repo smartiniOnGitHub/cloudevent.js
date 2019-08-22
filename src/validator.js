@@ -427,7 +427,12 @@ class Validator {
    */
   static ensureIsUndefined (arg, name) {
     if (!Validator.isUndefined(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be undefined, instead got a '${typeof arg}'`)
+      // TODO: test results calling new methods ... but to remove later ...
+      // return new TypeError(`The argument '${name || Validator.getArgumentValue(arg)}' must be undefined, instead got a '${typeof arg}'`)
+      // return new TypeError(`The argument '${Validator.getOrElse(name, Validator.getArgumentValue(arg))}' must be undefined, instead got a '${typeof arg}'`)
+      // return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be undefined, instead got a '${typeof arg}'`)
+      // return new TypeError(`The argument '${Validator.getOrElse(name, Validator.getArgumentName({ arg }))}' must be undefined, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be undefined, instead got a '${typeof arg}'`)
     }
   }
 
@@ -443,7 +448,7 @@ class Validator {
    */
   static ensureIsNull (arg, name) {
     if (!Validator.isNull(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be null, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be null, instead got a '${typeof arg}'`)
     }
   }
 
@@ -830,7 +835,7 @@ class Validator {
   }
 
   /**
-   * Tell the size in bytes of the given string
+   * Tell the size in bytes of the given string.
    *
    * @static
    * @param {string} str the string to check
@@ -845,6 +850,69 @@ class Validator {
     }
     // else
     throw new TypeError(`Unable to calculate the size in bytes of the argument '${str}'.`)
+  }
+
+  /**
+   * Return the value of the variable given as argument.
+   *
+   * Note that this could have been written (in a shorter way)
+   * as an arrow function.
+   *
+   * @static
+   * @param {object} arg the argument
+   * @return {string} the value of the variable (if defined and not null), nothing otherwise
+   */
+  static getArgumentValue (arg) {
+    if ((arg === undefined || arg === null)) {
+      return arg
+    }
+    // else
+    return arguments[0]
+  }
+
+  /**
+   * Return the name of the variable given as argument.
+   *
+   * To use it, must be called using the trick to wrap argument
+   * inside an object literal, so for example use it inside a template string with:
+   * `${getArgumentName({x})}`
+   * with nested objects (like with options with a property x inside)
+   * you need to use with:
+   * `${getArgumentName({options})}.${getArgumentName({x})}`.
+   * Note that this could have been written (in a shorter way)
+   * as an arrow function.
+   *
+   * @static
+   * @param {object} arg the argument
+   * @return {string} the name of the variable (if defined and not null), nothing otherwise
+   */
+  static getArgumentName (arg) {
+    if ((arg === undefined || arg === null)) {
+      return
+    }
+    // else
+    return Object.keys(arg)[0]
+  }
+
+  /**
+   * Return the argument if it's defined and not null,
+   * otherwise the given default value is returned.
+   *
+   * @static
+   * @param {object} arg the argument to return
+   * @param {object} def the default value to return
+   * @return {object} the argument (if defined and not null), otherwise the default value
+   */
+  static getOrElse (arg, def) {
+    if (typeof arg !== 'undefined' && arg !== null) {
+      // TODO: cleanup ...
+      // * Copy the original object to avoid changing objects that could be shared.
+      // if (typeof arg === 'string') return arg.slice()
+      // else return { ...arg }
+      return arg
+    }
+    // else
+    return def
   }
 }
 
