@@ -422,12 +422,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined, nothing otherwise
    */
-  static ensureIsUndefined (arg, name) {
+  static ensureIsUndefined (arg, name = 'arg') {
     if (!Validator.isUndefined(arg)) {
-      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be undefined, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be undefined, instead got a '${typeof arg}'`)
     }
   }
 
@@ -438,12 +438,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not null, nothing otherwise
    */
-  static ensureIsNull (arg, name) {
+  static ensureIsNull (arg, name = 'arg') {
     if (!Validator.isNull(arg)) {
-      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be null, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be null, instead got a '${typeof arg}'`)
     }
   }
 
@@ -454,12 +454,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined or null, nothing otherwise
    */
-  static ensureIsUndefinedOrNull (arg, name) {
+  static ensureIsUndefinedOrNull (arg, name = 'arg') {
     if (!Validator.isUndefinedOrNull(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be undefined or null, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be undefined or null, instead got a '${typeof arg}'`)
     }
   }
 
@@ -470,12 +470,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined or null, nothing otherwise
    */
-  static ensureIsDefinedAndNotNull (arg, name) {
+  static ensureIsDefinedAndNotNull (arg, name = 'arg') {
     if (!Validator.isDefinedAndNotNull(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be defined and not null, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be defined and not null, instead got a '${typeof arg}'`)
     }
   }
 
@@ -486,12 +486,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an array, nothing otherwise
    */
-  static ensureIsArray (arg, name) {
+  static ensureIsArray (arg, name = 'arg') {
     if (!Validator.isArray(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an array, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an array, instead got a '${typeof arg}'`)
     }
   }
 
@@ -502,12 +502,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a boolean, nothing otherwise
    */
-  static ensureIsBoolean (arg, name) {
+  static ensureIsBoolean (arg, name = 'arg') {
     if (!Validator.isBoolean(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be a boolean, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be a boolean, instead got a '${typeof arg}'`)
     }
   }
 
@@ -522,9 +522,9 @@ class Validator {
    * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
    */
-  static ensureIsClass (arg, classReference, name) {
+  static ensureIsClass (arg, classReference, name = 'arg') {
     if (!Validator.isClass(arg, classReference)) {
-      return new TypeError(`The argument '${name || Validator.getArgumentName({ arg })}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an instance of the given class reference, instead got a '${typeof arg}'`)
     }
   }
 
@@ -535,12 +535,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a function, nothing otherwise
    */
-  static ensureIsFunction (arg, name) {
+  static ensureIsFunction (arg, name = 'arg') {
     if (!Validator.isFunction(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be a function, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be a function, instead got a '${typeof arg}'`)
     }
   }
 
@@ -551,12 +551,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a string, nothing otherwise
    */
-  static ensureIsString (arg, name) {
+  static ensureIsString (arg, name = 'arg') {
     if (!Validator.isString(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be a string, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be a string, instead got a '${typeof arg}'`)
     }
   }
 
@@ -567,12 +567,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a string not empty, nothing otherwise
    */
-  static ensureIsStringNotEmpty (arg, name) {
+  static ensureIsStringNotEmpty (arg, name = 'arg') {
     if (!Validator.isStringNotEmpty(arg)) {
-      return new Error(`The string '${name || arguments[0]}' must be not empty`)
+      return new Error(`The string '${name}' must be not empty`)
     }
   }
 
@@ -583,12 +583,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object, nothing otherwise
    */
-  static ensureIsObject (arg, name) {
+  static ensureIsObject (arg, name = 'arg') {
     if (!Validator.isObject(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an object, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an object, instead got a '${typeof arg}'`)
     }
   }
 
@@ -601,12 +601,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object, nothing otherwise
    */
-  static ensureIsObjectPlain (arg, name) {
+  static ensureIsObjectPlain (arg, name = 'arg') {
     if (!Validator.isObjectPlain(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be a plain object, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be a plain object, instead got a '${typeof arg}'`)
     }
   }
 
@@ -617,12 +617,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object nor a collection, nothing otherwise
    */
-  static ensureIsObjectOrCollection (arg, name) {
+  static ensureIsObjectOrCollection (arg, name = 'arg') {
     if (!Validator.isObjectOrCollection(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an object or a collection, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an object or a collection, instead got a '${typeof arg}'`)
     }
   }
 
@@ -633,12 +633,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object nor a collection or it's an array, nothing otherwise
    */
-  static ensureIsObjectOrCollectionNotArray (arg, name) {
+  static ensureIsObjectOrCollectionNotArray (arg, name = 'arg') {
     if (!Validator.isObjectOrCollectionNotArray(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an object or a collection and not an array, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an object or a collection and not an array, instead got a '${typeof arg}'`)
     }
   }
 
@@ -649,12 +649,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object nor a collection or it's a string, nothing otherwise
    */
-  static ensureIsObjectOrCollectionNotString (arg, name) {
+  static ensureIsObjectOrCollectionNotString (arg, name = 'arg') {
     if (!Validator.isObjectOrCollectionNotString(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an object or a collection and not a string, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an object or a collection and not a string, instead got a '${typeof arg}'`)
     }
   }
 
@@ -665,12 +665,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object nor a collection nor a string, nothing otherwise
    */
-  static ensureIsObjectOrCollectionOrString (arg, name) {
+  static ensureIsObjectOrCollectionOrString (arg, name = 'arg') {
     if (!Validator.isObjectOrCollectionOrString(arg)) {
-      return new TypeError(`The argument '${name || arguments[0]}' must be an object or a collection or a string, instead got a '${typeof arg}'`)
+      return new TypeError(`The argument '${name}' must be an object or a collection or a string, instead got a '${typeof arg}'`)
     }
   }
 
@@ -681,12 +681,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date, nothing otherwise
    */
-  static ensureIsDate (arg, name) {
+  static ensureIsDate (arg, name = 'arg') {
     if (!Validator.isDate(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be a Date, instead got a '${typeof arg}'`)
+      return new Error(`The argument '${name}' must be a Date, instead got a '${typeof arg}'`)
     }
   }
 
@@ -697,12 +697,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date in the past, nothing otherwise
    */
-  static ensureIsDatePast (arg, name) {
+  static ensureIsDatePast (arg, name = 'arg') {
     if (!Validator.isDatePast(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be a Date that belongs to the past`)
+      return new Error(`The argument '${name}' must be a Date that belongs to the past`)
     }
   }
 
@@ -713,12 +713,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date in the future, nothing otherwise
    */
-  static ensureIsDateFuture (arg, name) {
+  static ensureIsDateFuture (arg, name = 'arg') {
     if (!Validator.isDateFuture(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be a Date that belongs to the future`)
+      return new Error(`The argument '${name}' must be a Date that belongs to the future`)
     }
   }
 
@@ -729,12 +729,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a number, nothing otherwise
    */
-  static ensureIsNumber (arg, name) {
+  static ensureIsNumber (arg, name = 'arg') {
     if (!Validator.isNumber(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be a Number, instead got a '${typeof arg}'`)
+      return new Error(`The argument '${name}' must be a Number, instead got a '${typeof arg}'`)
     }
   }
 
@@ -745,12 +745,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not an error or its subclass, nothing otherwise
    */
-  static ensureIsError (arg, name) {
+  static ensureIsError (arg, name = 'arg') {
     if (!Validator.isError(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be an Error or a subclass of it, instead got a '${typeof arg}'`)
+      return new Error(`The argument '${name}' must be an Error or a subclass of it, instead got a '${typeof arg}'`)
     }
   }
 
@@ -761,12 +761,12 @@ class Validator {
    *
    * @static
    * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of previous argument if not given)
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a string version, nothing otherwise
    */
-  static ensureIsVersion (arg, name) {
+  static ensureIsVersion (arg, name = 'arg') {
     if (!Validator.isVersion(arg)) {
-      return new Error(`The argument '${name || arguments[0]}' must be a string in the format 'n.n.n', and not '${arg}'`)
+      return new Error(`The argument '${name}' must be a string in the format 'n.n.n', and not '${arg}'`)
     }
   }
 
@@ -781,9 +781,9 @@ class Validator {
    * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not an URI/URL, nothing otherwise
    */
-  static ensureIsURI (arg, base, name) {
+  static ensureIsURI (arg, base, name = 'arg') {
     if (!Validator.isURI(arg, base)) {
-      return new Error(`The argument '${name || arguments[0]}' must be an URI or URL string, and not '${arg}', '${base}'`)
+      return new Error(`The argument '${name}' must be an URI or URL string, and not '${arg}', '${base}'`)
     }
   }
 
@@ -794,14 +794,14 @@ class Validator {
    * See {@link Validator.doesObjectContainsStandardProperty}.
    *
    * @static
-   * @param {object} obj the object to check
+   * @param {object} arg the object to check
    * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
    * @param {string} name the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if at least one property with a standard name is found, nothing otherwise
    */
-  static ensureObjectDoesNotContainStandardProperty (obj, isPropStandard, name) {
-    if (Validator.doesObjectContainsStandardProperty(obj, isPropStandard)) {
-      return new Error(`The object with name '${name || arguments[0]}' contains at least one property with a standard name`)
+  static ensureObjectDoesNotContainStandardProperty (arg, isPropStandard, name = 'arg') {
+    if (Validator.doesObjectContainsStandardProperty(arg, isPropStandard)) {
+      return new Error(`The object with name '${name}' contains at least one property with a standard name`)
     }
   }
 
@@ -811,6 +811,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @return {number} the size if it's an array|Map|Set|object|string, nothing otherwise
+   * @return {TypeError} if it's not an array nor a collection nor object nor a string, nothing otherwise
    */
   static getSize (arg) {
     if ((arg === undefined || arg === null)) {
@@ -835,6 +836,7 @@ class Validator {
    * @static
    * @param {string} str the string to check
    * @return {number} the size if it's a string, nothing otherwise
+   * @return {TypeError} if it's not a string, nothing otherwise
    */
   static getSizeInBytes (str) {
     if ((str === undefined || str === null)) {
