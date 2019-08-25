@@ -230,7 +230,7 @@ test('ensure some (less used) validation functions are right', (t) => {
     const dateBad = Date.now()
     t.ok(!V.isDate(dateBad))
     t.strictSame(V.ensureIsDate(dateBad, 'test') instanceof Error, true) // expected error returned
-    t.ok(!V.ensureIsObjectOrCollectionOrString(dateGood, 'date')) // no error returned
+    t.ok(V.ensureIsObjectOrCollectionOrString(dateGood, 'date')) // expected error returned
     t.ok(V.ensureIsNumber(dateGood, 'date')) // expected error returned
     t.ok(!V.ensureIsNumber(dateGood.getTime(), 'number')) // no error returned
   }
