@@ -349,6 +349,10 @@ class CloudEvent {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
+    const notACloudEventError = V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass')
+    if (V.isError(notACloudEventError)) {
+      return [notACloudEventError]
+    }
     const ve = [] // validation errors
 
     // standard validation
@@ -370,18 +374,17 @@ class CloudEvent {
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
-      ve.push(V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass'))
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
         if (V.isDefinedAndNotNull(event.datacontentencoding)) {
           // ensure data is a string in this case
           ve.push(V.ensureIsString(event.data, 'data'))
         } else if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
-          // ensure data is object or collection, or even a string in this case
+          // ensure data is a plain object or collection, or even a string in this case
           // because in serialization/deserialization some validation can occur on the transformed object
           ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
         } else {
-          // ensure data is object or collection, but not a string in this case
+          // ensure data is a plain object or collection, but not a string in this case
           ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         }
       }
@@ -390,10 +393,11 @@ class CloudEvent {
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
       ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
       if (V.isDefinedAndNotNull(event.extensions)) {
+        // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         const extensionsSize = V.getSize(event.extensions)
         if (extensionsSize < 1) {
-          ve.push(new Error('The object \'extensions\' must contain at least 1 property'))
+          ve.push(new Error("The object 'extensions' must contain at least 1 property"))
         }
       }
     }
