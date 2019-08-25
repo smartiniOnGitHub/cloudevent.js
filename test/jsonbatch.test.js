@@ -18,8 +18,28 @@
 const assert = require('assert').strict
 const test = require('tap').test
 
+/** create some common options, for better reuse in tests */
+const ceCommonOptions = {
+  time: new Date(),
+  datacontenttype: 'application/json',
+  schemaurl: 'http://my-schema.localhost.localdomain',
+  strict: false
+}
+/** create some common options with strict flag enabled, for better reuse in tests */
+const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create some common extensions, for better reuse in tests */
+const ceCommonExtensions = { exampleExtension: 'value' }
 /** create a sample namespace for events here, for better reuse in tests */
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+/** create a sample common server URL, for better reuse in tests */
+const ceServerUrl = '/test'
+/** create some common data from an object, for better reuse in tests */
+const ceCommonData = { hello: 'world', year: 2019 }
+/** create some common data from a Map, for better reuse in tests */
+const ceMapData = new Map() // empty Map
+// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
+ceMapData.set('key-1', 'value 1')
+ceMapData.set('key-2', 'value 2')
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {
@@ -127,10 +147,10 @@ test('ensure isValid and validate works good on undefined and null arguments, an
     t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 0)
   }
   {
-    // empty object
+    // empty object (not a CloudEvent/subclass instance)
     const arg = {}
-    t.strictSame(JSONBatch.validateBatch(arg), [])
-    t.strictSame(JSONBatch.validateBatch(arg).length, 0)
+    t.strictSame(JSONBatch.validateBatch(arg), [new TypeError("The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a 'object'")])
+    t.strictSame(JSONBatch.validateBatch(arg).length, 1)
     t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
   }
   {
@@ -153,6 +173,72 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   }
 })
 
-// TODO: test JSONBatch.validateBatch with arrays containing different CloudEvent instances (and inside even undefined, null references and others bad items) ... wip
+/** @test {JSONBatch} */
+test('ensure isValid and validate works good on array and related items', (t) => {
+  t.plan(18)
+  const { CloudEvent, JSONBatch } = require('../src/')
+  t.ok(CloudEvent)
+  t.ok(JSONBatch)
+
+  const ceFull = new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData,
+    'sample data', // data as string, to let this ce instance have some strict validation errors
+    ceCommonOptions,
+    // ceCommonExtensions
+    {} // extensions as empty object, to let this ce instance have some strict validation errors
+  )
+  t.ok(ceFull)
+  t.ok(CloudEvent.isValidEvent(ceFull))
+  t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+  t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true })) // expected errors here
+  t.strictSame(CloudEvent.validateEvent(ceFull), [])
+  t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
+
+  const ceFullStrict = new CloudEvent('1/full-strict',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData,
+    ceCommonOptionsStrict,
+    ceCommonExtensions
+  )
+  t.ok(ceFullStrict)
+  t.ok(CloudEvent.isValidEvent(ceFull))
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: false }))
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: true }))
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length, 0)
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
+
+  // define an array containing different CloudEvent instances, and even other objects ...
+  const arr = [
+    undefined,
+    null,
+    'string',
+    1234567890,
+    false,
+    true,
+    ceFull,
+    new Date(),
+    {},
+    [],
+    ceFullStrict,
+    // TODO: add here another ce not strict but with some validation errors in strict mode ... wip
+    null,
+    undefined
+  ]
+  t.ok(arr)
+  t.strictSame(arr.length, 13)
+
+  // TODO: temp ...
+  console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false })}`)
+  console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false }).length}`)
+  console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true })}`)
+  console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true }).length}`)
+  // in following tests to simplify comparison of results, check only the  number of expected errors ...
+  t.strictSame(JSONBatch.validateBatch(arr).length, 7)
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
+  // TODO: check why in the strict mode errors are 8 and not 9 (one is of type Error, not TypeError, but seems not related to the cause) ... wip
+})
 
 // TODO: test JSONBatch.validateBatch with plain object (normal, and even CloudEvent instance and CloudEvent subclasses and not) ... wip

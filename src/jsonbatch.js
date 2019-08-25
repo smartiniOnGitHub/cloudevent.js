@@ -76,37 +76,45 @@ class JSONBatch {
     if (V.isUndefinedOrNull(batch)) {
       return [new Error('JSONBatch undefined or null')]
     }
-    const ve = [] // validation errors
 
     // standard validation
     if (!V.isArray(batch) && !V.isObjectPlain(batch)) {
-      ve.push(new TypeError(`The argument 'batch' must be an array or a plain object, instead got a '${typeof batch}'`))
+      return [new TypeError(`The argument 'batch' must be an array or a plain object, instead got a '${typeof batch}'`)]
     }
 
-    // additional validation if strict mode enabled
-    // TODO: check implementation ... wip
-    if (strict === true) {
-      if (V.isArray(batch)) {
-        // validate any not null item
-        const itemsValidation = batch.filter((i) => i
-        ).map((i) => {
-          return CloudEvent.validateEvent(i, { strict })
-        })
-        console.log(`DEBUG: itemsValidation = ${itemsValidation}`) // TODO: temp ...
-        ve.push(...itemsValidation)
-        // TODO: check if add index position in the name ... wip
-        // ve.push(V.ensureIsClass(batch, CloudEvent, 'CloudEvent_Subclass'))
-      } else if (V.isObjectPlain(batch)) {
-        // validate the given (single) plain object, but first ensure it's a CloudEvent instance or subclass
-        if (!V.isClass(batch, CloudEvent)) {
-          ve.push(new TypeError(`The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a '${typeof batch}'`))
-        } else {
-          ve.push(...CloudEvent.validateEvent(batch, { strict }))
+    // additional validation on nested items
+    const ve = [] // validation errors
+    if (V.isArray(batch)) {
+      // validate any not null item
+      const itemsValidation = batch.filter((i) => V.isDefinedAndNotNull(i)
+      ).map((i) => {
+        // console.log(`DEBUG: itemsValidation for non null item = ${i}`) // TODO: temp ...
+        const ceValidation = CloudEvent.validateEvent(i, { strict })
+        // console.log(`DEBUG: ceValidation for non null item (JSON) = ${JSON.stringify(ceValidation)}, length = ${ceValidation.length}`) // TODO: temp ...
+        if (ceValidation.length > 0) {
+          // validation errors found
+          return ceValidation
         }
+      })
+      // console.log(`DEBUG: itemsValidation for non null items (tot ${itemsValidation.length}) = ${itemsValidation}, is array = ${V.isArray(itemsValidation)}`) // TODO: temp ...
+      ve.push(...itemsValidation)
+    } else if (V.isObjectPlain(batch)) {
+      // validate the given (single) plain object, but first ensure it's a CloudEvent instance or subclass
+      if (!V.isClass(batch, CloudEvent)) {
+        ve.push(new TypeError(`The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a '${typeof batch}'`))
+      } else {
+        ve.push(...CloudEvent.validateEvent(batch, { strict }))
       }
     }
 
-    return ve.filter((i) => i)
+    // console.log(`DEBUG: ve (tot ${ve.length}) = ${ve}`) // TODO: temp ...
+    const veFiltered = ve.filter((i) => {
+      // console.log(`DEBUG: veFiltered(i): i is array = ${V.isArray(i)}, i is error = ${V.isError(i)}, details (JSON) = ${JSON.stringify(i)}`) // TODO: temp ...
+      return (V.isArray(i) || V.isError(i))
+      // TODO: maybe check if/how to do flat map here ... wip
+    })
+
+    return veFiltered
   }
 
   /**
