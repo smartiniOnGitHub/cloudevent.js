@@ -426,6 +426,7 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to check
    * @return {boolean} true if it's an instance (or a subclass), otherwise false
+   * @throws {Error} if event is undefined or null
    */
   static isCloudEvent (event) {
     if (V.isUndefinedOrNull(event)) {
