@@ -349,9 +349,8 @@ class CloudEvent {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
-    const notACloudEventError = V.ensureIsClass(event, CloudEvent, 'CloudEvent_Subclass')
-    if (V.isError(notACloudEventError)) {
-      return [notACloudEventError]
+    if (!CloudEvent.isCloudEvent(event)) {
+      return [new TypeError(`The argument must be a CloudEvent (or a subclass), instead got a '${typeof event}'`)]
     }
     const ve = [] // validation errors
 
