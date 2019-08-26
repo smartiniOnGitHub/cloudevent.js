@@ -175,7 +175,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on array and related items', (t) => {
-  t.plan(18)
+  t.plan(21)
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -195,6 +195,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true })) // expected errors here
   t.strictSame(CloudEvent.validateEvent(ceFull), [])
   t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
+  t.notOk(JSONBatch.isJSONBatch(ceFull))
 
   const ceFullStrict = new CloudEvent('1/full-strict',
     ceNamespace,
@@ -209,6 +210,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: true }))
   t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length, 0)
   t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
+  t.notOk(JSONBatch.isJSONBatch(ceFullStrict))
 
   // define an array containing different CloudEvent instances, and even other objects ...
   const arr = [
@@ -229,21 +231,15 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(arr)
   t.strictSame(arr.length, 13)
 
-  /*
-  // TODO: temp ...
-  console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false })}`)
-  console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false }).length}`)
-  console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true })}`)
-  console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true }).length}`)
-   */
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(arr).length, 7)
   t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
+  t.ok(JSONBatch.isJSONBatch(arr))
 })
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on plain object and even CloudEvent instance and CloudEvent subclasses and not', (t) => {
-  t.plan(24)
+  t.plan(31)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -274,8 +270,7 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFull).length, 0)
   t.strictSame(JSONBatch.validateBatch(ceFull, { strict: true }).length, 3)
-  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(ceFull, { strict: false })}`) // TODO: temp ...
-  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(ceFull, { strict: true })}`) // TODO: temp ...
+  t.notOk(JSONBatch.isJSONBatch(ceFull))
 
   const ceFullSubclass = new CESubclass('1/full/subclass',
     ceNamespace,
@@ -298,13 +293,23 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFullSubclass).length, 0)
   t.strictSame(JSONBatch.validateBatch(ceFullSubclass, { strict: true }).length, 3)
-  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(ceFullSubclass, { strict: false })}`) // TODO: temp ...
-  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(ceFullSubclass, { strict: true })}`) // TODO: temp ...
+  t.notOk(JSONBatch.isJSONBatch(ceFullSubclass))
 
   // try even with a plain object
   const plainObject = { id: '1/plainObject', data: 'sample data' }
   t.strictSame(JSONBatch.validateBatch(plainObject).length, 1)
   t.strictSame(JSONBatch.validateBatch(plainObject, { strict: true }).length, 1)
-  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(plainObject, { strict: false })}`) // TODO: temp ...
-  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(plainObject, { strict: true })}`) // TODO: temp ...
+  t.notOk(JSONBatch.isJSONBatch(plainObject))
+
+  // try with some references
+  t.throws(function () {
+    JSONBatch.isJSONBatch(undefined)
+    assert(true) // never executed
+  }, Error, 'Expected exception when checking for a JSONBatch instance with bad data')
+  t.throws(function () {
+    JSONBatch.isJSONBatch(null)
+    assert(true) // never executed
+  }, Error, 'Expected exception when checking for a JSONBatch instance with bad data')
+  t.notOk(JSONBatch.isJSONBatch({}))
+  t.ok(JSONBatch.isJSONBatch([]))
 })

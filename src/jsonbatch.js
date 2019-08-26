@@ -83,15 +83,12 @@ class JSONBatch {
       // additional validation on nested items (any not null item)
       const itemsValidation = batch.filter((i) => V.isDefinedAndNotNull(i)
       ).map((i) => {
-        // console.log(`DEBUG: itemsValidation for non null item = ${i}`) // TODO: temp ...
         const ceValidation = CloudEvent.validateEvent(i, { strict })
-        // console.log(`DEBUG: ceValidation for non null item (JSON) = ${JSON.stringify(ceValidation)}, length = ${ceValidation.length}`) // TODO: temp ...
         if (ceValidation.length > 0) {
           // return validation errors found
           return ceValidation
         }
       })
-      // console.log(`DEBUG: itemsValidation for non null items (tot ${itemsValidation.length}) = ${itemsValidation}, is array = ${V.isArray(itemsValidation)}`) // TODO: temp ...
       ve.push(...itemsValidation)
     } else if (CloudEvent.isCloudEvent(batch)) {
       // validate the given (single) CloudEvent instance or subclass
@@ -104,9 +101,7 @@ class JSONBatch {
       return [new TypeError(`The argument 'batch' must be an array or a CloudEvent instance (or a subclass), instead got a '${typeof batch}'`)]
     }
 
-    // console.log(`DEBUG: ve (tot ${ve.length}) = ${ve}`) // TODO: temp ...
     const veFiltered = ve.filter((i) => {
-      // console.log(`DEBUG: veFiltered(i): i is array = ${V.isArray(i)}, i is error = ${V.isError(i)}, details (JSON) = ${JSON.stringify(i)}`) // TODO: temp ...
       return (V.isArray(i) || V.isError(i))
     }).reduce((acc, x) => acc.concat(x), []) // same as flatMap (available only in newer releases)
 
@@ -127,6 +122,20 @@ class JSONBatch {
     const validationErrors = JSONBatch.validateBatch(batch, { strict })
     const size = V.getSize(validationErrors)
     return (size === 0)
+  }
+
+  /**
+   * Tell the given object, if it's a JSONBatch (or at least an empty one).
+   *
+   * @static
+   * @param {!object} event the CloudEvent to check
+   * @return {boolean} true if it's an instance (or a subclass), otherwise false
+   */
+  static isJSONBatch (batch) {
+    if (V.isUndefinedOrNull(batch)) {
+      throw new Error('JSONBatch undefined or null')
+    }
+    return V.isArray(batch)
   }
 
   // TODO: implement other features ... wip
