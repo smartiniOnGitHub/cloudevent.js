@@ -149,7 +149,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   {
     // empty object (not a CloudEvent/subclass instance)
     const arg = {}
-    t.strictSame(JSONBatch.validateBatch(arg), [new TypeError("The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a 'object'")])
+    t.strictSame(JSONBatch.validateBatch(arg), [new TypeError("The argument 'batch' must be an array or a CloudEvent instance (or a subclass), instead got a 'object'")])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
     t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
   }
@@ -241,4 +241,70 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
 })
 
-// TODO: test JSONBatch.validateBatch with plain object (normal, and even CloudEvent instance and CloudEvent subclasses and not) ... wip
+/** @test {JSONBatch} */
+test('ensure isValid and validate works good on plain object and even CloudEvent instance and CloudEvent subclasses and not', (t) => {
+  t.plan(24)
+  const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
+  t.ok(CloudEvent)
+  t.ok(JSONBatch)
+
+  class NotCESubclass {
+  }
+  class CESubclass extends CloudEvent {
+  }
+
+  const ceFull = new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData,
+    'sample data', // data as string, to let this ce instance have some strict validation errors
+    ceCommonOptions,
+    // ceCommonExtensions
+    {} // extensions as empty object, to let this ce instance have some strict validation errors
+  )
+  t.ok(ceFull)
+  // check that created instances belongs to the right base class
+  t.ok(V.isClass(ceFull, CloudEvent))
+  t.ok(!V.isClass(ceFull, NotCESubclass))
+  t.ok(!V.isClass(ceFull, CESubclass))
+  t.ok(!V.ensureIsClass(ceFull, CloudEvent, 'ceFull')) // no error returned
+  t.ok(V.ensureIsClass(ceFull, CESubclass, 'ceFull')) // expected error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFull, CESubclass, 'ceFull'), TypeError)) // expected error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFull, NotCESubclass, 'ceFull'), TypeError)) // expected error returned
+  // in following tests to simplify comparison of results, check only the  number of expected errors ...
+  t.strictSame(JSONBatch.validateBatch(ceFull).length, 0)
+  t.strictSame(JSONBatch.validateBatch(ceFull, { strict: true }).length, 3)
+  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(ceFull, { strict: false })}`) // TODO: temp ...
+  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(ceFull, { strict: true })}`) // TODO: temp ...
+
+  const ceFullSubclass = new CESubclass('1/full/subclass',
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData,
+    'sample data', // data as string, to let this ce instance have some strict validation errors
+    ceCommonOptions,
+    // ceCommonExtensions
+    {} // extensions as empty object, to let this ce instance have some strict validation errors
+  )
+  t.ok(ceFullSubclass)
+  // check that created instances belongs to the right base class
+  t.ok(V.isClass(ceFullSubclass, CloudEvent))
+  t.ok(!V.isClass(ceFullSubclass, NotCESubclass))
+  t.ok(V.isClass(ceFullSubclass, CESubclass))
+  t.ok(!V.ensureIsClass(ceFullSubclass, CloudEvent, 'ceFullSubclass')) // no error returned
+  t.ok(!V.ensureIsClass(ceFullSubclass, CESubclass, 'ceFullSubclass')) // no error returned
+  t.ok(!V.isClass(V.ensureIsClass(ceFullSubclass, CESubclass, 'ceFullSubclass'), TypeError)) // no error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFullSubclass, NotCESubclass, 'ceFullSubclass'), TypeError)) // expected error returned
+  // in following tests to simplify comparison of results, check only the  number of expected errors ...
+  t.strictSame(JSONBatch.validateBatch(ceFullSubclass).length, 0)
+  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, { strict: true }).length, 3)
+  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(ceFullSubclass, { strict: false })}`) // TODO: temp ...
+  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(ceFullSubclass, { strict: true })}`) // TODO: temp ...
+
+  // try even with a plain object
+  const plainObject = { id: '1/plainObject', data: 'sample data' }
+  t.strictSame(JSONBatch.validateBatch(plainObject).length, 1)
+  t.strictSame(JSONBatch.validateBatch(plainObject, { strict: true }).length, 1)
+  // console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(plainObject, { strict: false })}`) // TODO: temp ...
+  // console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(plainObject, { strict: true })}`) // TODO: temp ...
+})
