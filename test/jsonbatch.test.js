@@ -175,10 +175,22 @@ test('ensure isValid and validate works good on undefined and null arguments, an
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on array and related items', (t) => {
-  t.plan(21)
-  const { CloudEvent, JSONBatch } = require('../src/')
+  t.plan(39)
+  const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
+  t.ok(V)
+
+  const empty = []
+  t.ok(empty)
+  t.ok(JSONBatch.isJSONBatch(empty))
+  t.ok(JSONBatch.isValidBatch(empty))
+  t.strictSame(JSONBatch.validateBatch(empty, { strict: false }).length, 0)
+  t.strictSame(JSONBatch.validateBatch(empty, { strict: true }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, strict: false }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, strict: false }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, strict: true }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, strict: true }).length, 0)
 
   const ceFull = new CloudEvent('1/full',
     ceNamespace,
@@ -230,16 +242,35 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   ]
   t.ok(arr)
   t.strictSame(arr.length, 13)
+  t.strictSame(arr.filter((i) => V.isDefinedAndNotNull(i)).length, 9) // number of not null items
 
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
-  t.strictSame(JSONBatch.validateBatch(arr).length, 7)
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
   t.ok(JSONBatch.isJSONBatch(arr))
+  t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: false }).length, 7)
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 2) // no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: false }).length, 2) // both are valid
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: true }).length, 1) // only one is valid in strict mode
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: true }).length, 2) // strict true with onlyValid false makes no filtering
+
+  // additional test, ensure that all instances returned (only valid), are CloudEvent instances
+  const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, strict: false })
+  t.ok(eventsGot.every((i) => CloudEvent.isCloudEvent(i)))
+  /*
+  // TODO: temp ...
+  console.log(`get events (onlyValid, strict) = ${JSON.stringify(eventsGot)}`)
+  for (const i of eventsGot) {
+    console.log(`  event i = ${JSON.stringify(i)}, is a CloudEvent instance = ${CloudEvent.isCloudEvent(i)}`)
+  }
+   */
+  // test with other instances returned (filtered in a different way)
+  t.ok(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).every((i) => CloudEvent.isCloudEvent(i)))
 })
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on plain object and even CloudEvent instance and CloudEvent subclasses and not', (t) => {
-  t.plan(31)
+  t.plan(32)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -300,16 +331,20 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.strictSame(JSONBatch.validateBatch(plainObject).length, 1)
   t.strictSame(JSONBatch.validateBatch(plainObject, { strict: true }).length, 1)
   t.notOk(JSONBatch.isJSONBatch(plainObject))
+  t.throws(function () {
+    const eventsGot = JSONBatch.getEvents(plainObject)
+    assert(eventsGot === null) // never executed
+  }, Error, 'Expected exception when trying to get events from a bad JSONBatch')
 
   // try with some references
   t.throws(function () {
     JSONBatch.isJSONBatch(undefined)
     assert(true) // never executed
-  }, Error, 'Expected exception when checking for a JSONBatch instance with bad data')
+  }, Error, 'Expected exception when checking for a JSONBatch with bad data')
   t.throws(function () {
     JSONBatch.isJSONBatch(null)
     assert(true) // never executed
-  }, Error, 'Expected exception when checking for a JSONBatch instance with bad data')
+  }, Error, 'Expected exception when checking for a JSONBatch with bad data')
   t.notOk(JSONBatch.isJSONBatch({}))
   t.ok(JSONBatch.isJSONBatch([]))
 })

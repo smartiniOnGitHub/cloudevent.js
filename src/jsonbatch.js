@@ -128,14 +128,55 @@ class JSONBatch {
    * Tell the given object, if it's a JSONBatch (or at least an empty one).
    *
    * @static
-   * @param {!object} event the CloudEvent to check
-   * @return {boolean} true if it's an instance (or a subclass), otherwise false
+   * @param {!object} batch the JSONBatch to check
+   * @return {boolean} true if it's an array, otherwise false
+   * @throws {Error} if batch is undefined or null
    */
   static isJSONBatch (batch) {
     if (V.isUndefinedOrNull(batch)) {
       throw new Error('JSONBatch undefined or null')
     }
     return V.isArray(batch)
+  }
+
+  /**
+   * Return any not null CloudEvent instance from the given object.
+   *
+   * @static
+   * @param {!object} batch the JSONBatch to extract CloudEvent instances (if any)
+   * @param {object} options optional processing attributes:
+   *        onlyValid (boolean, default false) to extract only valid instances
+   *        strict (boolean, default false) to validate it in a more strict way
+   * @return {object[]} processed events, as an array
+   * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
+   * @throws {TypeError} if batch is not a JSONBatch
+   */
+  static getEvents (batch, {
+    onlyValid = false,
+    strict = false
+  } = {}) {
+    if (!JSONBatch.isJSONBatch(batch)) {
+      throw new TypeError('The given batch is not a JSONBatch')
+    }
+
+    const ce = [] // CloudEvent instances
+    const itemsFiltered = batch.filter((i) => V.isDefinedAndNotNull(i) && CloudEvent.isCloudEvent(i))
+    if (onlyValid === false) {
+      // return all items filtered
+      ce.push(...itemsFiltered)
+    } else {
+      // return only valid instances
+      const itemsValid = itemsFiltered.map((i) => {
+        const ceValidation = CloudEvent.validateEvent(i, { strict })
+        if (ceValidation.length === 0) {
+          // return only instances without validation errors
+          return i
+        }
+      }).filter((i) => V.isDefinedAndNotNull(i)) // remove empty items
+      ce.push(...itemsValid)
+    }
+
+    return ce
   }
 
   // TODO: implement other features ... wip
