@@ -223,22 +223,22 @@ test('ensure isValid and validate works good on array and related items', (t) =>
     {},
     [],
     ceFullStrict,
-    // TODO: add here another ce not strict but with some validation errors in strict mode ... wip
     null,
     undefined
   ]
   t.ok(arr)
   t.strictSame(arr.length, 13)
 
+  /*
   // TODO: temp ...
   console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false })}`)
   console.log(`DEBUG: validate batch = ${JSONBatch.validateBatch(arr, { strict: false }).length}`)
   console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true })}`)
   console.log(`DEBUG: validate batch (strict) = ${JSONBatch.validateBatch(arr, { strict: true }).length}`)
+   */
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(arr).length, 7)
   t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
-  // TODO: check why in the strict mode errors are 8 and not 9 (one is of type Error, not TypeError, but seems not related to the cause) ... wip
 })
 
 // TODO: test JSONBatch.validateBatch with plain object (normal, and even CloudEvent instance and CloudEvent subclasses and not) ... wip

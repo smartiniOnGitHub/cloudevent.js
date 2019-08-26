@@ -100,7 +100,7 @@ class JSONBatch {
       ve.push(...itemsValidation)
     } else if (V.isObjectPlain(batch)) {
       // validate the given (single) plain object, but first ensure it's a CloudEvent instance or subclass
-      if (!V.isClass(batch, CloudEvent)) {
+      if (!CloudEvent.isCloudEvent(batch)) {
         ve.push(new TypeError(`The argument 'batch' must be an instance or a subclass of CloudEvent, instead got a '${typeof batch}'`))
       } else {
         ve.push(...CloudEvent.validateEvent(batch, { strict }))
@@ -111,8 +111,7 @@ class JSONBatch {
     const veFiltered = ve.filter((i) => {
       // console.log(`DEBUG: veFiltered(i): i is array = ${V.isArray(i)}, i is error = ${V.isError(i)}, details (JSON) = ${JSON.stringify(i)}`) // TODO: temp ...
       return (V.isArray(i) || V.isError(i))
-      // TODO: maybe check if/how to do flat map here ... wip
-    })
+    }).reduce((acc, x) => acc.concat(x), []) // same as flatMap (available only in newer releases)
 
     return veFiltered
   }
