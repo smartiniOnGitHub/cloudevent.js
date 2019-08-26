@@ -257,13 +257,6 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   // additional test, ensure that all instances returned (only valid), are CloudEvent instances
   const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, strict: false })
   t.ok(eventsGot.every((i) => CloudEvent.isCloudEvent(i)))
-  /*
-  // TODO: temp ...
-  console.log(`get events (onlyValid, strict) = ${JSON.stringify(eventsGot)}`)
-  for (const i of eventsGot) {
-    console.log(`  event i = ${JSON.stringify(i)}, is a CloudEvent instance = ${CloudEvent.isCloudEvent(i)}`)
-  }
-   */
   // test with other instances returned (filtered in a different way)
   t.ok(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).every((i) => CloudEvent.isCloudEvent(i)))
 })
