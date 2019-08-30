@@ -103,7 +103,7 @@ class JSONBatch {
 
     const veFiltered = ve.filter((i) => {
       return (V.isArray(i) || V.isError(i))
-    }).reduce((acc, x) => acc.concat(x), []) // same as flatMap (available only in newer releases)
+    }).reduce((acc, x) => acc.concat(x), []) // same as flat/flatMap
 
     return veFiltered
   }
