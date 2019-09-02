@@ -140,6 +140,39 @@ class JSONBatch {
   }
 
   /**
+   * Generator to iterate across all CloudEvent instances in the JSONBatch.
+   *
+   * @static
+   * @param {!object} batch the JSONBatch to iterate
+   * @param {object} options optional processing attributes:
+   *        onlyValid (boolean, default false) to extract only valid instances
+   *        strict (boolean, default false) to validate it in a more strict way
+   * @return {object} a CloudEvent (if any)
+   * @throws {Error} if batch is undefined or null
+   * @throws {TypeError} if batch is not a JSONBatch
+   */
+  static * getEvent (batch, {
+    onlyValid = false,
+    strict = false
+  } = {}) {
+    if (!JSONBatch.isJSONBatch(batch)) {
+      throw new TypeError('The given batch is not a JSONBatch')
+    }
+
+    const itemsFiltered = batch.filter((i) => V.isDefinedAndNotNull(i) && CloudEvent.isCloudEvent(i))
+    for (const i of itemsFiltered) {
+      if (onlyValid === false) {
+        yield i
+      } else {
+        // return only if it's a valid instance
+        if (CloudEvent.isValidEvent(i, { strict })) {
+          yield i
+        }
+      }
+    }
+  }
+
+  /**
    * Return any not null CloudEvent instance from the given object.
    *
    * @static
@@ -160,6 +193,8 @@ class JSONBatch {
     }
 
     const ce = [] // CloudEvent instances
+    /*
+    // TODO: remove and use getEvent ... ok
     const itemsFiltered = batch.filter((i) => V.isDefinedAndNotNull(i) && CloudEvent.isCloudEvent(i))
     if (onlyValid === false) {
       // return all items filtered
@@ -174,6 +209,11 @@ class JSONBatch {
         }
       }).filter((i) => V.isDefinedAndNotNull(i)) // remove empty items
       ce.push(...itemsValid)
+    }
+     */
+    // get values from the generator function, to simplify logic here
+    for (const val of JSONBatch.getEvent(batch, { onlyValid, strict })) {
+      ce.push(val)
     }
 
     return ce
