@@ -193,24 +193,6 @@ class JSONBatch {
     }
 
     const ce = [] // CloudEvent instances
-    /*
-    // TODO: remove and use getEvent ... ok
-    const itemsFiltered = batch.filter((i) => V.isDefinedAndNotNull(i) && CloudEvent.isCloudEvent(i))
-    if (onlyValid === false) {
-      // return all items filtered
-      ce.push(...itemsFiltered)
-    } else {
-      // return only valid instances
-      const itemsValid = itemsFiltered.map((i) => {
-        const ceValidation = CloudEvent.validateEvent(i, { strict })
-        if (ceValidation.length === 0) {
-          // return only instances without validation errors
-          return i
-        }
-      }).filter((i) => V.isDefinedAndNotNull(i)) // remove empty items
-      ce.push(...itemsValid)
-    }
-     */
     // get values from the generator function, to simplify logic here
     for (const val of JSONBatch.getEvent(batch, { onlyValid, strict })) {
       ce.push(val)
