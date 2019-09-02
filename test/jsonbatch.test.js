@@ -263,7 +263,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on plain object and even CloudEvent instance and CloudEvent subclasses and not', (t) => {
-  t.plan(32)
+  t.plan(33)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -324,6 +324,15 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.strictSame(JSONBatch.validateBatch(plainObject).length, 1)
   t.strictSame(JSONBatch.validateBatch(plainObject, { strict: true }).length, 1)
   t.notOk(JSONBatch.isJSONBatch(plainObject))
+  t.throws(function () {
+    const ce = [] // CloudEvent instances
+    // get values from the generator function
+    for (const event of JSONBatch.getEvent(plainObject, { })) {
+      assert(event === null) // never executed
+      ce.push(event) // never executed
+    }
+    assert(ce.length === 0) // never executed
+  }, Error, 'Expected exception when trying to get an event from a bad JSONBatch')
   t.throws(function () {
     const eventsGot = JSONBatch.getEvents(plainObject)
     assert(eventsGot === null) // never executed
