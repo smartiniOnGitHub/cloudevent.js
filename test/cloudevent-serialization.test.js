@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
-  t.plan(7)
+  t.plan(9)
 
   {
     const { CloudEvent } = require('../src/') // get references via destructuring
@@ -40,6 +40,12 @@ test('ensure serialization functions exists (check only the static method here)'
     assert(typeof ceSerialize === 'function')
     t.ok(ceSerialize)
     t.strictEqual(typeof ceSerialize, 'function')
+
+    const ceDeserialize = CloudEvent.deserializeEvent
+    assert(ceDeserialize !== null)
+    assert(typeof ceDeserialize === 'function')
+    t.ok(ceDeserialize)
+    t.strictEqual(typeof ceDeserialize, 'function')
   }
 })
 
