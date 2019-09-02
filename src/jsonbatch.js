@@ -201,7 +201,42 @@ class JSONBatch {
     return ce
   }
 
-  // TODO: implement other features ... wip
+  /**
+   * Serialize the given JSONBatch in JSON format.
+   * Note that standard CloudEvent serialization will be called
+   * for any CloudEvent instance, nothing other;
+   * so options are the same used in CloudEvent related method.
+   *
+   * See {@link CloudEvent.serializeEvent}.
+   *
+   * @static
+   * @param {!object[]} batch the JSONBatch (so a CloudEvent array instance) to serialize
+   * @param {object} options optional serialization attributes
+   * @return {string} the serialized JSONBatch, as a string
+   * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
+   */
+  static serializeEvents (batch, options = {}) {
+    // TODO: implement ... wip
+  }
+
+  /**
+   * Deserialize/parse the given JSONBatch from JSON format.
+   * Note that standard CloudEvent deserialization will be called
+   * for any CloudEvent instance, nothing other;
+   * so options are the same used in CloudEvent related method.
+   *
+   * See {@link CloudEvent.deserializeEvent}.
+   *
+   * @static
+   * @param {!string} ser the serialized JSONBatch to parse/deserialize
+   * @param {object} options optional deserialization attributes
+   * @return {object[]} the deserialized batch as a JSONBatch (so a CloudEvent array instance)
+   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
+   * @throws {Error} in case of JSON parsing error
+   */
+  static deserializeEvents (batch, options = {}) {
+    // TODO: implement ... wip
+  }
 }
 
 module.exports = JSONBatch
