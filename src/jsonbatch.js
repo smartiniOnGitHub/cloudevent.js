@@ -214,9 +214,23 @@ class JSONBatch {
    * @param {object} options optional serialization attributes
    * @return {string} the serialized JSONBatch, as a string
    * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
+   * @throws {TypeError} if batch is not a JSONBatch
    */
   static serializeEvents (batch, options = {}) {
-    // TODO: implement ... wip
+    if (!JSONBatch.isJSONBatch(batch)) {
+      throw new TypeError('The given batch is not a JSONBatch')
+    }
+
+    let ser = '[ ' // serialized CloudEvent instances
+    // get values from the generator function, to simplify logic here
+    for (const val of JSONBatch.getEvent(batch, options)) {
+      ser = ser + JSONBatch.serializeEvent(val, options) + ', '
+    }
+    ser = ser + ' ]'
+    console.log(`ser = \n${ser}`) // TODO: temp ...
+
+    return ser
+    // TODO: check if right ... wip
   }
 
   /**
@@ -231,11 +245,15 @@ class JSONBatch {
    * @param {!string} ser the serialized JSONBatch to parse/deserialize
    * @param {object} options optional deserialization attributes
    * @return {object[]} the deserialized batch as a JSONBatch (so a CloudEvent array instance)
-   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
+   * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    */
-  static deserializeEvents (batch, options = {}) {
-    // TODO: implement ... wip
+  static deserializeEvents (ser, options = {}) {
+    if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
+
+    // TODO: remove JSON array delimiters, get any serialized CloudEvent and parse with specific deserialization method ... wip
+
+    // TODO: check if right ... wip
   }
 }
 
