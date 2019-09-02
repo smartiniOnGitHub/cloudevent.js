@@ -506,7 +506,7 @@ class CloudEvent {
    *        onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
    *        timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object} the deserialized event as a CloudEvent instance
-   * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
+   * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    */
   static deserializeEvent (ser, {
