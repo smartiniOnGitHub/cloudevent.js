@@ -124,7 +124,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   {
     // undefined
     const arg = undefined
-    t.notOk()
+    t.notOk(arg)
     t.notOk(JSONBatch.isValidBatch())
     t.strictSame(JSONBatch.validateBatch(), [new Error('JSONBatch undefined or null')])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
@@ -133,7 +133,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   {
     // null
     const arg = null
-    t.notOk(null)
+    t.notOk(arg)
     t.notOk(JSONBatch.isValidBatch(arg))
     t.strictSame(JSONBatch.validateBatch(arg), [new Error('JSONBatch undefined or null')])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)

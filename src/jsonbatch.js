@@ -212,6 +212,9 @@ class JSONBatch {
    * @static
    * @param {!object[]} batch the JSONBatch (so a CloudEvent array instance) to serialize
    * @param {object} options optional serialization attributes
+   *        Additional options valid here:
+   *        logError (boolean, default false) to log to console serialization errors
+   *        throwError (boolean, default false) to throw serialization errors
    * @return {string} the serialized JSONBatch, as a string
    * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
    * @throws {TypeError} if batch is not a JSONBatch
@@ -221,16 +224,34 @@ class JSONBatch {
       throw new TypeError('The given batch is not a JSONBatch')
     }
 
-    let ser = '[ ' // serialized CloudEvent instances
+    let ser = '[' // serialized CloudEvent instances
+    let num = 0 // number of serialized CloudEvent
+
     // get values from the generator function, to simplify logic here
     for (const val of JSONBatch.getEvent(batch, options)) {
-      ser = ser + JSONBatch.serializeEvent(val, options) + ', '
+      num++
+      ser += ((num > 1) ? ', ' : '')
+      ser += ((options.prettyPrint === true) ? '\n' : '')
+      try {
+        ser += JSONBatch.serializeEvent(val, options)
+      } catch (e) {
+        if (options.logError === true) {
+          console.error(e)
+        } else if (options.throwError === true) {
+          const msg = `Unable to serialize CloudEvent instance number ${num}, error detail: ${e.message}`
+          throw new Error(msg)
+        }
+      }
     }
-    ser = ser + ' ]'
+
+    if (options.prettyPrint === true) {
+      ser += '\n'
+    }
+    ser += ']'
     console.log(`ser = \n${ser}`) // TODO: temp ...
 
     return ser
-    // TODO: check if right ... wip
+    // TODO: check if JSON is right ... wip
   }
 
   /**
@@ -252,8 +273,21 @@ class JSONBatch {
     if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
 
     // TODO: remove JSON array delimiters, get any serialized CloudEvent and parse with specific deserialization method ... wip
+    /*
+    // TODO: check if something like this could work: ... probably not, but good to know
+    var json = `[ { "data":"Test", "null_data": null, "result":true, "count":42 } , {} ]`
 
-    // TODO: check if right ... wip
+    obj = JSON.parse(json, (key, value) => {
+      if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+        console.log('object found: ' + (value !== null) ? JSON.stringify(value) : null) // TODO: temp …
+        return value
+      }
+      return value
+    })
+    console.log('Parsed object = ' + obj)
+     */
+
+    // TODO: check if this implementation is right ... wip
   }
 }
 
