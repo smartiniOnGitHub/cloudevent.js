@@ -18,6 +18,41 @@
 const assert = require('assert').strict
 const test = require('tap').test
 
+/** create some common options, for better reuse in tests */
+const ceCommonOptions = {
+  time: new Date(),
+  datacontenttype: 'application/json',
+  schemaurl: 'http://my-schema.localhost.localdomain',
+  strict: false
+}
+/** create some common options with strict flag enabled, for better reuse in tests */
+const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+/** create some common extensions, for better reuse in tests */
+const ceCommonExtensions = { exampleExtension: 'value' }
+/** create a sample namespace for events here, for better reuse in tests */
+const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
+/** create a sample common server URL, for better reuse in tests */
+const ceServerUrl = '/test'
+/** create some common data from an object, for better reuse in tests */
+const ceCommonData = { hello: 'world', year: 2019 }
+/** create some common data from a Map, for better reuse in tests */
+const ceMapData = new Map() // empty Map
+// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
+ceMapData.set('key-1', 'value 1')
+ceMapData.set('key-2', 'value 2')
+/** create a sample string big (more than 64 KB) */
+const ceBigStringLength = 100000
+const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
+
+// sample function to calculate a random string, given the length, to use in tests here
+function getRandomString (length) {
+  let str = Math.random().toString(36).substr(2)
+  while (str.length < length) {
+    str += Math.random().toString(36).substr(2)
+  }
+  return str.substr(0, length)
+}
+
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
   t.plan(12)
@@ -154,7 +189,69 @@ test('ensure serialization functions works good on undefined and null arguments,
 
 /** @test {CloudEvent} */
 test('ensure serialization functions works in the right way', (t) => {
-  t.plan(0)
+  t.plan(3)
+  const { CloudEvent, JSONBatch } = require('../src/')
+  t.ok(JSONBatch)
 
-  // TODO: in progress ... wip
+  const ceFull = new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData,
+    'sample data', // data as string, to let this ce instance have some strict validation errors
+    ceCommonOptions,
+    // ceCommonExtensions
+    {} // extensions as empty object, to let this ce instance have some strict validation errors
+  )
+  const ceFullStrict = new CloudEvent('1/full-strict',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData,
+    ceCommonOptionsStrict,
+    ceCommonExtensions
+  )
+  // test even when a bad (not valid) instance is inside the array
+  const ceFullBad = new CloudEvent(null,
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData, // data
+    { random: ceBigString }, // data
+    ceCommonOptions,
+    ceCommonExtensions
+  )
+  // define an array containing different CloudEvent instances, and even other objects ...
+  const arr = [
+    undefined,
+    null,
+    'string',
+    1234567890,
+    false,
+    true,
+    ceFull,
+    new Date(),
+    {},
+    [],
+    ceFullStrict,
+    null,
+    undefined,
+    ceFullBad
+  ]
+
+  // in following tests to simplify comparison of results, do only some brief checks ...
+  const ser = JSONBatch.serializeEvents(arr, { prettyPrint: true, logError: true })
+  // console.log(`DEBUG: serializer JSONBatch (prettyPrint enabled) = ${ser}`)
+  assert(ser !== null)
+  t.ok(ser)
+
+  t.throws(function () {
+    const serNoBig = JSONBatch.serializeEvents(arr, {
+      // prettyPrint: true,
+      logError: true,
+      throwError: true,
+      // onlyValid: true, // commented otherwise it will be filtered out by getEvents ...
+      onlyIfLessThan64KB: true // to force throw here ...
+    })
+    assert(serNoBig === null) // never executed
+  }, Error, 'No serialization here due to selected flags (and a big instance) ...')
+
+  // TODO: add test for deserialization ... wip
 })

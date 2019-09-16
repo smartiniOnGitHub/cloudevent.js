@@ -229,15 +229,16 @@ class JSONBatch {
 
     // get values from the generator function, to simplify logic here
     for (const val of JSONBatch.getEvent(batch, options)) {
-      num++
-      ser += ((num > 1) ? ', ' : '')
+      ser += ((num > 0) ? ', ' : '')
       ser += ((options.prettyPrint === true) ? '\n' : '')
       try {
-        ser += JSONBatch.serializeEvent(val, options)
+        ser += CloudEvent.serializeEvent(val, options)
+        num++
       } catch (e) {
         if (options.logError === true) {
           console.error(e)
-        } else if (options.throwError === true) {
+        }
+        if (options.throwError === true) {
           const msg = `Unable to serialize CloudEvent instance number ${num}, error detail: ${e.message}`
           throw new Error(msg)
         }
@@ -248,10 +249,8 @@ class JSONBatch {
       ser += '\n'
     }
     ser += ']'
-    console.log(`ser = \n${ser}`) // TODO: temp ...
 
     return ser
-    // TODO: check if JSON is right ... wip
   }
 
   /**
