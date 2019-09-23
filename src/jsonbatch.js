@@ -264,29 +264,76 @@ class JSONBatch {
    * @static
    * @param {!string} ser the serialized JSONBatch to parse/deserialize
    * @param {object} options optional deserialization attributes
+   *        Additional options valid here:
+   *        logError (boolean, default false) to log to console deserialization errors
+   *        throwError (boolean, default false) to throw serialization errors
    * @return {object[]} the deserialized batch as a JSONBatch (so a CloudEvent array instance)
    * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
+   * @throws {TypeError} if ser is not a JSONBatch representation
    */
   static deserializeEvents (ser, options = {}) {
     if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
 
-    // TODO: remove JSON array delimiters, get any serialized CloudEvent and parse with specific deserialization method ... wip
-    /*
-    // TODO: check if something like this could work: ... probably not, but good to know
-    var json = `[ { "data":"Test", "null_data": null, "result":true, "count":42 } , {} ]`
-
-    obj = JSON.parse(json, (key, value) => {
-      if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
-        console.log('object found: ' + (value !== null) ? JSON.stringify(value) : null) // TODO: temp …
-        return value
+    // first deserialize to normal object instances
+    let deser = null
+    try {
+      deser = JSON.parse(ser)
+    } catch (e) {
+      if (options.logError === true) {
+        console.error(e)
       }
-      return value
-    })
-    console.log('Parsed object = ' + obj)
-     */
+      if (options.throwError === true) {
+        const msg = `Unable to deserialize the given string to JSONBatch, error detail: ${e.message}`
+        throw new Error(msg)
+      }
+    }
+    if (!V.isArray(deser)) {
+      throw new TypeError('The given string is not an array representation')
+    }
 
-    // TODO: check if this implementation is right ... wip
+    // then build CloudEvent instances from any not null object that seems compatible
+    const itemsFiltered = deser.filter((i) => V.isDefinedAndNotNull(i) && V.isObjectPlain(i))
+    // console.log(`DEBUG: deser (filtered) = ${JSON.stringify(itemsFiltered)}`) // TODO: ... wip
+    const batch = []
+    let num = 0 // number of created CloudEvent
+    for (const i of itemsFiltered) {
+      // create a CloudEvent instance from the current object (if possible)
+      try {
+        // batch.push(i) // TODO: temp, just to start here ... wip
+        const extensions = null // TODO: handle extensions, etc ... wip
+        const ce = new CloudEvent(i.id, i.type, i.source, i.data, {
+          time: i.time,
+          datacontentencoding: i.datacontentencoding,
+          datacontenttype: i.datacontenttype,
+          schemaurl: i.schemaurl,
+          subject: i.subject,
+          strict: i.strict
+        },
+        extensions
+        )
+        if (V.isUndefinedOrNull(options.onlyValid) ||
+          options.onlyValid === false ||
+          (options.onlyValid === true && CloudEvent.isValidEvent(ce, { strict: options.strict }))
+        ) {
+          batch.push(ce)
+          num++
+        }
+      } catch (e) {
+        if (options.logError === true) {
+          console.error(e)
+        }
+        if (options.throwError === true) {
+          const msg = `Unable to create CloudEvent instance number ${num}, error detail: ${e.message}`
+          throw new Error(msg)
+        }
+      }
+    }
+
+    if (!JSONBatch.isJSONBatch(batch)) {
+      throw new TypeError('The given string is not a JSONBatch representation')
+    }
+    return batch
   }
 }
 

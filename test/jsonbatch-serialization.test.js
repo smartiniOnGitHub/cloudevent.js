@@ -95,7 +95,7 @@ test('ensure serialization functions exists (check only the static method here)'
 
 /** @test {JSONBatch} */
 test('ensure serialization functions works good on undefined and null arguments, and even on empty and bad ones', (t) => {
-  t.plan(17)
+  t.plan(20)
   const { JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -134,11 +134,19 @@ test('ensure serialization functions works good on undefined and null arguments,
       const deser = JSONBatch.deserializeEvents(arg)
       assert(deser === null) // never executed
     }, Error, 'Missing or wrong serialized data ...')
+    // deserialize a string containing only an empty array
+    const deser = JSONBatch.deserializeEvents(JSON.stringify(arg))
+    t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
   }
   {
     // empty array with prettyPrint enabled
     const arg = []
-    t.strictSame(JSONBatch.serializeEvents(arg, { prettyPrint: true }), '[\n]')
+    const ser = JSONBatch.serializeEvents(arg, { prettyPrint: true })
+    const expectedSer = '[\n]'
+    t.strictSame(ser, expectedSer)
+    // deserialize a string containing only an empty array
+    const deser = JSONBatch.deserializeEvents(expectedSer)
+    t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
   }
   {
     // empty object (not a CloudEvent/subclass instance)
@@ -159,7 +167,10 @@ test('ensure serialization functions works good on undefined and null arguments,
       const ser = JSONBatch.serializeEvents(arg)
       assert(ser === null) // never executed
     }, TypeError, 'The given batch is not a JSONBatch')
-    // TODO: add test for deserialization; then even for empty string ... wip
+    t.throws(function () {
+      const deser = JSONBatch.deserializeEvents(arg)
+      assert(deser === null) // never executed
+    }, TypeError, 'The given string is not an array representation')
   }
   {
     // bad object type
@@ -189,7 +200,7 @@ test('ensure serialization functions works good on undefined and null arguments,
 
 /** @test {CloudEvent} */
 test('ensure serialization functions works in the right way', (t) => {
-  t.plan(3)
+  t.plan(5)
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -238,7 +249,7 @@ test('ensure serialization functions works in the right way', (t) => {
 
   // in following tests to simplify comparison of results, do only some brief checks ...
   const ser = JSONBatch.serializeEvents(arr, { prettyPrint: true, logError: true })
-  // console.log(`DEBUG: serializer JSONBatch (prettyPrint enabled) = ${ser}`)
+  // console.log(`DEBUG: serialized JSONBatch (prettyPrint enabled) = ${ser}`)
   assert(ser !== null)
   t.ok(ser)
 
@@ -253,5 +264,14 @@ test('ensure serialization functions works in the right way', (t) => {
     assert(serNoBig === null) // never executed
   }, Error, 'No serialization here due to selected flags (and a big instance) ...')
 
-  // TODO: add test for deserialization ... wip
+  const deser = JSONBatch.deserializeEvents(ser, {
+    logError: true,
+    throwError: true,
+    onlyValid: true // sample, to filter out not valid serialized instances ...
+    // onlyIfLessThan64KB: true // to force throw here ...
+  })
+  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${deser}`)
+  assert(deser !== null)
+  t.ok(deser)
+  t.strictSame(deser.length, 2)
 })
