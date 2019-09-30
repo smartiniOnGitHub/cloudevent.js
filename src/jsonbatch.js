@@ -307,7 +307,7 @@ class JSONBatch {
           datacontenttype: i.datacontenttype,
           schemaurl: i.schemaurl,
           subject: i.subject,
-          strict: CloudEvent.getStrictExtensionOfEvent(i)
+          strict: CloudEvent.getStrictExtensionOfEvent(i) || options.strict
         },
         extensions
         )
@@ -329,9 +329,6 @@ class JSONBatch {
       }
     }
 
-    if (!JSONBatch.isJSONBatch(batch)) {
-      throw new TypeError('The given string is not a JSONBatch representation')
-    }
     return batch
   }
 }

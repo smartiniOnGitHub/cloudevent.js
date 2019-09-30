@@ -478,3 +478,25 @@ test('ensure validation functions on standard properties are right', (t) => {
   t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ property: 'value' }, isPropStandard, 'test'), undefined) // no error returned
   t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard, 'test') instanceof Error, true) // expected error returned
 })
+
+/** @test {Validator} */
+test('ensure validation functions to filter bad object instances raise exceptions', (t) => {
+  t.plan(3)
+
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(V)
+
+  // sample function that tell if the given property name is standard
+  function isPropStandard (prop) {
+    return prop === 'standard'
+  }
+
+  t.throws(function () {
+    const objFiltered = V.getObjectFilteredProperties([], isPropStandard)
+    assert(objFiltered !== null) // never executed
+  }, Error, 'Expected exception when trying to filter not a plain object')
+  t.throws(function () {
+    const objFiltered = V.getObjectFilteredProperties({}, 'isPropStandard')
+    assert(objFiltered !== null) // never executed
+  }, Error, 'Expected exception when trying to filter a plain object but with a wrong filtering function')
+})

@@ -200,7 +200,7 @@ test('ensure serialization functions works good on undefined and null arguments,
 
 /** @test {CloudEvent} */
 test('ensure serialization functions works in the right way', (t) => {
-  t.plan(12)
+  t.plan(19)
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -290,4 +290,44 @@ test('ensure serialization functions works in the right way', (t) => {
   t.strictSame(events.length, deser.length)
   events.forEach((e, i) => t.ok(e.id === deser[i].id)) // this count events.length tests ...
   events.forEach((e, i) => t.ok(e.isStrict === deser[i].isStrict)) // this count events.length tests ...
+
+  t.throws(function () {
+    const deserNoWrongArray = JSONBatch.deserializeEvents('[,]', {})
+    assert(deserNoWrongArray === null) // never executed
+  }, Error, 'No deserialization here due to selected flags (and a bad deserialization string) ...')
+
+  const deserNoWrong = JSONBatch.deserializeEvents('["x"]', {})
+  assert(deserNoWrong !== null)
+  t.ok(deserNoWrong)
+  t.strictSame(deserNoWrong.length, 0)
+
+  t.throws(function () {
+    const deserNoWrongArrayRaiseError = JSONBatch.deserializeEvents('[,]', {
+      logError: true,
+      throwError: true
+    })
+    assert(deserNoWrongArrayRaiseError === null) // never executed
+  }, Error, 'No deserialization here due to selected flags (and a bad deserialization string) ...')
+
+  const eventsEvenBad = JSONBatch.getEvents(arr, {})
+  const serEventsEvenBad = JSONBatch.serializeEvents(eventsEvenBad, {})
+  const deserStrict = JSONBatch.deserializeEvents(serEventsEvenBad, {
+    onlyValid: true, // sample, to filter out not valid serialized instances ...
+    // onlyIfLessThan64KB: true, // to force throw here ...
+    strict: true // to force strict validation ...
+  })
+  assert(deserStrict !== null)
+  t.ok(deserStrict)
+  t.strictSame(deserStrict.length, 1)
+
+  t.throws(function () {
+    const deserStrictRaiseError = JSONBatch.deserializeEvents(serEventsEvenBad, {
+      logError: true,
+      throwError: true,
+      onlyValid: true, // sample, to filter out not valid serialized instances ...
+      // onlyIfLessThan64KB: true, // to force throw here ...
+      strict: true // to force strict validation ...
+    })
+    assert(deserStrictRaiseError === null) // never executed
+  }, Error, 'No deserialization here due to selected flags (and errors in deserialization content) ...')
 })
