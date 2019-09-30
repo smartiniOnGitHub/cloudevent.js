@@ -300,10 +300,6 @@ class JSONBatch {
       // create a CloudEvent instance from the current object (if possible)
       try {
         const extensions = V.getObjectFilteredProperties(i, CloudEvent.isExtensionProperty)
-        // console.log(`DEBUG: i = ${JSON.stringify(i)}`) // TODO: ... wip
-        console.log(`DEBUG: i is strict = ${CloudEvent.getStrictExtensionOfEvent(i)}`) // TODO: ... wip
-        console.log(`DEBUG: extensions = ${JSON.stringify(extensions)}`) // TODO: ... wip
-        // TODO: handle extensions (maybe add only to the strict one in test data) ... wip
         // note that strict is handleg both as strict and inside extensions, but it's good the same
         const ce = new CloudEvent(i.id, i.type, i.source, i.data, {
           time: i.time,
@@ -319,8 +315,6 @@ class JSONBatch {
           options.onlyValid === false ||
           (options.onlyValid === true && CloudEvent.isValidEvent(ce, { strict: options.strict }))
         ) {
-          console.log(`DEBUG: valid ce built = ${JSON.stringify(ce)}`) // TODO: ... wip
-          console.log(`DEBUG: ce is strict = ${CloudEvent.getStrictExtensionOfEvent(ce)}`) // TODO: ... wip
           batch.push(ce)
           num++
         }

@@ -923,13 +923,10 @@ class Validator {
     if (!Validator.isFunction(propFilter)) throw new TypeError(`The argument 'propFilter' must be a function, instead got a '${typeof propFilter}'`)
     const objFiltered = {}
     for (const [key, value] of Object.entries(obj)) {
-      // console.log(`DEBUG: ${key}: ${value}`) // TODO: temp ... wip
       if (propFilter(key) === true) {
         objFiltered[key] = value
-        console.log(`DEBUG: prop = ${key} added, so objFiltered.${key} = ${objFiltered.key}`) // TODO: temp ... wip
       }
     }
-    console.log(`DEBUG: objFiltered = ${JSON.stringify(objFiltered)}`) // TODO: temp ... wip
     return objFiltered
   }
 }
