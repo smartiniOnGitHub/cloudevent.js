@@ -200,7 +200,7 @@ test('ensure serialization functions works good on undefined and null arguments,
 
 /** @test {CloudEvent} */
 test('ensure serialization functions works in the right way', (t) => {
-  t.plan(5)
+  t.plan(12)
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -264,14 +264,30 @@ test('ensure serialization functions works in the right way', (t) => {
     assert(serNoBig === null) // never executed
   }, Error, 'No serialization here due to selected flags (and a big instance) ...')
 
+  const events = JSONBatch.getEvents(arr, {
+    onlyValid: true,
+    strict: false
+  })
+  // console.log(`DEBUG: events JSONBatch length = ${events.length}, summary: ${events}`)
+  // console.log(`DEBUG: events JSONBatch length = ${events.length}, details: ${JSON.stringify(events)}`)
+  assert(events !== null)
+  t.ok(events)
+  t.strictSame(events.length, 2)
+
   const deser = JSONBatch.deserializeEvents(ser, {
     logError: true,
     throwError: true,
     onlyValid: true // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true // to force throw here ...
   })
-  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${deser}`)
+  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
+  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
   assert(deser !== null)
   t.ok(deser)
   t.strictSame(deser.length, 2)
+
+  // ensure events and deser contains similar CloudEvent instances
+  t.strictSame(events.length, deser.length)
+  events.forEach((e, i) => t.ok(e.id === deser[i].id)) // this count events.length tests ...
+  events.forEach((e, i) => t.ok(e.isStrict === deser[i].isStrict)) // this count events.length tests ...
 })
