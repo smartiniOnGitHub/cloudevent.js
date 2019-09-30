@@ -811,7 +811,7 @@ class Validator {
    * @static
    * @param {object} arg the object to check
    * @return {number} the size if it's an array|Map|Set|object|string, nothing otherwise
-   * @return {TypeError} if it's not an array nor a collection nor object nor a string, nothing otherwise
+   * @throws {TypeError} if it's not an array nor a collection nor object nor a string
    */
   static getSize (arg) {
     if ((arg === undefined || arg === null)) {
@@ -836,7 +836,7 @@ class Validator {
    * @static
    * @param {string} str the string to check
    * @return {number} the size if it's a string, nothing otherwise
-   * @return {TypeError} if it's not a string, nothing otherwise
+   * @throws {TypeError} if it's not a string
    */
   static getSizeInBytes (str) {
     if ((str === undefined || str === null)) {
@@ -906,6 +906,31 @@ class Validator {
     }
     // else
     return def
+  }
+
+  /**
+   * Return a copy of the given ibject,
+   * with all properties filtered by the given function (predicate).
+   *
+   * @static
+   * @param {object} obj the base object
+   * @param {function} propFilter the function (predicate) for filtering properties
+   * @return {object} a new object containing only filtered properties
+   * @throws {TypeError} if obj is not a plain object, or propFilter is not a function
+   */
+  static getObjectFilteredProperties (obj, propFilter) {
+    if (!Validator.isObjectPlain(obj)) throw new TypeError(`The argument 'obj' must be a plain object, instead got a '${typeof obj}'`)
+    if (!Validator.isFunction(propFilter)) throw new TypeError(`The argument 'propFilter' must be a function, instead got a '${typeof propFilter}'`)
+    const objFiltered = {}
+    for (const [key, value] of Object.entries(obj)) {
+      // console.log(`DEBUG: ${key}: ${value}`) // TODO: temp ... wip
+      if (propFilter(key) === true) {
+        objFiltered[key] = value
+        console.log(`DEBUG: prop = ${key} added, so objFiltered.${key} = ${objFiltered.key}`) // TODO: temp ... wip
+      }
+    }
+    console.log(`DEBUG: objFiltered = ${JSON.stringify(objFiltered)}`) // TODO: temp ... wip
+    return objFiltered
   }
 }
 

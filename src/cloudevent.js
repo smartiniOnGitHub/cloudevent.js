@@ -273,7 +273,7 @@ class CloudEvent {
       throw new TypeError('The given extensions is not an object instance')
     }
     const myExtensions = obj.com_github_smartiniOnGitHub_cloudevent || {}
-    if (!V.isObject(myExtensions)) {
+    if (!V.isObjectPlain(myExtensions)) {
       throw new TypeError('The property com_github_smartiniOnGitHub_cloudevent is not an object instance')
     }
     const strict = myExtensions.strict || false
@@ -581,6 +581,17 @@ class CloudEvent {
    */
   static isStandardProperty (property) {
     return CloudEvent.standardProps.includes(property)
+  }
+
+  /**
+   * Tell the given property, if it's an extension CloudEvent property/attribute.
+   *
+   * @static
+   * @param {!string} property the property/attribute to check
+   * @return {boolean} true if it's an extension (not standard) otherwise false
+   */
+  static isExtensionProperty (property) {
+    return !CloudEvent.standardProps.includes(property)
   }
 
   /**
