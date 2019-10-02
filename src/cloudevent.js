@@ -737,14 +737,20 @@ class CloudEvent {
   }
 
   /**
-   * Override the usual toString method.
+   * Override the usual toString method,
+   * to show a summary (only some info) on current instance.
+   * Note that the representation of the 'data' attribute is
+   * limited to 1024 chars (arbitrary limit, set here including the trim marker),
+   * to avoid too much overhead with instances with a big 'data' attribute.
    *
    * See {@link Object.toString}.
    *
    * @return {string} a string representation for object instance
    */
   toString () {
-    return `CloudEvent[specversion: ${this.specversion}, ${T.dumpObject(this.id, 'id')}, ${T.dumpObject(this.type, 'type')}, ${T.dumpObject(this.data, 'data')}, ...]`
+    const dataDumped = T.dumpObject(this.data, 'data')
+    const dataSummary = (dataDumped.length < 1024) ? dataDumped : (dataDumped.substr(0, 1019) + ' ...}')
+    return `CloudEvent[specversion: ${this.specversion}, ${T.dumpObject(this.id, 'id')}, ${T.dumpObject(this.type, 'type')}, ${dataSummary}, ...]`
   }
 
   /**
