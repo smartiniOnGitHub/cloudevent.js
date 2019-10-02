@@ -64,10 +64,10 @@ class Transformer {
       return `${name}: undefined`
     } else if (V.isNull(obj)) {
       return `${name}: null`
-    } else if (!V.isObjectOrCollection(obj)) {
-      return `${name}: '${obj.toString()}'`
-    } else {
+    } else if (V.isObject(obj) || V.isKeyedCollection(obj)) {
       return `${name}: ${JSON.stringify(obj)}`
+    } else {
+      return `${name}: '${obj.toString()}'`
     }
   }
 
