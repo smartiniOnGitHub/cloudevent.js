@@ -248,7 +248,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(JSONBatch.isJSONBatch(arr))
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
   t.strictSame(JSONBatch.validateBatch(arr, { strict: false }).length, 7)
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 9)
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 8)
   t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 2) // no filtering
   t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: false }).length, 2) // both are valid
   t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: true }).length, 1) // only one is valid in strict mode
@@ -293,7 +293,7 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.ok(V.isClass(V.ensureIsClass(ceFull, NotCESubclass, 'ceFull'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFull).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFull, { strict: true }).length, 3)
+  t.strictSame(JSONBatch.validateBatch(ceFull, { strict: true }).length, 2)
   t.notOk(JSONBatch.isJSONBatch(ceFull))
 
   const ceFullSubclass = new CESubclass('1/full/subclass',
@@ -316,7 +316,7 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.ok(V.isClass(V.ensureIsClass(ceFullSubclass, NotCESubclass, 'ceFullSubclass'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFullSubclass).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, { strict: true }).length, 3)
+  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, { strict: true }).length, 2)
   t.notOk(JSONBatch.isJSONBatch(ceFullSubclass))
 
   // try even with a plain object

@@ -122,7 +122,7 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
-  t.plan(12)
+  t.plan(13)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -138,8 +138,9 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.strictSame(CloudEvent.validateEvent(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
     // the same but using normal instance methods, to ensure they works good ...
     t.ok(!ceEmpty.isValid())
-    t.strictSame(ceEmpty.validate(ceEmpty).length, 3) // simplify comparison of results, check only the  number of expected errors ...
+    t.strictSame(ceEmpty.validate().length, 3) // simplify comparison of results, check only the  number of expected errors ...
     t.ok(!ceEmpty.isStrict)
+    t.strictSame(ceEmpty.validate({ strict: true }).length, 5) // simplify comparison of results, check only the  number of expected errors ...
   }
 
   {
@@ -302,7 +303,7 @@ test('ensure strict mode is managed in the right way', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure extensions are managed in the right way', (t) => {
-  t.plan(18)
+  t.plan(19)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -321,13 +322,13 @@ test('ensure extensions are managed in the right way', (t) => {
     assert(true) // never executed
   }, TypeError, 'Expected exception when setting bad extensions into an object')
 
-  t.ok(CloudEvent.getExtensionsOfEvent()) // empty object as return value
-  t.ok(CloudEvent.getExtensionsOfEvent(undefined)) // empty object as return value
+  t.notOk(CloudEvent.getExtensionsOfEvent()) // null as return value
+  t.notOk(CloudEvent.getExtensionsOfEvent(undefined)) // null as return value
   t.throws(function () {
     CloudEvent.getExtensionsOfEvent(null)
     assert(true) // never executed
   }, TypeError, 'Expected exception when getting extensions from a null object')
-  t.ok(CloudEvent.getExtensionsOfEvent({})) // empty object as return value
+  t.notOk(CloudEvent.getExtensionsOfEvent({})) // null as return value
   t.ok(CloudEvent.getExtensionsOfEvent(sampleExtensions))
   t.throws(function () {
     CloudEvent.getExtensionsOfEvent('bad extension')
@@ -357,6 +358,17 @@ test('ensure extensions are managed in the right way', (t) => {
     )
     assert(ceFullStrict === undefined) // never executed
   }, Error, 'Expected exception when creating a CloudEvent with extensions containing standard prioperties, in strict mode')
+  // ensure no instance will be created if extensions are defined but empty (not valid in strict mode)
+  t.throws(function () {
+    const ceFullStrictEmptyExtensions = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData,
+      ceCommonOptionsStrict,
+      {} // defined but empty extensions (null or undefined would be good otherwise)
+    )
+    assert(ceFullStrictEmptyExtensions === undefined) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with extensions defined but empty, in strict mode')
 })
 
 /** @test {CloudEvent} */

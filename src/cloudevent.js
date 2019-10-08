@@ -155,6 +155,11 @@ class CloudEvent {
     // add strict to extensions, but only when defined
     if (strict === true) {
       this.constructor.setStrictExtensionInEvent(this, strict)
+
+      const extensionsSize = V.getSize(extensions)
+      if (extensionsSize < 1) {
+        throw new Error('Unable to create CloudEvent instance, extensions must contain at least 1 property')
+      }
       if (V.doesObjectContainsStandardProperty(extensions, CloudEvent.isStandardProperty)) {
         throw new Error('Unable to create CloudEvent instance, extensions contains standard properties')
       }
@@ -327,9 +332,15 @@ class CloudEvent {
     const extensions = {}
     if (V.isObject(obj)) {
       const exts = Object.entries(obj).filter(i => !V.doesStringIsStandardProperty(i[0], CloudEvent.isStandardProperty))
-      // add filtered extensions to the given extensions
-      for (const [key, value] of exts) {
-        extensions[key] = value
+      if (exts.length > 0) {
+        // add filtered extensions to the given extensions
+        for (const [key, value] of exts) {
+          extensions[key] = value
+        }
+      } else {
+        // no extensions found, so return a null value
+        // (extensions defined but empty are not valid extensions)
+        return null
       }
     } else {
       throw new TypeError('Unsupported extensions: not an object or a string')
@@ -394,10 +405,7 @@ class CloudEvent {
       if (V.isDefinedAndNotNull(event.extensions)) {
         // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
-        const extensionsSize = V.getSize(event.extensions)
-        if (extensionsSize < 1) {
-          ve.push(new Error("The object 'extensions' must contain at least 1 property"))
-        }
+        // error for extensions defined but empty (without properties), moved in constructor
       }
     }
 
