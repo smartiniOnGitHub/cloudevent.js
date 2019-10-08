@@ -199,7 +199,8 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeseria
 ```
 
 Look into the [example](./example/) folder for more sample scripts that uses the library 
-(inline but it's the same using it from npm registry).
+(inline but it's the same using it from npm registry); 
+you can find even examples for using JSONBatch objects (array of CloudEvent instances).
 
 
 ## Requirements

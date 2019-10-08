@@ -30,8 +30,13 @@ assert(CloudEventExports !== null)
 // get a reference only to cloudevent class definition/s
 // const { CloudEvent } = require('cloudevent') // from published module
 // const { CloudEvent } = require('../src/') // from local path
-const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // from local path
-assert(CloudEvent !== null && V !== null && T !== null)
+const {
+  CloudEvent,
+  CloudEventValidator: V,
+  CloudEventTransformer: T,
+  JSONBatch
+} = require('../src/') // from local path
+assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
 
 // create some sample instances but without mandatory fields (for validation) ...
 console.log('\nCreation of some CloudEvent instances, and related diagnostics:')
@@ -143,7 +148,7 @@ assert(CloudEvent.isValidEvent(ceFullStrict))
 assert(CloudEvent.isValidEvent(ceErrorStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
 assert(CloudEvent.validateEvent(ceEmpty).length === 3)
-assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 6)
+assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 5)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
 assert(CloudEvent.validateEvent(ceMinimal).length === 0)
 assert(CloudEvent.validateEvent(ceFull).length === 0)
@@ -217,6 +222,43 @@ assert(CloudEvent.isCloudEvent(ceFullStrictOtherContentTypeDeserialized))
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeserialized, 'ceFullStrictOtherContentTypeDeserialized')}`)
 
 // then use (validate/send/store/etc) deserialized instances ...
+
+// example usage of some CloudEvent instances as a JSONBatch
+// note that I put even wrong data types inside the array to show some features
+console.log('\nJSONBatch examples:')
+const batch = [
+  undefined,
+  null,
+  'string', // bad
+  1234567890, // bad
+  false, // bad
+  true, // bad
+  ceMinimal,
+  ceFull,
+  new Date(), // bad
+  {}, // bad
+  [], // bad
+  ceFullStrict,
+  ceErrorStrict,
+  ceFullStrictOtherContentType,
+  null,
+  undefined
+]
+assert(JSONBatch.isJSONBatch(batch))
+assert(!JSONBatch.isValidBatch(batch)) // it has some validation error (on its content)
+console.log(`JSONBatch contains ${batch.length} items, but only some are valid CloudEvent instances, see related sample code:`)
+console.log(`${JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length} CloudEvent instances`)
+console.log(`${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length} CloudEvent instances valid in strict mode`)
+// sample validation, in normal and in strict mode
+assert(JSONBatch.validateBatch(batch, { strict: false }).length === 7)
+assert(JSONBatch.validateBatch(batch, { strict: true }).length === 8)
+// sample filtering of events
+assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 5) // no filtering
+assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 5) // only valid
+assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length === 4) // only valid in strict mode
+// TODO: add serialization/deserialization tests ... wip
+
+// other ...
 
 console.log('\nSample script: end execution.')
 assert(true) // all good here
