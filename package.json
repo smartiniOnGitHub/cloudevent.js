@@ -7,6 +7,7 @@
     "dependency:log": "npm list > ./temp/dependencies.log",
     "docs": "npx esdoc",
     "example": "node example/nodejs-base",
+    "example:debug": "node --inspect-brk example/nodejs-base",
     "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
     "lint:log": "npm run lint > ./temp/lint-standard.log",
     "license-check": "npx legally",
@@ -15,6 +16,7 @@
     "license-checker:log": "npm run license-checker | tee ./temp/license-checker.log",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
+    "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
     "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --no-esm --strict test/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
@@ -23,13 +25,13 @@
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "esdoc-node": "^1.0.4",
-    "standard": "^12.0.1",
-    "tap": "^14.3.1"
+    "esdoc-node": "^1.0.5",
+    "standard": "^14.3.1",
+    "tap": "^14.6.9"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.16.0"
+    "node": ">=8.16.1"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {

@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert')
+const assert = require('assert').strict
 const test = require('tap').test
 
 /** @test {Transformer} */
@@ -115,7 +115,7 @@ test('ensure timestamps are transformed to string in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from string in the right way', (t) => {
-  t.plan(20)
+  t.plan(23)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -150,7 +150,15 @@ test('ensure timestamps are transformed from string in the right way', (t) => {
     t.ok(timestamp)
     t.ok(V.isDateValid(timestamp))
     t.ok(V.isNumber(timestamp.getTime()))
-    // console.log(`timestamp: '${timestamp}'`)
+    // console.log(`timestamp (without timezone offset): '${timestamp}'`)
+  }
+
+  {
+    const timestamp = T.timestampFromString(endOf2018TimestampAsString, T.timezoneOffsetMsec)
+    t.ok(timestamp)
+    t.ok(V.isDateValid(timestamp))
+    t.ok(V.isNumber(timestamp.getTime()))
+    // console.log(`timestamp (with timezone offset): '${timestamp}'`)
   }
 
   {
@@ -175,7 +183,7 @@ test('ensure timestamps are transformed from string in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to string and back as date in the right way', (t) => {
-  t.plan(8)
+  t.plan(13)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -185,20 +193,32 @@ test('ensure the current timestamp is transformed to string and back as date in 
   t.ok(V.isString(timestampAsString))
   // console.log(`current timestamp as string (UTC): '${timestampAsString}'`)
 
-  const timestampFromString = T.timestampFromString(timestampAsString)
-  t.ok(timestampFromString)
-  t.ok(V.isDateValid(timestampFromString))
-  // console.log(`current timestamp from string (with timezone offset): '${timestampFromString}'`)
+  {
+    const timestampFromString = T.timestampFromString(timestampAsString)
+    t.ok(timestampFromString)
+    t.ok(V.isDateValid(timestampFromString))
+    // console.log(`current timestamp from string (without timezone offset): '${timestampFromString}'`)
+    // ensure both timestamps have the same value, but they are different object references
+    t.strictSame(timestampFromString.getTime(), commonEventTime.getTime())
+    t.notStrictEqual(timestampFromString, commonEventTime)
+    t.notEqual(timestampFromString, commonEventTime)
+  }
 
-  // ensure both timestamps have the same value, but they are different object references
-  t.strictSame(timestampFromString.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
-  t.notStrictEqual(timestampFromString, commonEventTime)
-  t.notEqual(timestampFromString, commonEventTime)
+  {
+    const timestampFromString = T.timestampFromString(timestampAsString, T.timezoneOffsetMsec)
+    t.ok(timestampFromString)
+    t.ok(V.isDateValid(timestampFromString))
+    // console.log(`current timestamp from string (with timezone offset): '${timestampFromString}'`)
+    // ensure both timestamps have the same value, but they are different object references
+    t.strictSame(timestampFromString.getTime(), commonEventTime.getTime() + T.timezoneOffsetMsec)
+    t.notStrictEqual(timestampFromString, commonEventTime)
+    t.notEqual(timestampFromString, commonEventTime)
+  }
 })
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from number in the right way', (t) => {
-  t.plan(26)
+  t.plan(29)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(V))
@@ -239,7 +259,15 @@ test('ensure timestamps are transformed from number in the right way', (t) => {
     t.ok(timestamp)
     t.ok(V.isDateValid(timestamp))
     t.ok(V.isNumber(timestamp.getTime()))
-    // console.log(`timestamp: '${timestamp}'`)
+    // console.log(`timestamp (without timezone offset): '${timestamp}'`)
+  }
+
+  {
+    const timestamp = T.timestampFromNumber(endOf2018TimestampAsNumber, T.timezoneOffsetMsec)
+    t.ok(timestamp)
+    t.ok(V.isDateValid(timestamp))
+    t.ok(V.isNumber(timestamp.getTime()))
+    // console.log(`timestamp (with timezone offset): '${timestamp}'`)
   }
 
   {
@@ -264,7 +292,7 @@ test('ensure timestamps are transformed from number in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to number and back as date in the right way', (t) => {
-  t.plan(12)
+  t.plan(17)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -289,20 +317,32 @@ test('ensure the current timestamp is transformed to number and back as date in 
   t.ok(V.isNumber(timestampAsNumber))
   // console.log(`timestamp as number: '${timestampAsNumber}'`)
 
-  const timestampFromNumber = T.timestampFromNumber(timestampAsNumber)
-  t.ok(timestampFromNumber)
-  t.ok(V.isDateValid(timestampFromNumber))
-  // console.log(`timestamp from number: '${timestampFromNumber}'`)
+  {
+    const timestampFromNumber = T.timestampFromNumber(timestampAsNumber)
+    t.ok(timestampFromNumber)
+    t.ok(V.isDateValid(timestampFromNumber))
+    // console.log(`timestamp from number (without timezone offset): '${timestampFromNumber}'`)
+    // ensure both timestamps have the same value, but they are different object references
+    t.strictSame(timestampFromNumber.getTime(), commonEventTime.getTime())
+    t.notStrictEqual(timestampFromNumber, commonEventTime)
+    t.notEqual(timestampFromNumber, commonEventTime)
+  }
 
-  // ensure both timestamps have the same value, but they are different object references
-  t.strictSame(timestampFromNumber.getTime() - T.timezoneOffsetMsec, commonEventTime.getTime())
-  t.notStrictEqual(timestampFromNumber, commonEventTime)
-  t.notEqual(timestampFromNumber, commonEventTime)
+  {
+    const timestampFromNumber = T.timestampFromNumber(timestampAsNumber, T.timezoneOffsetMsec)
+    t.ok(timestampFromNumber)
+    t.ok(V.isDateValid(timestampFromNumber))
+    // console.log(`timestamp from number (with timezone offset): '${timestampFromNumber}'`)
+    // ensure both timestamps have the same value, but they are different object references
+    t.strictSame(timestampFromNumber.getTime(), commonEventTime.getTime() + T.timezoneOffsetMsec)
+    t.notStrictEqual(timestampFromNumber, commonEventTime)
+    t.notEqual(timestampFromNumber, commonEventTime)
+  }
 })
 
 /** @test {Transformer} */
 test('ensure errors are transformed into data attribute in the right way', (t) => {
-  t.plan(51)
+  t.plan(60)
 
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
@@ -423,6 +463,26 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     delete data.timestamp // delete the attribute to simplify next comparison
     t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, status: 'error' })
   }
+
+  {
+    const error = new TypeError('sample type error')
+    t.ok(V.isError(error))
+    error.code = '1000' // add a sample error code, as string
+    t.ok(V.isString(error.code))
+    const data = T.errorToData(error, {
+      includeStackTrace: true,
+      addStatus: false,
+      addTimestamp: false
+    })
+    t.ok(data)
+    t.ok(V.isObject(data))
+    t.ok(data.stack)
+    t.ok(V.isString(data.stack))
+    data.stack = null // empty the attribute to simplify next comparison
+    t.ok(!data.status)
+    t.ok(!data.timestamp)
+    t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, code: '1000' })
+  }
 })
 
 /** @test {Transformer} */
@@ -440,7 +500,7 @@ test('ensure dumpObject works in the right way', (t) => {
   t.ok(T.dumpObject([1, 2, 3, null], 'array'))
   t.ok(T.dumpObject(new Map([['key-1', 'value 1'], ['key-2', 'value 2']]), 'map'))
   t.ok(T.dumpObject(new Set([['key-1', 'value 1'], ['key-2', 'value 2']]), 'set'))
-  t.ok(T.dumpObject(`12345 67890 `, 'string'))
+  t.ok(T.dumpObject('12345 67890 ', 'string'))
   t.ok(T.dumpObject(1234567890, 'number'))
   t.ok(T.dumpObject(true, 'boolean'))
 })
@@ -570,4 +630,33 @@ test('ensure objects are merged in the right way', (t) => {
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
   }
+})
+
+/** @test {Transformer} */
+test('ensure strings are encoded/decoded in th right way in base64', (t) => {
+  t.plan(13)
+
+  const { CloudEventTransformer: T } = require('../src/') // get references via destructuring
+
+  t.strictSame(T.stringToBase64(), '')
+  t.strictSame(T.stringToBase64(undefined), '')
+  t.strictSame(T.stringToBase64(null), '')
+  t.strictSame(T.stringToBase64(''), '')
+  t.throws(function () {
+    const base64 = T.stringToBase64({}) // not a string
+    assert(base64 === null) // never executed
+  }, Error, 'Expected exception when transforming not a right string to a base64 (String)')
+  t.strictSame(T.stringToBase64('Hello World, 2019'), 'SGVsbG8gV29ybGQsIDIwMTk=')
+
+  t.strictSame(T.stringFromBase64(), '')
+  t.strictSame(T.stringFromBase64(undefined), '')
+  t.strictSame(T.stringFromBase64(null), '')
+  t.strictSame(T.stringFromBase64(''), '')
+  t.throws(function () {
+    const base64 = T.stringFromBase64({}) // not a string
+    assert(base64 === null) // never executed
+  }, Error, 'Expected exception when transforming not a right string from a base64 (String)')
+  t.strictSame(T.stringFromBase64('SGVsbG8gV29ybGQsIDIwMTk='), 'Hello World, 2019')
+
+  t.strictSame(T.stringFromBase64(T.stringToBase64('Hello World, 2019')), 'Hello World, 2019')
 })
