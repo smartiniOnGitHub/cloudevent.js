@@ -235,6 +235,7 @@ class JSONBatch {
         ser += CloudEvent.serializeEvent(val, options)
         num++
       } catch (e) {
+        ser += 'null' // as a fallback placeholder
         if (options.logError === true) {
           console.error(e)
         }
