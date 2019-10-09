@@ -256,7 +256,27 @@ assert(JSONBatch.validateBatch(batch, { strict: true }).length === 8)
 assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 5) // no filtering
 assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 5) // only valid
 assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length === 4) // only valid in strict mode
-// TODO: add serialization/deserialization tests ... wip
+console.log('JSONBatch events: get only valid instances, as a sample')
+const events = JSONBatch.getEvents(batch, {
+  onlyValid: true,
+  strict: false
+})
+console.log(`JSONBatch events: length = ${events.length}, summary: ${events}`)
+console.log(`JSONBatch events: length = ${events.length}, details: ${JSON.stringify(events)}`)
+assert(events !== null)
+// sample serialization/deserialization on it (batch) or a subset (events)
+// note that additional serialization options could be used, for example to handle non default data content types ...
+const ser = JSONBatch.serializeEvents(events, { prettyPrint: true, logError: true })
+console.log(`JSONBatch events: serialized = \n${ser}\n`)
+const deser = JSONBatch.deserializeEvents(ser, {
+  logError: true,
+  throwError: true,
+  onlyValid: true // sample, to filter out not valid serialized instances ...
+  // onlyIfLessThan64KB: true
+})
+console.log(`JSONBatch events: deserialized length = ${deser.length}, summary: ${deser}`)
+console.log(`JSONBatch events: deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
+assert(deser !== null)
 
 // other ...
 
