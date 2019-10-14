@@ -500,3 +500,42 @@ test('ensure validation functions to filter bad object instances raise exception
     assert(objFiltered !== null) // never executed
   }, Error, 'Expected exception when trying to filter a plain object but with a wrong filtering function')
 })
+
+/** @test {Validator} */
+test('ensure validation functions to throw exceptions, works good', (t) => {
+  t.plan(12)
+
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(V)
+
+  t.notOk(V.throwOnError()) // no error returned
+  t.notOk(V.throwOnError(undefined)) // no error returned
+  t.notOk(V.throwOnError(null)) // no error returned
+  t.notOk(V.throwOnError({})) // no error returned
+  t.throws(function () {
+    V.throwOnError(new TypeError('Sample TypeError'))
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from an Error')
+
+  t.throws(function () {
+    V.throwOnFalse()
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from an undefined value')
+  t.throws(function () {
+    V.throwOnFalse(undefined)
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from an undefined value')
+  t.throws(function () {
+    V.throwOnFalse(null)
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from a null value')
+  t.throws(function () {
+    V.throwOnFalse({})
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from a not boolean value')
+  t.notOk(V.throwOnFalse(true)) // no error returned
+  t.throws(function () {
+    V.throwOnFalse(false)
+    assert(false) // never executed
+  }, Error, 'Expected exception when trying to throw from a false value')
+})

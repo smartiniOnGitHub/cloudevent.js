@@ -929,6 +929,38 @@ class Validator {
     }
     return objFiltered
   }
+
+  /**
+   * Throw if the given argument is an error instance or its subclass.
+   *
+   * See {@link Validator.isError}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @throws {Error} the given error
+   */
+  static throwOnError (arg) {
+    if (Validator.isError(arg)) {
+      throw arg
+    }
+  }
+
+  /**
+   * Throw if the given argument is false.
+   * Note that this is similar to assertions.
+   *
+   * See {@link Validator.isError}.
+   *
+   * @static
+   * @param {object} arg the object to check
+   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @throws {Error} if the given argument is not a boolean, or if it's false
+   */
+  static throwOnFalse (arg, name = 'arg') {
+    if (!Validator.isBoolean(arg) || arg === false) {
+      return new Error(`The argument '${name}' is false`)
+    }
+  }
 }
 
 module.exports = Validator
