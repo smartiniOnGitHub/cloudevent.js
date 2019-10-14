@@ -27,11 +27,11 @@
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-node": "^1.0.5",
     "standard": "^14.3.1",
-    "tap": "^14.6.9"
+    "tap": "^14.7.0"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.16.1"
+    "node": ">=8.16.2"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
