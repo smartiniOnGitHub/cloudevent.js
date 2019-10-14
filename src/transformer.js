@@ -55,8 +55,8 @@ class Transformer {
    * Utility function that return a dump of the given object.
    *
    * @static
-   * @param {(object|Map|Set)} obj the object to dump
-   * @param {string} name the name to assign in the returned string, or 'noname' as default value
+   * @param {(?object|Map|Set)} obj the object to dump
+   * @param {string} [name='noname'] the name to assign in the returned string, or 'noname' as default value
    * @return {string} the dump of the object or a message when obj is undefined/null/not an object
    */
   static dumpObject (obj, name = 'noname') {
@@ -80,7 +80,7 @@ class Transformer {
    *
    * @static
    * @param {!string} obj the timestamp/date to parse (as a string)
-   * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
+   * @param {number} [timezoneOffset=0] a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {TypeError} if obj is undefined or null, or is not a string
    */
@@ -100,7 +100,7 @@ class Transformer {
    * Note that the value returned is in the UTC format.
    *
    * @static
-   * @param {object} obj the timestamp/date to convert, or the current one
+   * @param {?object} obj the timestamp/date to convert, or the current one if not defined or null
    * @return {string} the string representation of the object
    * @throws {TypeError} if obj is undefined or null, or is not a Date instance
    */
@@ -124,7 +124,7 @@ class Transformer {
    *
    * @static
    * @param {!number} obj the timestamp/date to parse (as a number)
-   * @param {number} timezoneOffset a timezone offset to add (in msec, default 0)
+   * @param {number} [timezoneOffset=0] a timezone offset to add (in msec, default 0)
    * @return {object} the parsed version, as a timestamp (Date) object, if possible
    * @throws {TypeError} if obj is undefined or null, or is not a number
    */
@@ -142,7 +142,7 @@ class Transformer {
    * Note that the value returned is in the UTC format.
    *
    * @static
-   * @param {object} obj the timestamp/date to convert, or the current one
+   * @param {?object} obj the timestamp/date to convert, or the current one if not defined or null
    * @return {number} the number representation of the object
    * @throws {TypeError} if obj is not a Date instance
    */
@@ -162,7 +162,7 @@ class Transformer {
    * in base64 (compatible with the CloudEvent standard).
    *
    * @static
-   * @param {string} obj the string to encode, or '' by default
+   * @param {?string} obj the string to encode, or '' if not defined or null
    * @return {string} the string encoded in base64
    * @throws {TypeError} if str is not a string instance
    */
@@ -183,7 +183,7 @@ class Transformer {
    * (compatible with the CloudEvent standard).
    *
    * @static
-   * @param {string} obj the string to decode, or '' by default
+   * @param {?string} obj the string to decode, or '' if not defined or null
    * @return {string} the string decoded from base64
    * @throws {TypeError} if str is not a string instance
    */
@@ -204,7 +204,7 @@ class Transformer {
    *
    * @static
    * @param {!Error} err the Error to transform
-   * @param {object} options transformation options:
+   * @param {object} [options={}] transformation options:
    *        includeStackTrace flag (default false) to add the StackTrace into the object to return,
    *        addStatus flag (default true) to add a 'status' attribute into the object to return,
    *        addTimestamp flag (default false) to add the current 'timestamp' as attribute into the object to return,
@@ -257,7 +257,7 @@ class Transformer {
    *
    * @static
    * @param {!string} url the URI/URL (as a string)
-   * @param {object} options containing: strict (boolean, default false) to check it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to check it in a more strict way
    * @return {string} the parsed version, but without arguments (if any)
    * @throws {TypeError} if url is undefined or null, or is not a string
    */

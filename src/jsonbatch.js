@@ -69,7 +69,7 @@ class JSONBatch {
    *
    * @static
    * @param {!object[]|object} batch the JSONBatch (array) to validate, or a single CloudEvent instance
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} an array of (flattened, non null) validation errors, or at least an empty array
    */
   static validateBatch (batch, { strict = false } = {}) {
@@ -115,7 +115,7 @@ class JSONBatch {
    *
    * @static
    * @param {!object} batch the JSONBatch to validate
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {boolean} true if valid, otherwise false
    */
   static isValidBatch (batch, { strict = false } = {}) {
@@ -144,7 +144,7 @@ class JSONBatch {
    *
    * @static
    * @param {!object} batch the JSONBatch to iterate
-   * @param {object} options optional processing attributes:
+   * @param {object} [options={}] optional processing attributes:
    *        onlyValid (boolean, default false) to extract only valid instances
    *        strict (boolean, default false) to validate it in a more strict way
    * @return {object} a CloudEvent (if any)
@@ -177,7 +177,7 @@ class JSONBatch {
    *
    * @static
    * @param {!object} batch the JSONBatch to extract CloudEvent instances (if any)
-   * @param {object} options optional processing attributes:
+   * @param {object} [options={}] optional processing attributes:
    *        onlyValid (boolean, default false) to extract only valid instances
    *        strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} processed events, as an array
@@ -211,7 +211,7 @@ class JSONBatch {
    *
    * @static
    * @param {!object[]} batch the JSONBatch (so a CloudEvent array instance) to serialize
-   * @param {object} options optional serialization attributes
+   * @param {object} [options={}] optional serialization attributes
    *        Additional options valid here:
    *        logError (boolean, default false) to log to console serialization errors
    *        throwError (boolean, default false) to throw serialization errors
@@ -264,7 +264,7 @@ class JSONBatch {
    *
    * @static
    * @param {!string} ser the serialized JSONBatch to parse/deserialize
-   * @param {object} options optional deserialization attributes
+   * @param {object} [options={}] optional deserialization attributes
    *        Additional options valid here:
    *        logError (boolean, default false) to log to console deserialization errors
    *        throwError (boolean, default false) to throw serialization errors

@@ -45,8 +45,8 @@ class CloudEvent {
    * @param {!string} id the ID of the event (unique), mandatory
    * @param {!string} type the type of the event (usually prefixed with a reverse-DNS name), mandatory
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
-   * @param {(object|Map|Set|string)} data the real event data
-   * @param {object} options optional attributes of the event; some has default values chosen here:
+   * @param {?(object|Map|Set|string)} data the real event data
+   * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
    *        datacontentencoding (string) optional in most cases here,
    *        datacontenttype (string, default 'application/json') tell how the data attribute must be encoded,
@@ -246,8 +246,8 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {object} obj the object with extensions to fill (maybe already populated), that will be enhanced inplace
-   * @param {boolean} strict, the flag to set (default false)
+   * @param {object} [obj={}] the object with extensions to fill (maybe already populated), that will be enhanced inplace
+   * @param {boolean} [strict=false] the flag to set (default false)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
@@ -268,7 +268,7 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {object} obj the object with extensions to check
+   * @param {object} [obj={}] the object with extensions to check
    * @return {boolean} the strict flag value, or false if not found
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null
@@ -294,8 +294,8 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {object} obj the object to fill, that will be enhanced inplace
-   * @param {object} extensions the extensions to fill (maybe already populated)
+   * @param {object} [obj={}] the object to fill, that will be enhanced inplace
+   * @param {object} [extensions=null] the extensions to fill (maybe already populated)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
@@ -323,7 +323,7 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {object} obj the object to check
+   * @param {object} [obj={}] the object to check
    * @return {object} an object containins all extensions (non standard properties) found
    * @throws {TypeError} if obj is not an object
    * @throws {Error} if obj is undefined or null
@@ -353,7 +353,7 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   static validateEvent (event, { strict = false } = {}) {
@@ -419,7 +419,7 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, { strict = false } = {}) {
@@ -450,7 +450,7 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to serialize
-   * @param {object} options optional serialization attributes:
+   * @param {object} [options={}] optional serialization attributes:
    *        encoder (function, no default) a function that takes data and returns encoded data as a string,
    *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
@@ -507,7 +507,7 @@ class CloudEvent {
    *
    * @static
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
-   * @param {object} options optional deserialization attributes:
+   * @param {object} [options={}] optional deserialization attributes:
    *        decoder (function, no default) a function that takes data and returns decoder data as a string,
    *        decodedData (string, no default) already decoded data (but consistency with the datacontenttype is not checked),
    *        onlyValid (boolean, default false) to deserialize only if it's a valid instance,
@@ -649,7 +649,7 @@ class CloudEvent {
    *
    * See {@link CloudEvent.serializeEvent}.
    *
-   * @param {object} options optional serialization attributes:
+   * @param {object} [options={}] optional serialization attributes:
    *        encoder (function, default null) a function that takes data and returns encoded data,
    *        encodedData (string, default null) already encoded data (but consistency with the datacontenttype is not checked),
    * @return {string} the serialized event, as a string
@@ -663,7 +663,7 @@ class CloudEvent {
    *
    * See {@link CloudEvent.validateEvent}.
    *
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   validate ({ strict = false } = {}) {
@@ -675,7 +675,7 @@ class CloudEvent {
    *
    * See {@link CloudEvent.isValidEvent}.
    *
-   * @param {object} options containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
    * @return {boolean} true if valid, otherwise false
    */
   isValid ({ strict = false } = {}) {

@@ -44,7 +44,7 @@ class Validator {
    * Tell if the given argument is undefined.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if undefined, false otherwise
    */
   static isUndefined (arg) {
@@ -55,7 +55,7 @@ class Validator {
    * Tell if the given argument is null.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if null, false otherwise
    */
   static isNull (arg) {
@@ -66,7 +66,7 @@ class Validator {
    * Tell if the given argument is undefined or null.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if undefined or null, false otherwise
    */
   static isUndefinedOrNull (arg) {
@@ -77,7 +77,7 @@ class Validator {
    * Tell if the given argument is defined and not null.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if defined and not null, false otherwise
    */
   static isDefinedAndNotNull (arg) {
@@ -88,7 +88,7 @@ class Validator {
    * Tell if the given argument is a string.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a string, false otherwise
    */
   static isString (arg) {
@@ -101,7 +101,7 @@ class Validator {
    * See {@link Validator.isString}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a not empty string, false otherwise
    */
   static isStringNotEmpty (arg) {
@@ -112,7 +112,7 @@ class Validator {
    * Tell if the given argument is a date.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a date, false otherwise
    */
   static isDate (arg) {
@@ -125,7 +125,7 @@ class Validator {
    * See {@link Validator.isDate}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a valid date, false otherwise
    */
   static isDateValid (arg) {
@@ -138,7 +138,7 @@ class Validator {
    * See {@link Validator.isDateValid}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a valid date in the past (or now), false otherwise
    */
   static isDatePast (arg) {
@@ -151,7 +151,7 @@ class Validator {
    * See {@link Validator.isDateValid}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a valid date in the future (or now), false otherwise
    */
   static isDateFuture (arg) {
@@ -162,7 +162,7 @@ class Validator {
    * Tell if the given argument is a number.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a number, false otherwise
    */
   static isNumber (arg) {
@@ -173,7 +173,7 @@ class Validator {
    * Tell if the given argument is an array.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's an array, false otherwise
    */
   static isArray (arg) {
@@ -184,7 +184,7 @@ class Validator {
    * Tell if the given argument is a boolean.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a boolean, false otherwise
    */
   static isBoolean (arg) {
@@ -195,8 +195,8 @@ class Validator {
    * Tell if the given argument is an instance of the given class reference.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {object} classReference the class that should be implemented/extended
+   * @param {?object} arg the object to check
+   * @param {?object} classReference the class that should be implemented/extended
    * @return {boolean} true if it's an instance (or extends) that class, false otherwise
    */
   static isClass (arg, classReference) {
@@ -207,7 +207,7 @@ class Validator {
    * Tell if the given argument is an error.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's an error, false otherwise
    */
   static isError (arg) {
@@ -218,7 +218,7 @@ class Validator {
    * Tell if the given argument is a function.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a function, false otherwise
    */
   static isFunction (arg) {
@@ -230,7 +230,7 @@ class Validator {
    * and is defined and not null.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's an object, false otherwise
    */
   static isObject (arg) {
@@ -243,7 +243,7 @@ class Validator {
    * Symbol, Map/WeakMap, Set/WeakSet, etc.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a plain object, false otherwise
    */
   static isObjectPlain (arg) {
@@ -254,7 +254,7 @@ class Validator {
    * Tell if the given argument is a keyed collection.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a Map|WeakMap or a Set|WeakSet, false otherwise
    */
   static isKeyedCollection (arg) {
@@ -270,7 +270,7 @@ class Validator {
    * See {@link Validator.isObject}, {@link Validator.isKeyedCollection}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a plain object or a keyed collection, false otherwise
    */
   static isObjectOrCollection (arg) {
@@ -284,7 +284,7 @@ class Validator {
    * See {@link Validator.isArray}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a plain object or a keyed collection but not an array, false otherwise
    */
   static isObjectOrCollectionNotArray (arg) {
@@ -297,7 +297,7 @@ class Validator {
    * See {@link Validator.isObjectOrCollection}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a plain object or a keyed collection but not a string, false otherwise
    */
   static isObjectOrCollectionNotString (arg) {
@@ -310,7 +310,7 @@ class Validator {
    * See {@link Validator.isObjectOrCollection}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {boolean} true if it's a plain object or a keyed collection or a string, false otherwise
    */
   static isObjectOrCollectionOrString (arg) {
@@ -327,7 +327,7 @@ class Validator {
    * - format updated to handle version output of 'git describe'
    *
    * @static
-   * @param {string} arg the version string to check
+   * @param {?string} arg the version string to check
    * @return {boolean} true if it's a version string, false otherwise
    */
   static isVersion (arg) {
@@ -340,8 +340,8 @@ class Validator {
    * Tell if the given argument is an URI or an URL.
    *
    * @static
-   * @param {string} arg the uri/url to check
-   * @param {string} base the (optional) base to build the full URL
+   * @param {?string} arg the uri/url to check
+   * @param {?string} base the (optional) base to build the full URL
    * @return {boolean} true if it's an URI/URL, false otherwise
    */
   static isURI (arg, base) {
@@ -380,8 +380,8 @@ class Validator {
    * that has a standard (reserved) property name.
    *
    * @static
-   * @param {object} obj the object to check
-   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @param {?object} obj the object to check
+   * @param {?function} isPropStandard the function that tell the given argument (property), if it's standard
    * @return {boolean} true if at least one property with a standard name is found, otherwise false
    */
   static doesObjectContainsStandardProperty (obj, isPropStandard) {
@@ -401,8 +401,8 @@ class Validator {
    * Tell if the given string has a standard (reserved) property name.
    *
    * @static
-   * @param {string} str the string to check
-   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @param {?string} str the string to check
+   * @param {?function} isPropStandard the function that tell the given argument (property), if it's standard
    * @return {boolean} true if the given string has a standard name, otherwise false
    */
   static doesStringIsStandardProperty (str, isPropStandard) {
@@ -421,8 +421,8 @@ class Validator {
    * See {@link Validator.isUndefined}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined, nothing otherwise
    */
   static ensureIsUndefined (arg, name = 'arg') {
@@ -437,8 +437,8 @@ class Validator {
    * See {@link Validator.isNull}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not null, nothing otherwise
    */
   static ensureIsNull (arg, name = 'arg') {
@@ -453,8 +453,8 @@ class Validator {
    * See {@link Validator.isUndefinedOrNull}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined or null, nothing otherwise
    */
   static ensureIsUndefinedOrNull (arg, name = 'arg') {
@@ -469,8 +469,8 @@ class Validator {
    * See {@link Validator.isDefinedAndNotNull}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not undefined or null, nothing otherwise
    */
   static ensureIsDefinedAndNotNull (arg, name = 'arg') {
@@ -485,8 +485,8 @@ class Validator {
    * See {@link Validator.isArray}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an array, nothing otherwise
    */
   static ensureIsArray (arg, name = 'arg') {
@@ -501,8 +501,8 @@ class Validator {
    * See {@link Validator.isBoolean}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a boolean, nothing otherwise
    */
   static ensureIsBoolean (arg, name = 'arg') {
@@ -517,9 +517,9 @@ class Validator {
    * See {@link Validator.isClass}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {object} classReference the class that should be implemented/extended
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {?object} classReference the class that should be implemented/extended
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an instance (or extends) that class, nothing otherwise
    */
   static ensureIsClass (arg, classReference, name = 'arg') {
@@ -534,8 +534,8 @@ class Validator {
    * See {@link Validator.isFunction}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a function, nothing otherwise
    */
   static ensureIsFunction (arg, name = 'arg') {
@@ -550,8 +550,8 @@ class Validator {
    * See {@link Validator.isString}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a string, nothing otherwise
    */
   static ensureIsString (arg, name = 'arg') {
@@ -566,8 +566,8 @@ class Validator {
    * See {@link Validator.isStringNotEmpty}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a string not empty, nothing otherwise
    */
   static ensureIsStringNotEmpty (arg, name = 'arg') {
@@ -582,8 +582,8 @@ class Validator {
    * See {@link Validator.isObject}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not an object, nothing otherwise
    */
   static ensureIsObject (arg, name = 'arg') {
@@ -600,8 +600,8 @@ class Validator {
    * See {@link Validator.isObjectPlain}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object, nothing otherwise
    */
   static ensureIsObjectPlain (arg, name = 'arg') {
@@ -616,8 +616,8 @@ class Validator {
    * See {@link Validator.isObjectOrCollection}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object nor a collection, nothing otherwise
    */
   static ensureIsObjectOrCollection (arg, name = 'arg') {
@@ -632,8 +632,8 @@ class Validator {
    * See {@link Validator.isObjectOrCollectionNotArray}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object nor a collection or it's an array, nothing otherwise
    */
   static ensureIsObjectOrCollectionNotArray (arg, name = 'arg') {
@@ -648,8 +648,8 @@ class Validator {
    * See {@link Validator.isObjectOrCollectionNotString}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object nor a collection or it's a string, nothing otherwise
    */
   static ensureIsObjectOrCollectionNotString (arg, name = 'arg') {
@@ -664,8 +664,8 @@ class Validator {
    * See {@link Validator.isObjectOrCollectionOrString}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {TypeError} if it's not a plain object nor a collection nor a string, nothing otherwise
    */
   static ensureIsObjectOrCollectionOrString (arg, name = 'arg') {
@@ -680,8 +680,8 @@ class Validator {
    * See {@link Validator.isDate}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date, nothing otherwise
    */
   static ensureIsDate (arg, name = 'arg') {
@@ -696,8 +696,8 @@ class Validator {
    * See {@link Validator.isDatePast}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date in the past, nothing otherwise
    */
   static ensureIsDatePast (arg, name = 'arg') {
@@ -712,8 +712,8 @@ class Validator {
    * See {@link Validator.isDateFuture}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a date in the future, nothing otherwise
    */
   static ensureIsDateFuture (arg, name = 'arg') {
@@ -728,8 +728,8 @@ class Validator {
    * See {@link Validator.isNumber}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a number, nothing otherwise
    */
   static ensureIsNumber (arg, name = 'arg') {
@@ -744,8 +744,8 @@ class Validator {
    * See {@link Validator.isError}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not an error or its subclass, nothing otherwise
    */
   static ensureIsError (arg, name = 'arg') {
@@ -760,8 +760,8 @@ class Validator {
    * See {@link Validator.isVersion}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not a string version, nothing otherwise
    */
   static ensureIsVersion (arg, name = 'arg') {
@@ -776,9 +776,9 @@ class Validator {
    * See {@link Validator.isURI}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} base the (optional) base to build the full URL
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {?string} base the (optional) base to build the full URL
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if it's not an URI/URL, nothing otherwise
    */
   static ensureIsURI (arg, base, name = 'arg') {
@@ -794,9 +794,9 @@ class Validator {
    * See {@link Validator.doesObjectContainsStandardProperty}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {function} isPropStandard the function that tell the given argument (property), if it's standard
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {?function} isPropStandard the function that tell the given argument (property), if it's standard
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @return {Error} if at least one property with a standard name is found, nothing otherwise
    */
   static ensureObjectDoesNotContainStandardProperty (arg, isPropStandard, name = 'arg') {
@@ -809,7 +809,7 @@ class Validator {
    * Tell the size of the given object
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @return {number} the size if it's an array|Map|Set|object|string, nothing otherwise
    * @throws {TypeError} if it's not an array nor a collection nor object nor a string
    */
@@ -834,7 +834,7 @@ class Validator {
    * Tell the size in bytes of the given string.
    *
    * @static
-   * @param {string} str the string to check
+   * @param {?string} str the string to check
    * @return {number} the size if it's a string, nothing otherwise
    * @throws {TypeError} if it's not a string
    */
@@ -856,7 +856,7 @@ class Validator {
    * as an arrow function.
    *
    * @static
-   * @param {object} arg the argument
+   * @param {?object} arg the argument
    * @return {string} the value of the variable (if defined and not null), nothing otherwise
    */
   static getArgumentValue (arg) {
@@ -880,7 +880,7 @@ class Validator {
    * as an arrow function.
    *
    * @static
-   * @param {object} arg the argument
+   * @param {?object} arg the argument
    * @return {string} the name of the variable (if defined and not null), nothing otherwise
    */
   static getArgumentName (arg) {
@@ -896,8 +896,8 @@ class Validator {
    * otherwise the given default value is returned.
    *
    * @static
-   * @param {object} arg the argument to return
-   * @param {object} def the default value to return
+   * @param {?object} arg the argument to return
+   * @param {?object} def the default value to return
    * @return {object} the argument (if defined and not null), otherwise the default value
    */
   static getOrElse (arg, def) {
@@ -913,8 +913,8 @@ class Validator {
    * with all properties filtered by the given function (predicate).
    *
    * @static
-   * @param {object} obj the base object
-   * @param {function} propFilter the function (predicate) for filtering properties
+   * @param {?object} obj the base object
+   * @param {?function} propFilter the function (predicate) for filtering properties
    * @return {object} a new object containing only filtered properties
    * @throws {TypeError} if obj is not a plain object, or propFilter is not a function
    */
@@ -936,7 +936,7 @@ class Validator {
    * See {@link Validator.isError}.
    *
    * @static
-   * @param {object} arg the object to check
+   * @param {?object} arg the object to check
    * @throws {Error} the given error
    */
   static throwOnError (arg) {
@@ -952,8 +952,8 @@ class Validator {
    * See {@link Validator.isError}.
    *
    * @static
-   * @param {object} arg the object to check
-   * @param {string} name the name to use in generated error (or the value of first argument if not given)
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
    * @throws {Error} if the given argument is not a boolean, or if it's false
    */
   static throwOnFalse (arg, name = 'arg') {
