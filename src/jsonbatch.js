@@ -38,7 +38,7 @@ const V = require('./validator') // get validator from here
 /**
  * JSONBatch implementation.
  *
- * @see https://github.com/cloudevents/spec/blob/v0.3/json-format.md#4-json-batch-format
+ * @see https://github.com/cloudevents/spec/blob/master/json-format.md#4-json-batch-format
  */
 class JSONBatch {
   /**
