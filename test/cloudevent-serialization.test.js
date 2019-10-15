@@ -49,30 +49,17 @@ test('ensure serialization functions exists (check only the static method here)'
   }
 })
 
-/** create some common options, for better reuse in tests */
-const commonEventTime = new Date()
-const ceCommonOptions = {
-  time: commonEventTime,
-  datacontenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
-  subject: 'subject',
-  strict: false
-}
-/** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-/** create some common extensions, for better reuse in tests */
-const ceCommonExtensions = { exampleExtension: 'value' }
-/** create a sample namespace for events here, for better reuse in tests */
-const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
-/** create a sample common server URL, for better reuse in tests */
-const ceServerUrl = '/test'
-/** create some common data from an object, for better reuse in tests */
-const ceCommonData = { hello: 'world', year: 2019 }
-/** create some common data from a Map, for better reuse in tests */
-const ceMapData = new Map() // empty Map
-// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
-ceMapData.set('key-1', 'value 1')
-ceMapData.set('key-2', 'value 2')
+// import some common test data
+const {
+  commonEventTime,
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  ceCommonExtensions,
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData
+} = require('./common-test-data')
+
 /** sample data as an xml string */
 const ceDataAsXmlString = '<data "hello"="world" "year"="2019" />'
 /** sample data as a json string */

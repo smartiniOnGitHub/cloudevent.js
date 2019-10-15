@@ -18,28 +18,15 @@
 const assert = require('assert').strict
 const test = require('tap').test
 
-/** create some common options, for better reuse in tests */
-const ceCommonOptions = {
-  time: new Date(),
-  datacontenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
-  strict: false
-}
-/** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-/** create some common extensions, for better reuse in tests */
-const ceCommonExtensions = { exampleExtension: 'value' }
-/** create a sample namespace for events here, for better reuse in tests */
-const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
-/** create a sample common server URL, for better reuse in tests */
-const ceServerUrl = '/test'
-/** create some common data from an object, for better reuse in tests */
-const ceCommonData = { hello: 'world', year: 2019 }
-/** create some common data from a Map, for better reuse in tests */
-const ceMapData = new Map() // empty Map
-// const ceMapData = new Map([['key-1', 'value 1'], ['key-2', 'value 2']])
-ceMapData.set('key-1', 'value 1')
-ceMapData.set('key-2', 'value 2')
+// import some common test data
+const {
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  ceCommonExtensions,
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData
+} = require('./common-test-data')
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {
