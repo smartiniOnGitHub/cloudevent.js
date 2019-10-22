@@ -1,5 +1,33 @@
 # Change Log
 
+## [0.6.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.6.0) (2019-10-23)
+Summary Changelog:
+- Implement the [v0.3 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.3) with all breaking changes since its v0.2
+- Update dependencies for the development environment
+- Update JSON Schema to that of spec v0.3
+- Breaking change: updated attributes as per spec, like: 
+  rename 'contenttype' into 'datacontenttype', add the new attribute 'subject', 
+  remove the 'extensions' specific attribute, standard names no more usable in extensions, 
+  handle 'datacontentencoding' and its 'base64' encoding (other encodings with a user-defined encode function), 
+  etc; 
+  updated/renamed methods (normal and static) in the same way, for consistency with the naming of attributes
+- Update Validator and Transformer with some new useful (static) methods
+- Restore the ability to have object (and not only string) value for data when 'datacontenttype' is not default
+- Implement even the "JSON Batch Format" (many Cloudevents inside a JSON array) in a new class JSONBatch, 
+  with specific new static methods for serializing/deserializing array of Cloudevents; 
+  but do not use streaming here (for simplicity)
+- Improve generated docs with an update of ESDoc syntax, to clarify 
+  not nullable parameters, nullable parameters, optional, optional with a default value 
+- Update examples with new features
+- Add npm custom command to run Tap tests in a 'dev' mode (but without debugger breaks), 
+  by continuously run it in 'watch' mode
+- Add npm custom command 'example:debug' to be able to debug the example
+- Refactor unit tests to share some common parts
+- Use Node.js assertions but in strict mode, available in Node.js 8.16.x (but not in previous like 8.9.0)
+- Ensure test code has 100% coverage
+- Other small changes
+- Add a badge for license, another for vulnerabilities in dependencies
+
 ## [0.5.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.5.0) (2019-04-28)
 Summary Changelog:
 - Implement the [v0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.2) with all breaking changes since its v0.1
