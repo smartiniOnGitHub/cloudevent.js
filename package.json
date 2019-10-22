@@ -27,7 +27,7 @@
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-node": "^1.0.5",
     "standard": "^14.3.1",
-    "tap": "^14.7.0"
+    "tap": "^14.8.2"
   },
   "peerDependencies": {},
   "engines": {
