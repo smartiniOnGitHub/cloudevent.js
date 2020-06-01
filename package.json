@@ -18,9 +18,13 @@
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
     "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
     "test:unit:debug": "tap -T --node-arg=--inspect-brk --comments --no-esm --strict test/*.test.js",
-    "test": "npm run lint && npm run test:unit"
+    "test": "npm run lint && npm run test:unit",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
-  "dependencies": {},
+  "dependencies": {
+    "snyk": "^1.316.2"
+  },
   "devDependencies": {
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
@@ -46,5 +50,6 @@
     "cloudevents"
   ],
   "author": "Sandro Martini <sandro.martini@gmail.com>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "snyk": true
 }
