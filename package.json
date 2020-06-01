@@ -23,7 +23,7 @@
     "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
-    "snyk": "^1.316.2"
+    "snyk": "^1.334.0"
   },
   "devDependencies": {
     "esdoc": "^1.1.0",
@@ -35,7 +35,7 @@
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.16.2"
+    "node": ">=8.17.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
