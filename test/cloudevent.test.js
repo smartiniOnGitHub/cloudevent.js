@@ -717,8 +717,8 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
   const ceOptionsWithDataEncoding = { ...ceCommonOptions, datacontentencoding: 'Base64' }
-  const ceDataAsString = 'Hello World, 2019'
-  const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMTk='
+  const ceDataAsString = 'Hello World, 2020'
+  const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 
   {
     // datacontentencoding bad (not a string), and data bad (not as a string), expect validation errors ...

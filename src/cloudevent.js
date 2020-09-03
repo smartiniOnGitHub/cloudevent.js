@@ -176,7 +176,7 @@ class CloudEvent {
    * @return {string} the value
    */
   static version () {
-    return '0.3'
+    return '1.0'
   }
 
   /**
@@ -528,6 +528,7 @@ class CloudEvent {
     const parsed = JSON.parse(ser)
     // ensure it's an object (single), and not a string neither a collection or an array
     if (!V.isObject(parsed) || V.isArray(parsed)) throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
+    if (!V.isStringNotEmpty(parsed.specversion) || parsed.specversion !== CloudEvent.version()) throw new Error(`Unable to deserialize, not compatible specversion: got '${parsed.specversion}' expected '${CloudEvent.version()}'.`)
 
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)

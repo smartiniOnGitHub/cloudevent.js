@@ -40,7 +40,7 @@ const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent'
 /** create a sample common server URL, for better reuse in tests */
 const ceServerUrl = '/test'
 /** create some common data from an object, for better reuse in tests */
-const ceCommonData = { hello: 'world', year: 2019 }
+const ceCommonData = { hello: 'world', year: 2020 }
 /** create some common data from a Map, for better reuse in tests */
 const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])

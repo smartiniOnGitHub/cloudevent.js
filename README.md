@@ -63,7 +63,7 @@ const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 const ceCommonExtensions = { exampleExtension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
-const ceCommonData = { hello: 'world', year: 2019 }
+const ceCommonData = { hello: 'world', year: 2020 }
 
 // create some sample minimal instances, good even for validation ...
 const ceMinimal = new CloudEvent('1', // id
@@ -154,12 +154,12 @@ console.log('Serialization output for ceFullStrict, details:\n' + ceFullStrictSe
 // non default contenttype
 const ceFullStrictOtherContentTypeSerializedStatic = CloudEvent.serializeEvent(ceFullStrictOtherContentType, {
   // encoder: (data) => '<data "encoder"="sample" />',
-  encodedData: '<data "hello"="world" "year"="2019" />',
+  encodedData: '<data "hello"="world" "year"="2020" />',
   onlyValid: true
 })
 const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.serialize({
   // encoder: (data) => '<data "encoder"="sample" />',
-  encodedData: '<data "hello"="world" "year"="2019" />',
+  encodedData: '<data "hello"="world" "year"="2020" />',
   onlyValid: true
 })
 console.log('Serialization output for ceFullStrictOtherContentType, details:\n' + ceFullStrictOtherContentTypeSerialized)
@@ -186,7 +186,7 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictDeserializedOnlyValid, 
 // non default contenttype
 const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
   // decoder: (data) => { decoder: 'Sample' },
-  decodedData: { hello: 'world', year: 2019 },
+  decodedData: { hello: 'world', year: 2020 },
   onlyValid: true
 })
 assert(ceFullStrictOtherContentTypeDeserialized !== null)
@@ -206,7 +206,7 @@ you can find even examples for using JSONBatch objects (array of CloudEvent inst
 
 ## Requirements
 
-Node.js 8.16.x or later.
+Node.js 8 LTS (but recommended 8.17.0) or later.
 
 
 ## Note
