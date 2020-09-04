@@ -25,7 +25,7 @@ const commonEventTime = new Date()
 const ceCommonOptions = {
   time: commonEventTime,
   datacontenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain',
+  dataschema: 'http://my-schema.localhost.localdomain',
   subject: 'subject',
   strict: false
 }

@@ -49,8 +49,8 @@ class CloudEvent {
    * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
    *        datacontentencoding (string) optional in most cases here,
-   *        datacontenttype (string, default 'application/json') tell how the data attribute must be encoded,
-   *        schemaurl (uri) optional,
+   *        datacontenttype (string, default 'application/json') is the content type of the data attribute,
+   *        dataschema (uri) optional, reference to the schema that data adheres to,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
    * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
@@ -61,7 +61,7 @@ class CloudEvent {
     time = new Date(),
     datacontentencoding,
     datacontenttype = CloudEvent.datacontenttypeDefault(),
-    schemaurl,
+    dataschema,
     subject,
     strict = false
   } = {},
@@ -132,6 +132,12 @@ class CloudEvent {
      */
     this.datacontenttype = datacontenttype
     /**
+     * The URI of the schema for event data, if any.
+     * @type {uri}
+     * @private
+     */
+    this.dataschema = dataschema
+    /**
      * The event timestamp.
      * Copy the original object to avoid changing objects that could be shared.
      * Note that here the object will be transformed into string when serialized.
@@ -139,12 +145,6 @@ class CloudEvent {
      * @private
      */
     this.time = new Date(time.valueOf())
-    /**
-     * The URL of schema for the event, if any.
-     * @type {uri}
-     * @private
-     */
-    this.schemaurl = schemaurl
     /**
      * The subject of the event in the context of the event producer.
      * @type {string}
@@ -372,8 +372,8 @@ class CloudEvent {
     ve.push(V.ensureIsStringNotEmpty(event.id, 'id'))
     ve.push(V.ensureIsStringNotEmpty(event.type, 'type'))
     ve.push(V.ensureIsStringNotEmpty(event.source, 'source'))
-    if (V.isDefinedAndNotNull(event.schemaurl)) {
-      ve.push(V.ensureIsStringNotEmpty(event.schemaurl, 'schemaurl'))
+    if (V.isDefinedAndNotNull(event.dataschema)) {
+      ve.push(V.ensureIsStringNotEmpty(event.dataschema, 'dataschema'))
     }
     if (V.isDefinedAndNotNull(event.subject)) {
       ve.push(V.ensureIsStringNotEmpty(event.subject, 'subject'))
@@ -401,7 +401,7 @@ class CloudEvent {
       ve.push(V.ensureIsURI(event.source, null, 'source'))
       ve.push(V.ensureIsDatePast(event.time, 'time'))
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
-      ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
+      ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
       if (V.isDefinedAndNotNull(event.extensions)) {
         // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
@@ -549,7 +549,7 @@ class CloudEvent {
         time: T.timestampFromString(parsed.time, timezoneOffset),
         datacontentencoding: parsed.datacontentencoding,
         datacontenttype: parsed.datacontenttype,
-        schemaurl: parsed.schemaurl,
+        dataschema: parsed.dataschema,
         subject: parsed.subject,
         strict: strict
       },
@@ -633,14 +633,13 @@ class CloudEvent {
         type: { type: 'string', minLength: 1 },
         source: { type: 'string', format: 'uri-reference' },
         datacontenttype: { type: 'string' },
-        // data: { type: ['object', 'string'] },
+        data: { type: ['object', 'string'] },
+        data_base64: { type: 'string' },
+        dataschema: { type: 'string', format: 'uri' },
         // time: { type: 'string', format: 'date-time' },
-        schemaurl: { type: 'string', format: 'uri-reference' },
         subject: { type: 'string', minLength: 1 }
       },
-      required: [
-        'specversion', 'id', 'type', 'source'
-      ],
+      required: ['specversion', 'id', 'type', 'source'],
       additionalProperties: true // to handle data, and maybe other (non-standard) properties (extensions)
     }
   }
@@ -783,7 +782,7 @@ CloudEvent.standardProps = [
   'specversion',
   'id', 'type', 'source', 'data',
   'time', 'datacontentencoding', 'datacontenttype',
-  'schemaurl', 'subject'
+  'dataschema', 'subject'
 ]
 
 module.exports = CloudEvent

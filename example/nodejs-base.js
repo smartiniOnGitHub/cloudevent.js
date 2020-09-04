@@ -53,7 +53,7 @@ console.log(`cloudEvent dump: ${T.dumpObject(ceMinimalMandatoryUndefinedNoStrict
 const ceCommonOptions = {
   time: new Date(),
   datacontenttype: 'application/json',
-  schemaurl: 'http://my-schema.localhost.localdomain/v1/',
+  dataschema: 'http://my-schema.localhost.localdomain/v1/',
   subject: 'subject',
   strict: false // same as default
 }

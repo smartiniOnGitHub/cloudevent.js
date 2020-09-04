@@ -306,7 +306,7 @@ class JSONBatch {
           time: i.time,
           datacontentencoding: i.datacontentencoding,
           datacontenttype: i.datacontenttype,
-          schemaurl: i.schemaurl,
+          dataschema: i.dataschema,
           subject: i.subject,
           strict: CloudEvent.getStrictExtensionOfEvent(i) || options.strict
         },
