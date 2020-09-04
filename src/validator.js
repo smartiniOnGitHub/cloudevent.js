@@ -360,12 +360,12 @@ class Validator {
         return false
       }
     } else {
-      // simple check if it's an URI (or better, a relative URL)
-      if (arg.startsWith('/')) {
+      // simple check if it's an URI (or better: a relative URL, or a full URI with scheme etc)
+      const uriRegex = /^(\w+:|\/)/ // or /^(\w+:|\/)(.*)$/ for full match
+      if (uriRegex.test(arg)) {
         return true
       }
       try {
-        // return (new URL(arg) !== null)
         const u = new url.URL(arg)
         return (u !== null)
       } catch (e) {
