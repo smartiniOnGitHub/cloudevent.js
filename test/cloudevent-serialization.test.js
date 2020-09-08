@@ -2044,6 +2044,37 @@ test('create and deserialize some CloudEvent instances with data encoded in base
 })
 
 // define some events valid in the spec version 0.3
-// const ceFullSerializedComparison03 = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
-// const ceFullStrictSerializedComparison03 = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
-// TODO: add deserialization tests for a previous specversion ... wip
+const ceFullSerializedJson03 = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","exampleExtension":"value"}`
+const ceFullStrictSerializedJson03 = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
+
+/** @test {CloudEvent} */
+test('deserialize some CloudEvent instances (but a previous specversion) from JSON, and ensure errora are raised', (t) => {
+  t.plan(6)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+
+  {
+    const serialized = ceFullSerializedJson03
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    t.throws(function () {
+      const ceDeserialized = CloudEvent.deserializeEvent(serialized)
+      assert(ceDeserialized === undefined) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent from a different specversion')
+  }
+
+  {
+    // the same but with strict mode enabled ...
+    const serialized = ceFullStrictSerializedJson03
+    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    t.ok(serialized)
+    t.ok(V.isString(serialized))
+
+    t.throws(function () {
+      const ceDeserialized = CloudEvent.deserializeEvent(serialized)
+      assert(ceDeserialized === undefined) // never executed
+    }, Error, 'Expected exception when creating a CloudEvent from a different specversion')
+  }
+})
