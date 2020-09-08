@@ -5,7 +5,7 @@ Summary Changelog:
 - Implement the [v1.0 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0) with all breaking changes since its v0.3
 - Update dependencies for the development environment
 - Update JSON Schema to that of spec v1.0
-- Keep compatibility wil Node.js 8 (but this is latest release that supports it)
+- Keep compatibility with Node.js 8 (but this is latest release that supports it)
 - Breaking change: updated attributes as per spec
 
 ## [0.6.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.6.0) (2019-10-23)
