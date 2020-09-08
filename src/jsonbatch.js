@@ -304,7 +304,7 @@ class JSONBatch {
         // note that strict is handleg both as strict and inside extensions, but it's good the same
         const ce = new CloudEvent(i.id, i.type, i.source, i.data, {
           time: i.time,
-          datacontentencoding: i.datacontentencoding,
+          data_base64: i.data_base64,
           datacontenttype: i.datacontenttype,
           dataschema: i.dataschema,
           subject: i.subject,

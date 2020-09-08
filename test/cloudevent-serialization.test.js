@@ -134,7 +134,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-    ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+    ceFullDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
 
     const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
@@ -216,7 +216,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-    ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+    ceFullStrictDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFullStrict, ceFullStrictDeserialized)
 
     const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
@@ -914,7 +914,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-    ceFullDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+    ceFullDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
 
     // ensure payload data is a copy of event data
@@ -975,7 +975,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-    ceFullStrictDeserialized.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
+    ceFullStrictDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFullStrict, ceFullStrictDeserialized)
 
     // ensure payload data is a copy of event data
@@ -1825,36 +1825,37 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
 })
 
 /** @test {CloudEvent} */
-test('create and deserialize some CloudEvent instances with datacontentencoding specified, and ensure they are right', (t) => {
-  t.plan(120)
+test('create and deserialize some CloudEvent instances with data encoded in base64, and ensure they are right', (t) => {
+  t.plan(100)
 
-  const { CloudEvent, CloudEventValidator: V } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
-  const ceOptionsWithDataEncoding = { ...ceCommonOptions, datacontentencoding: 'Base64' }
-  const ceOptionsWithDataEncodingNotSupported = { ...ceCommonOptions, datacontentencoding: 'Custom encoding' }
   const ceDataAsString = 'Hello World, 2020'
   const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
+  const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataEncoded }
 
   {
     const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
       ceNamespace,
       ceServerUrl,
-      ceDataAsString, // data
-      ceOptionsWithDataEncoding,
+      null, // data
+      ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFull, 'ceFull')}`)
     t.ok(ceFull)
     t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
     t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-    t.strictSame(ceFull.data, ceDataAsString)
-    t.notStrictSame(ceFull.data, ceDataEncoded)
+    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+    t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
 
     const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
     t.ok(ceFullSerializedStatic)
     const ceFullSerialized = ceFull.serialize()
     t.ok(ceFullSerialized)
@@ -1895,13 +1896,15 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
     t.notStrictEqual(ceDeserialized.time, commonEventTime)
     t.notEqual(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
-    t.ok(ceDeserialized.data)
-    t.ok(V.isString(ceDeserialized.data))
+    t.ok(ceDeserialized.data_base64)
+    t.ok(V.isString(ceDeserialized.data_base64))
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.strictSame(ceDeserialized.data, ceDeserialized.payload)
+    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictSame(ceDeserialized.payload, ceDeserialized.data_base64)
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFull.data)
     t.notStrictSame(ceDeserialized.data, ceDataEncoded)
@@ -1916,12 +1919,12 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
       // some checks on serialized instance
       const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      // ceFullDeserializedJSON.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
-      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}'`)
+      // console.log(`DEBUG - original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
+      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
       t.notStrictSame(ceFullDeserializedJSON, ceFull)
-      t.notStrictSame(ceFullDeserializedJSON.data, ceFull.data)
-      t.strictSame(ceFullDeserializedJSON.data, ceDataEncoded)
+      t.strictSame(ceFullDeserializedJSON.data, ceFull.data)
+      t.strictSame(ceFullDeserializedJSON.data_base64, ceFull.data_base64)
     }
     {
       // test with not supported data (not a string representation)
@@ -1931,39 +1934,7 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
       t.throws(function () {
         const ceDeserialized = CloudEvent.deserializeEvent(serialized)
         assert(ceDeserialized === undefined) // never executed
-      }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding set and data not a string')
-    }
-    {
-      // test with a not supported datacontentencoding
-      // update serialized with bad data
-      const serialized = ceFullSerializedStatic.replace('Base64', 'Custom encoding')
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
-      // some checks on serialized instance, but using deserialization methods
-      t.throws(function () {
-        const ceDeserialized = CloudEvent.deserializeEvent(serialized)
-        assert(ceDeserialized === undefined) // never executed
-      }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding not supported')
-    }
-    {
-      // test with a not supported datacontentencoding
-      const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
-        ceNamespace,
-        ceServerUrl,
-        ceDataAsString, // data
-        ceOptionsWithDataEncodingNotSupported,
-        ceCommonExtensions
-      )
-      t.ok(ceFull)
-      t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
-      t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
-      t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
-      t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-      t.strictSame(ceFull.data, ceDataAsString)
-      t.notStrictSame(ceFull.data, ceDataEncoded)
-      t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
-      t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-      const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-      t.ok(ceFullSerializedStatic)
+      }, Error, 'Expected exception when creating a CloudEvent with data_base64 set but wrong')
     }
   }
 
@@ -1972,21 +1943,23 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
     const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
       ceNamespace,
       ceServerUrl,
-      ceDataAsString, // data
-      { ...ceOptionsWithDataEncoding, strict: true },
+      null, // data
+      { ...ceOptionsWithDataInBase64, strict: true },
       ceCommonExtensions
     )
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)
     t.ok(ceFullStrict)
     t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: false }))
     t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
-    t.strictSame(ceFullStrict.data, ceDataAsString)
-    t.notStrictSame(ceFullStrict.data, ceDataEncoded)
+    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+    t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
 
     const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
     t.ok(ceFullSerializedStatic)
     const ceFullSerialized = ceFullStrict.serialize()
     t.ok(ceFullSerialized)
@@ -2027,13 +2000,15 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
     t.notStrictEqual(ceDeserialized.time, commonEventTime)
     t.notEqual(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
-    t.ok(ceDeserialized.data)
-    t.ok(V.isString(ceDeserialized.data))
+    t.ok(ceDeserialized.data_base64)
+    t.ok(V.isString(ceDeserialized.data_base64))
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.strictSame(ceDeserialized.data, ceDeserialized.payload)
+    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictSame(ceDeserialized.payload, ceDeserialized.data_base64)
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFullStrict.data)
     t.notStrictSame(ceDeserialized.data, ceDataEncoded)
@@ -2048,53 +2023,22 @@ test('create and deserialize some CloudEvent instances with datacontentencoding 
       // some checks on serialized instance
       const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
       ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      // ceFullDeserializedJSON.datacontentencoding = undefined // quick fix for this not so common attribute in the deserialized object
-      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}'`)
+      // console.log(`DEBUG - original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
+      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
       t.notStrictSame(ceFullDeserializedJSON, ceFullStrict)
-      t.notStrictSame(ceFullDeserializedJSON.data, ceFullStrict.data)
-      t.strictSame(ceFullDeserializedJSON.data, ceDataEncoded)
+      t.strictSame(ceFullDeserializedJSON.data, ceFullStrict.data)
+      t.strictSame(ceFullDeserializedJSON.data_base64, ceFullStrict.data_base64)
     }
     {
       // test with not supported data (not a string representation)
-      const serialized = ceFullSerializedStatic.replace(ceDataEncoded, '')
+      const serialized = ceFullSerializedStatic.replace(ceDataEncoded, '{}')
       // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
       // some checks on serialized instance, but using deserialization methods
       t.throws(function () {
         const ceDeserialized = CloudEvent.deserializeEvent(serialized)
         assert(ceDeserialized === undefined) // never executed
-      }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding set and data not a string')
-    }
-    {
-      // test with a not supported datacontentencoding
-      const serialized = ceFullSerializedStatic.replace('Base64', 'Custom encoding')
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
-      // some checks on serialized instance, but using deserialization methods
-      t.throws(function () {
-        const ceDeserialized = CloudEvent.deserializeEvent(serialized)
-        assert(ceDeserialized === undefined) // never executed
-      }, Error, 'Expected exception when creating a CloudEvent with datacontentencoding not supported')
-    }
-    {
-      // test with a not supported datacontentencoding
-      const ceFull = new CloudEvent('1/full/sample-data-nested/strict',
-        ceNamespace,
-        ceServerUrl,
-        ceDataAsString, // data
-        { ...ceOptionsWithDataEncodingNotSupported, strict: true },
-        ceCommonExtensions
-      )
-      t.ok(ceFull)
-      t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
-      t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
-      t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
-      t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-      t.strictSame(ceFull.data, ceDataAsString)
-      t.notStrictSame(ceFull.data, ceDataEncoded)
-      t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
-      t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-      const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-      t.ok(ceFullSerializedStatic)
+      }, Error, 'Expected exception when creating a CloudEvent with data_base64 set but wrong')
     }
   }
 })

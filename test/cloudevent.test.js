@@ -411,7 +411,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
-  t.plan(81)
+  t.plan(87)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -478,6 +478,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataNull.isValid({ strict: false }))
     t.strictSame(ceFullDataNull.validate(), [])
     t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
+    t.strictSame(ceFullDataNull.payload, ceFullDataNull.data)
     // the same but with strict mode enabled ...
     const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
       ceNamespace,
@@ -497,6 +498,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataNullStrict.isValid({ strict: true }))
     t.strictSame(ceFullDataNullStrict.validate(), [])
     t.strictSame(ceFullDataNullStrict.validate({ strict: true }).length, 0)
+    t.strictSame(ceFullDataNullStrict.payload, ceFullDataNullStrict.data)
   }
 
   {
@@ -524,6 +526,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataString.validate(), [])
     t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
     t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
+    t.strictSame(ceFullDataString.payload, ceFullDataString.data)
     // the same but with strict mode enabled ...
     const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
       ceNamespace,
@@ -549,6 +552,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataStringStrict.validate().length, 1)
     t.strictSame(ceFullDataStringStrict.validate({ strict: true }).length, 1)
     t.strictSame(ceFullDataStringStrict.validate({ strict: false }).length, 1)
+    t.strictSame(ceFullDataStringStrict.payload, ceFullDataStringStrict.data)
   }
 
   {
@@ -572,6 +576,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataMap.isValid({ strict: false }))
     t.strictSame(ceFullDataMap.validate(), []) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataMap.payload, ceFullDataMap.data)
     // the same but with strict mode enabled ...
     const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
       ceNamespace,
@@ -591,6 +596,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.ok(ceFullDataMapStrict.isValid({ strict: true }))
     t.strictSame(ceFullDataMapStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataMapStrict.payload, ceFullDataMapStrict.data)
   }
 })
 
@@ -711,47 +717,42 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
 })
 
 /** @test {CloudEvent} */
-test('ensure CloudEvent with datacontentencoding are managed in the right way', (t) => {
-  t.plan(72)
+test('ensure CloudEvent with data encoded in base64 are managed in the right way', (t) => {
+  t.plan(44)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
-  const ceOptionsWithDataEncoding = { ...ceCommonOptions, datacontentencoding: 'Base64' }
   const ceDataAsString = 'Hello World, 2020'
   const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
-
+  const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataEncoded }
   {
-    // datacontentencoding bad (not a string), and data bad (not as a string), expect validation errors ...
+    // data_base64 bad (not a string), expect validation errors ...
     const ceFull = new CloudEvent('1/full',
       ceNamespace,
       ceServerUrl,
-      ceCommonData,
-      { ...ceCommonOptions, datacontentencoding: {} },
+      null,
+      { ...ceCommonOptions, datainbase64: {} },
       ceCommonExtensions
     )
     t.ok(ceFull)
     t.ok(!CloudEvent.isValidEvent(ceFull, { strict: false }))
     t.ok(!CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 1)
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 2)
-    t.ok(V.isObject(ceFull.data))
-    t.notStrictSame(ceFull.data, ceDataAsString)
-    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
-    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
   }
   {
-    // datacontentencoding good, but data not as a string here, expect validation errors ...
+    // data_base64 good, but data defined here, expect validation errors ...
     const ceFull = new CloudEvent('1/full',
       ceNamespace,
       ceServerUrl,
       ceCommonData,
-      ceOptionsWithDataEncoding,
+      ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
     t.ok(ceFull)
-    t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+    t.ok(!CloudEvent.isValidEvent(ceFull, { strict: false }))
     t.ok(!CloudEvent.isValidEvent(ceFull, { strict: true }))
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 1)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
     t.ok(V.isObject(ceFull.data))
     t.notStrictSame(ceFull.data, ceDataAsString)
@@ -759,31 +760,31 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }
   {
-    // datacontentencoding custom (so not supported), and data as a string here (good), expect no validation errors ...
+    // data_base64 good, but data defined as a string here, expect validation errors ...
     const ceFull = new CloudEvent('1/full',
       ceNamespace,
       ceServerUrl,
       ceDataAsString,
-      { ...ceCommonOptions, datacontentencoding: 'Custom encoding' },
+      ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
     t.ok(ceFull)
-    t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
-    t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
+    t.ok(!CloudEvent.isValidEvent(ceFull, { strict: false }))
+    t.ok(!CloudEvent.isValidEvent(ceFull, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 2)
     t.ok(V.isString(ceFull.data))
     t.strictSame(ceFull.data, ceDataAsString)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }
   {
-    // datacontentencoding good, and data as a string here (good), expect no validation errors ...
+    // data_base64 good, and no data defined here (good), expect no validation errors ...
     const ceFull = new CloudEvent('1/full',
       ceNamespace,
       ceServerUrl,
-      ceDataAsString,
-      ceOptionsWithDataEncoding,
+      null,
+      ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
     t.ok(ceFull)
@@ -791,8 +792,6 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
     t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-    t.ok(V.isString(ceFull.data))
-    t.strictSame(ceFull.data, ceDataAsString)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }
@@ -800,31 +799,12 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
   // the same but with strict mode ...
   // note that in this case validation will use the strict flag set into ce instance ...
   {
-    // datacontentencoding bad (not a string), and data bad (not as a string), expect validation errors ...
+    // data_base64 bad (not a string), expect validation errors ...
     const ceFull = new CloudEvent('1/full-strict',
       ceNamespace,
       ceServerUrl,
-      ceCommonData,
-      { ...ceCommonOptions, datacontentencoding: {}, strict: true },
-      ceCommonExtensions
-    )
-    t.ok(ceFull)
-    t.ok(!CloudEvent.isValidEvent(ceFull, { strict: false }))
-    t.ok(!CloudEvent.isValidEvent(ceFull, { strict: true }))
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 2)
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 2)
-    t.ok(V.isObject(ceFull.data))
-    t.notStrictSame(ceFull.data, ceDataAsString)
-    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
-    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-  }
-  {
-    // datacontentencoding good, but data not as a string here, expect validation errors ...
-    const ceFull = new CloudEvent('1/full-strict',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData,
-      { ...ceOptionsWithDataEncoding, strict: true },
+      null,
+      { ...ceCommonOptions, datainbase64: {}, strict: true },
       ceCommonExtensions
     )
     t.ok(ceFull)
@@ -832,18 +812,36 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
     t.ok(!CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 1)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
-    t.ok(V.isObject(ceFull.data))
-    t.notStrictSame(ceFull.data, ceDataAsString)
-    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
-    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }
-  {
-    // datacontentencoding custom (so not supported), and data as a string here (good), expect no validation errors ...
-    const ceFull = new CloudEvent('1/full-strict',
+  // data_base64 good, but data defined here, expect instantiation errors ...
+  t.throws(function () {
+    const ce = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceCommonData,
+      { ...ceOptionsWithDataInBase64, strict: true },
+      ceCommonExtensions
+    )
+    assert(ce === null) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with data and datainbase64 with strict flag enabled')
+  // data_base64 good, but data defined as a string here, expect validation errors ...
+  t.throws(function () {
+    const ce = new CloudEvent('1/full-strict',
       ceNamespace,
       ceServerUrl,
       ceDataAsString,
-      { ...ceCommonOptions, datacontentencoding: 'Custom encoding', strict: true },
+      { ...ceOptionsWithDataInBase64, strict: true },
+      ceCommonExtensions
+    )
+    assert(ce === null) // never executed
+  }, Error, 'Expected exception when creating a CloudEvent with data and datainbase64 with strict flag enabled')
+  {
+    // data_base64 good, and no data defined here (good), expect no validation errors ...
+    const ceFull = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      null,
+      { ...ceOptionsWithDataInBase64, strict: true },
       ceCommonExtensions
     )
     t.ok(ceFull)
@@ -851,27 +849,6 @@ test('ensure CloudEvent with datacontentencoding are managed in the right way', 
     t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-    t.ok(V.isString(ceFull.data))
-    t.strictSame(ceFull.data, ceDataAsString)
-    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
-    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-  }
-  {
-    // datacontentencoding good, and data as a string here (good), expect no validation errors ...
-    const ceFull = new CloudEvent('1/full-strict',
-      ceNamespace,
-      ceServerUrl,
-      ceDataAsString,
-      { ...ceOptionsWithDataEncoding, strict: true },
-      ceCommonExtensions
-    )
-    t.ok(ceFull)
-    t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
-    t.ok(CloudEvent.isValidEvent(ceFull, { strict: true }))
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
-    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
-    t.ok(V.isString(ceFull.data))
-    t.strictSame(ceFull.data, ceDataAsString)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }

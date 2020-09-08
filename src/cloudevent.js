@@ -48,18 +48,18 @@ class CloudEvent {
    * @param {?(object|Map|Set|string)} data the real event data
    * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
-   *        datacontentencoding (string) optional in most cases here,
+   *        datainbase64 (string) base64 encoded value for the data (data attribute must not be present when this is defined),
    *        datacontenttype (string, default 'application/json') is the content type of the data attribute,
    *        dataschema (uri) optional, reference to the schema that data adheres to,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
    * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
    * @throws {Error} if strict is true and id or type is undefined or null
-   * @throws {Error} if datacontentencoding is defined and data is not a string or if encoding is not 'base64'
+   * @throws {Error} if data and data_base64 are defined
    */
   constructor (id, type, source, data, {
     time = new Date(),
-    datacontentencoding,
+    datainbase64,
     datacontenttype = CloudEvent.datacontenttypeDefault(),
     dataschema,
     subject,
@@ -69,7 +69,10 @@ class CloudEvent {
   ) {
     if (strict === true) {
       if (!id || !type || !source) {
-        throw new Error('Unable to create CloudEvent instance, mandatory field missing')
+        throw new Error('Unable to create CloudEvent instance, mandatory attributes missing')
+      }
+      if (V.isDefinedAndNotNull(data) && V.isDefinedAndNotNull(datainbase64)) {
+        throw new Error('Unable to create CloudEvent instance, data and data_base64 attributes are exclusive')
       }
     }
 
@@ -115,16 +118,13 @@ class CloudEvent {
      * @private
      */
     this.specversion = this.constructor.version()
+
     /**
-     * The content encoding for the data attribute
-     * for when the data field must be encoded as a string.
-     * This must be set if the data attribute contains string-encoded binary data,
-     * otherwise it must not be set.
-     * As (arbitrary) limitation, only 'base64' encoding is supported here.
+     * The real event data, but encoded in base64 format.
      * @type {string}
      * @private
      */
-    this.datacontentencoding = datacontentencoding
+    this.data_base64 = datainbase64
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
@@ -378,18 +378,18 @@ class CloudEvent {
     if (V.isDefinedAndNotNull(event.subject)) {
       ve.push(V.ensureIsStringNotEmpty(event.subject, 'subject'))
     }
-    if (V.isDefinedAndNotNull(event.datacontentencoding)) {
-      ve.push(V.ensureIsStringNotEmpty(event.datacontentencoding, 'datacontentencoding'))
+    if (V.isDefinedAndNotNull(event.data_base64)) {
+      ve.push(V.ensureIsStringNotEmpty(event.data_base64, 'data_base64'))
+      if (V.isDefinedAndNotNull(event.data)) {
+        ve.push('data and data_base64 attributes are exclusive')
+      }
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (V.isDefinedAndNotNull(event.datacontentencoding)) {
-          // ensure data is a string in this case
-          ve.push(V.ensureIsString(event.data, 'data'))
-        } else if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
+        if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
           // ensure data is a plain object or collection, or even a string in this case
           // because in serialization/deserialization some validation can occur on the transformed object
           ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
@@ -467,11 +467,6 @@ class CloudEvent {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         const ser = JSON.stringify(event, function replacer (key, value) {
           switch (key) {
-            case 'data':
-              // return data as is, or encoded or nothing (if not supported)
-              if (V.isUndefinedOrNull(event.datacontentencoding)) return value
-              if (event.datacontentencoding === 'Base64') return T.stringToBase64(this.data)
-              else return undefined
             case 'extensions':
               // filtering out top level extensions (if any)
               return undefined
@@ -533,13 +528,6 @@ class CloudEvent {
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
 
-    if (V.isDefinedAndNotNull(parsed.datacontentencoding)) {
-      if (V.isStringNotEmpty(parsed.data)) {
-        // decode the given data
-        if (parsed.datacontentencoding === 'Base64') parsed.data = T.stringFromBase64(parsed.data)
-      }
-    }
-
     // fill a new CludEvent instance with parsed data
     const ce = new CloudEvent(parsed.id,
       parsed.type,
@@ -547,7 +535,7 @@ class CloudEvent {
       parsed.data,
       { // options
         time: T.timestampFromString(parsed.time, timezoneOffset),
-        datacontentencoding: parsed.datacontentencoding,
+        datainbase64: parsed.data_base64,
         datacontenttype: parsed.datacontenttype,
         dataschema: parsed.dataschema,
         subject: parsed.subject,
@@ -717,7 +705,7 @@ class CloudEvent {
   }
 
   /**
-   * Getter method to return a copy of CloudEvent data attribute,
+   * Getter method to return a copy of CloudEvent data attribute (or data_base64 if defined),
    * or original data payload.
    *
    * See {@link CloudEvent.data}.
@@ -725,12 +713,18 @@ class CloudEvent {
    * @type {(object|Map|Set)}
    */
   get payload () {
-    if (V.isString(this.data)) {
-      // handle an edge case: if data is a String, I need to clone in a different way ...
-      return this.data.slice()
+    if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
+      if (V.isString(this.data)) {
+        // handle an edge case: if data is a String, I need to clone in a different way ...
+        return this.data.slice()
+      } else {
+        return { ...this.data }
+      }
+    } else if (V.isDefinedAndNotNull(this.data_base64)) {
+      return this.data_base64.slice()
     }
-    // else
-    return { ...this.data }
+    // else return tha same empty object
+    return this.data
   }
 
   /**
@@ -781,7 +775,7 @@ class CloudEvent {
 CloudEvent.standardProps = [
   'specversion',
   'id', 'type', 'source', 'data',
-  'time', 'datacontentencoding', 'datacontenttype',
+  'time', 'data_base64', 'datacontenttype',
   'dataschema', 'subject'
 ]
 
