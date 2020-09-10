@@ -708,7 +708,7 @@ class CloudEvent {
    * Getter method to return a copy of CloudEvent data attribute (or data_base64 if defined),
    * or original data payload.
    *
-   * See {@link CloudEvent.data}.
+   * See {@link CloudEvent.data}, {@link CloudEvent.data_base64}.
    *
    * @type {(object|Map|Set)}
    */
@@ -723,8 +723,24 @@ class CloudEvent {
     } else if (V.isDefinedAndNotNull(this.data_base64)) {
       return this.data_base64.slice()
     }
-    // else return tha same empty object
+    // else return the same empty object
     return this.data
+  }
+
+  /**
+   * Getter method to tell if CloudEvent data is text or binary,
+   * or unknown if not clear.
+   *
+   * @type {string}
+   */
+  get dataType () {
+    if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
+      return 'Text'
+    } else if (V.isDefinedAndNotNull(this.data_base64)) {
+      return 'Binary'
+    }
+    // else return an unknown/wrong data type
+    return 'Unknown'
   }
 
   /**

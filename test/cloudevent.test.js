@@ -411,7 +411,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
-  t.plan(87)
+  t.plan(93)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -479,6 +479,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataNull.validate(), [])
     t.strictSame(ceFullDataNull.validate({ strict: false }).length, 0)
     t.strictSame(ceFullDataNull.payload, ceFullDataNull.data)
+    t.strictSame(ceFullDataNull.dataType, 'Unknown')
     // the same but with strict mode enabled ...
     const ceFullDataNullStrict = new CloudEvent('1/full/null-data/strict',
       ceNamespace,
@@ -499,6 +500,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataNullStrict.validate(), [])
     t.strictSame(ceFullDataNullStrict.validate({ strict: true }).length, 0)
     t.strictSame(ceFullDataNullStrict.payload, ceFullDataNullStrict.data)
+    t.strictSame(ceFullDataNullStrict.dataType, 'Unknown')
   }
 
   {
@@ -527,6 +529,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataString.validate({ strict: false }).length, 0)
     t.strictSame(ceFullDataString.validate({ strict: true }).length, 1)
     t.strictSame(ceFullDataString.payload, ceFullDataString.data)
+    t.strictSame(ceFullDataString.dataType, 'Text')
     // the same but with strict mode enabled ...
     const ceFullDataStringStrict = new CloudEvent('1/full/string-data/strict',
       ceNamespace,
@@ -553,6 +556,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataStringStrict.validate({ strict: true }).length, 1)
     t.strictSame(ceFullDataStringStrict.validate({ strict: false }).length, 1)
     t.strictSame(ceFullDataStringStrict.payload, ceFullDataStringStrict.data)
+    t.strictSame(ceFullDataStringStrict.dataType, 'Text')
   }
 
   {
@@ -577,6 +581,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataMap.validate(), []) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMap.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMap.payload, ceFullDataMap.data)
+    t.strictSame(ceFullDataMap.dataType, 'Text')
     // the same but with strict mode enabled ...
     const ceFullDataMapStrict = new CloudEvent('1/full/map-data/strict',
       ceNamespace,
@@ -597,6 +602,7 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataMapStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMapStrict.payload, ceFullDataMapStrict.data)
+    t.strictSame(ceFullDataMapStrict.dataType, 'Text')
   }
 })
 
@@ -718,7 +724,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent with data encoded in base64 are managed in the right way', (t) => {
-  t.plan(44)
+  t.plan(48)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
@@ -794,6 +800,8 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+    t.strictSame(ceFull.payload, ceFull.data_base64)
+    t.strictSame(ceFull.dataType, 'Binary')
   }
 
   // the same but with strict mode ...
@@ -851,5 +859,7 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+    t.strictSame(ceFull.payload, ceFull.data_base64)
+    t.strictSame(ceFull.dataType, 'Binary')
   }
 })
