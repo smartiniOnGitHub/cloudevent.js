@@ -706,22 +706,33 @@ class CloudEvent {
 
   /**
    * Getter method to return a copy of CloudEvent data attribute (or data_base64 if defined),
-   * or original data payload.
+   * but transformed/decoded if possible.
    *
    * See {@link CloudEvent.data}, {@link CloudEvent.data_base64}.
    *
-   * @type {(object|Map|Set)}
+   * @type {(object|Map|Set|string)}
    */
   get payload () {
     if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
-      if (V.isString(this.data)) {
+      if (this.isDatacontenttypeJSON) {
+        try {
+          return JSON.parse(this.data)
+        } catch (e) {
+          // fallback in case of bad data (not parseable)
+          if (V.isString(this.data)) {
+            return this.data.slice()
+          } else {
+            return { ...this.data }
+          }
+        }
+      } else if (V.isString(this.data)) {
         // handle an edge case: if data is a String, I need to clone in a different way ...
         return this.data.slice()
       } else {
         return { ...this.data }
       }
     } else if (V.isDefinedAndNotNull(this.data_base64)) {
-      return this.data_base64.slice()
+      return T.stringFromBase64(this.data_base64)
     }
     // else return the same empty object
     return this.data

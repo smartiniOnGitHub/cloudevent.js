@@ -1904,7 +1904,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
     t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
-    t.strictSame(ceDeserialized.payload, ceDeserialized.data_base64)
+    t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFull.data)
     t.notStrictSame(ceDeserialized.data, ceDataEncoded)
@@ -2008,7 +2008,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
     t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
-    t.strictSame(ceDeserialized.payload, ceDeserialized.data_base64)
+    t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFullStrict.data)
     t.notStrictSame(ceDeserialized.data, ceDataEncoded)

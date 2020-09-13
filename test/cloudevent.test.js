@@ -361,7 +361,7 @@ test('ensure extensions are managed in the right way', (t) => {
 
 /** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
-  t.plan(21)
+  t.plan(23)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -383,6 +383,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   t.ok(ceFull1.isValid({ strict: false }))
   t.strictSame(ceFull1.validate(), [])
   t.strictSame(ceFull1.validate().length, 0)
+  t.strictSame(ceFull1.payload, ceCommonData)
 
   // create another instance with all fields equals: expected success ...
   const ceFull1Clone = new CloudEvent('1/full', // should be '2/full/no-strict' ...
@@ -402,6 +403,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   t.ok(ceFull1Clone.isValid({ strict: false }))
   t.strictSame(ceFull1Clone.validate(), [])
   t.strictSame(ceFull1Clone.validate().length, 0)
+  t.strictSame(ceFull1Clone.payload, ceCommonData)
 
   // then ensure they are different objects ...
   assert(ceFull1 !== ceFull1Clone) // they must be different object references
@@ -800,7 +802,7 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-    t.strictSame(ceFull.payload, ceFull.data_base64)
+    t.strictSame(ceFull.payload, T.stringFromBase64(ceFull.data_base64))
     t.strictSame(ceFull.dataType, 'Binary')
   }
 
@@ -859,7 +861,7 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 0)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-    t.strictSame(ceFull.payload, ceFull.data_base64)
+    t.strictSame(ceFull.payload, T.stringFromBase64(ceFull.data_base64))
     t.strictSame(ceFull.dataType, 'Binary')
   }
 })
