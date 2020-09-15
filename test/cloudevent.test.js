@@ -878,3 +878,52 @@ test('ensure old strict mode is no more valid (as per updated spec)', (t) => {
   }, TypeError, 'Expected exception when setting a non valid strict extension flag')
   t.ok(!CloudEvent.getStrictExtensionOfEvent({ ...ceExtensionStrict03 })) // ok but false return value
 })
+
+/** @test {CloudEvent} */
+test('ensure internal methods on extensions checks are fully tested', (t) => {
+  t.plan(12)
+  const { CloudEvent } = require('../src/')
+
+  t.throws(function () {
+    CloudEvent.isExtensionNameValid()
+    assert(false) // never executed
+  }, Error, 'Expected exception when checking a bad extension name')
+  t.throws(function () {
+    CloudEvent.isExtensionNameValid(undefined)
+    assert(false) // never executed
+  }, Error, 'Expected exception when checking a bad extension name')
+  t.throws(function () {
+    CloudEvent.isExtensionNameValid(null)
+    assert(false) // never executed
+  }, Error, 'Expected exception when checking a bad extension name')
+  t.throws(function () {
+    CloudEvent.isExtensionNameValid({})
+    assert(false) // never executed
+  }, TypeError, 'Expected exception when checking a bad extension name')
+
+  t.throws(function () {
+    CloudEvent.isExtensionValueValid()
+    assert(false) // never executed
+  }, Error, 'Expected exception when checking a bad extension value')
+  t.throws(function () {
+    CloudEvent.isExtensionValueValid(undefined)
+    assert(false) // never executed
+  }, Error, 'Expected exception when checking a bad extension value')
+  t.notOk(CloudEvent.isExtensionValueValid({}))
+
+  {
+    // try with not valid extension name/value, expect validation errors ...
+    const ceFull = new CloudEvent('1/full-strict',
+      ceNamespace,
+      ceServerUrl,
+      null,
+      ceCommonOptions,
+      ceExtensionStrict03
+    )
+    t.ok(ceFull)
+    t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+    t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 2)
+  }
+})
