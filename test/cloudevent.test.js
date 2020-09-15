@@ -867,4 +867,14 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
 // define my extension, valid in the spec version 0.3
 const ceExtensionStrict03 = { com_github_smartiniOnGitHub_cloudevent: { strict: true } }
 
-// TODO: add some tests with it (no more valid in 1.0) ... wip
+/** @test {CloudEvent} */
+test('ensure old strict mode is no more valid (as per updated spec)', (t) => {
+  t.plan(2)
+  const { CloudEvent } = require('../src/')
+
+  t.throws(function () {
+    CloudEvent.setStrictExtensionInEvent({}, ceExtensionStrict03)
+    assert(false) // never executed
+  }, TypeError, 'Expected exception when setting a non valid strict extension flag')
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ ...ceExtensionStrict03 })) // ok but false return value
+})
