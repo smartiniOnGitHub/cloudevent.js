@@ -60,7 +60,7 @@ const ceCommonOptions = {
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceCommonExtensions = { exampleExtension: 'value' }
+const ceCommonExtensions = { exampleextension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { hello: 'world', year: 2020 }
@@ -226,13 +226,17 @@ and changed to the simpler 'cloudevent', so it will be easier to get it at npm.
 Since v0.2 of the spec, there is no more a standard attribute to specify the version 
 of any specific event type, so the best if to follow their recommendations, 
 and for example add a version in the 'type' attribute 
-(for example '-v1.0.0' at the end of its base value, or at the end of its full value) ,
+(for example '-v1.0.0' at the end of its base value, or at the end of its full value), 
 or into the 'schemaurl' attribute but only its major version 
 (like '-v1' or '/v1/' at the end).
 Since v0.3 of the spec, there is no more a standard attribute for extensions, 
 so they are merged into usual properties (but must not use names 
 of standard properties); a best practice is to use reverse-DNS name 
 but without dots, so like 'com_github_smartiniOnGitHub_cloudevent'.
+Since v1.0 of the spec, some properties has been removed/simplified; 
+extension properties must be simple (no nested properties) 
+and must contain only lowercase letters and numbers in the name (and less than 20 chars in total); 
+so for example my strict extension now is 'strictvalidation' with a boolean value.
 
 
 ## Contributing

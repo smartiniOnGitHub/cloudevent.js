@@ -53,7 +53,7 @@ class CloudEvent {
    *        dataschema (uri) optional, reference to the schema that data adheres to,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
-   * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
+   * @param {object} extensions optional, contains extension properties (each extension as a key/value property, and no nested objects) but if given any object must contain at least 1 property
    * @throws {Error} if strict is true and id or type is undefined or null
    * @throws {Error} if data and data_base64 are defined
    */
@@ -233,8 +233,8 @@ class CloudEvent {
     if (!CloudEvent.isCloudEvent(event)) {
       throw new TypeError('The given event is not a CloudEvent instance')
     }
-    if (V.isDefinedAndNotNull(event.com_github_smartiniOnGitHub_cloudevent)) {
-      return event.com_github_smartiniOnGitHub_cloudevent.strict === true
+    if (V.isDefinedAndNotNull(event.strictvalidation)) {
+      return event.strictvalidation === true
     } else {
       return false
     }
@@ -258,8 +258,7 @@ class CloudEvent {
     if (!V.isBoolean(strict)) {
       throw new TypeError('The given strict flag is not a boolean instance')
     }
-    obj.com_github_smartiniOnGitHub_cloudevent = {}
-    obj.com_github_smartiniOnGitHub_cloudevent.strict = strict
+    obj.strictvalidation = strict
   }
 
   /**
@@ -272,20 +271,17 @@ class CloudEvent {
    * @return {boolean} the strict flag value, or false if not found
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null
+   * @throws {Error} if strictvalidation property is undefined or null
    */
   static getStrictExtensionOfEvent (obj = {}) {
     if (!V.isObject(obj)) {
       throw new TypeError('The given extensions is not an object instance')
     }
-    const myExtensions = obj.com_github_smartiniOnGitHub_cloudevent || {}
-    if (!V.isObjectPlain(myExtensions)) {
-      throw new TypeError('The property com_github_smartiniOnGitHub_cloudevent is not an object instance')
+    const myExtensionStrict = obj.strictvalidation || false
+    if (!V.isBoolean(myExtensionStrict)) {
+      throw new TypeError("Extension property 'strictvalidation' has not a boolean value")
     }
-    const strict = myExtensions.strict || false
-    if (!V.isBoolean(strict)) {
-      throw new TypeError('The given strict flag is not a boolean instance')
-    }
-    return strict
+    return myExtensionStrict
   }
 
   /**
@@ -295,7 +291,7 @@ class CloudEvent {
    * @private
    * @static
    * @param {object} [obj={}] the object to fill, that will be enhanced inplace
-   * @param {object} [extensions=null] the extensions to fill (maybe already populated)
+   * @param {object} [extensions=null] the extensions to fill (each extension as a key/value property, and no nested properties)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
@@ -381,7 +377,7 @@ class CloudEvent {
     if (V.isDefinedAndNotNull(event.data_base64)) {
       ve.push(V.ensureIsStringNotEmpty(event.data_base64, 'data_base64'))
       if (V.isDefinedAndNotNull(event.data)) {
-        ve.push('data and data_base64 attributes are exclusive')
+        ve.push(new Error('data and data_base64 attributes are exclusive'))
       }
     }
 
@@ -406,6 +402,12 @@ class CloudEvent {
         // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         // error for extensions defined but empty (without properties), moved in constructor
+        // then check for each extension name and value
+        for (const [key, value] of Object.entries(event.extensions)) {
+          // console.log(`DEBUG: [key, value] = ${key}, ${value}; typeof key, value = ${typeof key}, ${typeof value}`)
+          if (!CloudEvent.isExtensionNameValid(key)) ve.push(new Error(`extension name '${key}' not valid`))
+          if (!CloudEvent.isExtensionValueValid(value)) ve.push(new Error(`extension value '${value}' not valid for extension '${key}'`))
+        }
       }
     }
 
@@ -589,6 +591,39 @@ class CloudEvent {
    */
   static isExtensionProperty (property) {
     return !CloudEvent.standardProps.includes(property)
+  }
+
+  /**
+   * Tell if the given extension name is valid, to respect the spec.
+   * Should not be used outside CloudEvent.
+   *
+   * @private
+   * @static
+   * @param {!string} the name to check
+   * @return {boolean} true if it's an extension name valid, otherwise false
+   * @throws {TypeError} if name is not an object or a string
+   * @throws {Error} if name is undefined or null
+   */
+  static isExtensionNameValid (name) {
+    if (V.isUndefinedOrNull(name)) throw new Error('Extension name undefined or null')
+    if (!V.isString(name)) throw new TypeError('Extension name must be a string')
+    return name.match(/^[a-z0-9]{1,20}$/)
+  }
+
+  /**
+   * Tell if the given extension value is valid, to respect the spec.
+   * Should not be used outside CloudEvent.
+   *
+   * @private
+   * @static
+   * @param {!string|!boolean|!number} the object to check
+   * @return {boolean} true if it's an extension value valid, otherwise false
+   * @throws {Error} if value is undefined
+   */
+  static isExtensionValueValid (value) {
+    if (V.isUndefined(value)) throw new Error('Extension value undefined')
+    if (!V.isString(value) && !V.isBoolean(value) && !V.isNumber(value)) return false
+    return true
   }
 
   /**

@@ -58,7 +58,7 @@ const ceCommonOptions = {
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceCommonExtensions = { exampleExtension: 'value' }
+const ceCommonExtensions = { exampleextension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { hello: 'world', year: 2020 }

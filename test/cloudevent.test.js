@@ -63,6 +63,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.ok(ceMinimal)
     // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
 
     // check that created instances belongs to the right base class
     t.strictEqual(typeof ceMinimal, 'object')
@@ -260,33 +261,30 @@ test('ensure strict mode is managed in the right way', (t) => {
   t.ok(!CloudEvent.setStrictExtensionInEvent(undefined, undefined)) // ok but no return value
   t.throws(function () {
     CloudEvent.setStrictExtensionInEvent(null, true)
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when setting a strict extension flag into a null object')
   t.ok(!CloudEvent.setStrictExtensionInEvent({}, false)) // ok but no return value
   t.ok(!CloudEvent.setStrictExtensionInEvent({}, true)) // ok but no return value
   t.throws(function () {
     CloudEvent.setStrictExtensionInEvent({}, 'bad flag')
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when setting a bad strict extension flag into an object')
 
   t.ok(!CloudEvent.getStrictExtensionOfEvent()) // ok but false return value
   t.ok(!CloudEvent.getStrictExtensionOfEvent(undefined)) // ok but false return value
   t.throws(function () {
     CloudEvent.getStrictExtensionOfEvent(null)
-    assert(true) // never executed
-  }, TypeError, 'Expected exception when getting a strict extension flag from a null object')
+    assert(false) // never executed
+  }, TypeError, 'Expected exception when getting a strict extension flag from a null event')
   t.ok(!CloudEvent.getStrictExtensionOfEvent({})) // ok but false return value
-  t.ok(!CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: {} })) // ok but false return value
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ strictvalidation: null })) // ok but false return value
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ strict: 'bad value for a a wrong strict property' })) // ok but false return value
+  t.ok(!CloudEvent.getStrictExtensionOfEvent({ strictvalidation: false })) // ok but false return value
+  t.ok(CloudEvent.getStrictExtensionOfEvent({ strictvalidation: true })) // ok and true return value
   t.throws(function () {
-    CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: 'bad value' })
-    assert(true) // never executed
-  }, TypeError, 'Expected exception when getting a strict extension flag from a wrong property for my custom extensions object')
-  t.ok(!CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: false } })) // ok but false return value
-  t.ok(CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: true } })) // ok and true return value
-  t.throws(function () {
-    CloudEvent.getStrictExtensionOfEvent({ com_github_smartiniOnGitHub_cloudevent: { strict: 'bad flag' } })
-    assert(true) // never executed
-  }, TypeError, 'Expected exception when getting a bad strict extension flag from my custom extensions object')
+    CloudEvent.getStrictExtensionOfEvent({ strictvalidation: 'bad flag' })
+    assert(false) // never executed
+  }, TypeError, 'Expected exception when getting a bad strict extension flag')
 })
 
 /** @test {CloudEvent} */
@@ -295,32 +293,32 @@ test('ensure extensions are managed in the right way', (t) => {
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
-  const sampleExtensions = { exampleExtension: 'value' }
+  const sampleExtensions = ceCommonExtensions
   const sampleExtensionsWithStandardProperties = { ...sampleExtensions, id: 'myId' }
 
   t.ok(!CloudEvent.setExtensionsInEvent()) // ok but no return value
   t.ok(!CloudEvent.setExtensionsInEvent(undefined, undefined)) // ok but no return value
   t.throws(function () {
     CloudEvent.setExtensionsInEvent(null, sampleExtensions)
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when setting extensions into a null object')
   t.ok(!CloudEvent.setExtensionsInEvent({}, sampleExtensions)) // ok but no return value
   t.throws(function () {
     CloudEvent.setExtensionsInEvent({}, 'bad extension')
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when setting bad extensions into an object')
 
   t.notOk(CloudEvent.getExtensionsOfEvent()) // null as return value
   t.notOk(CloudEvent.getExtensionsOfEvent(undefined)) // null as return value
   t.throws(function () {
     CloudEvent.getExtensionsOfEvent(null)
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when getting extensions from a null object')
   t.notOk(CloudEvent.getExtensionsOfEvent({})) // null as return value
   t.ok(CloudEvent.getExtensionsOfEvent(sampleExtensions))
   t.throws(function () {
     CloudEvent.getExtensionsOfEvent('bad extension')
-    assert(true) // never executed
+    assert(false) // never executed
   }, TypeError, 'Expected exception when getting bad extensions')
 
   // ensure no instance will be created if extensions contains standard properties, but only in strict mode
@@ -865,3 +863,8 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(ceFull.dataType, 'Binary')
   }
 })
+
+// define my extension, valid in the spec version 0.3
+const ceExtensionStrict03 = { com_github_smartiniOnGitHub_cloudevent: { strict: true } }
+
+// TODO: add some tests with it (no more valid in 1.0) ... wip
