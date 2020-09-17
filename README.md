@@ -63,17 +63,23 @@ const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 const ceCommonExtensions = { exampleextension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
-const ceCommonData = { hello: 'world', year: 2020 }
+const ceCommonData = { hello: 'world', year: 2020, enabled: true }
+const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
+const ceDataAsString = 'Hello World, 2020'
+const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 
-// create some sample minimal instances, good even for validation ...
+// create a sample minimal instance ...
 const ceMinimal = new CloudEvent('1', // id
   ceNamespace, // type
   '/', // source
   {} // data (empty) // optional, but useful the same in this sample usage
 )
 
-// create some instances with an undefined mandatory argument (handled by defaults), but with strict flag disabled: expected success ...
-// note that null values are not handled by default values, only undefined values ...
+// When creating some instances with an undefined mandatory argument (handled by defaults),
+// but with strict flag disabled success is expected, otherwise with strict flag enabled a failure is expected ...
+// In JavaScript, null values are not handled as default values, only undefined values ...
+
+// create a sample instance with most common attributes defined ...
 const ceFull = new CloudEvent('1/full',
   ceNamespace,
   ceServerUrl,
@@ -91,6 +97,16 @@ const ceFullStrict = new CloudEvent('2/full-strict',
 assert(ceFullStrict.isStrict)
 assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
+// create an instance with a JSON string as data
+const ceFullStrictJSONTextData = new CloudEvent('2/full-strict-json-string-data',
+  ceNamespace,
+  ceServerUrl,
+  ceDataAsJSONString, // data
+  ceCommonOptionsStrict, // use strict options
+  ceCommonExtensions
+)
+assert(ceFullStrictJSONTextData !== null)
+assert(ceFullStrictJSONTextData.isStrict)
 // create an instance that wrap an Error
 const error = new Error('sample error')
 error.code = 1000 // add a sample error code, as number
@@ -99,7 +115,7 @@ const errorToData = T.errorToData(error, {
   // addStatus: false,
   addTimestamp: true
 })
-const ceErrorStrict = new CloudEvent('2/error-strict',
+const ceErrorStrict = new CloudEvent('3/error-strict',
   ceNamespace,
   ceServerUrl,
   errorToData, // data
@@ -111,7 +127,7 @@ assert(ceErrorStrict.isStrict)
 assert(!ceErrorStrict.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
 assert(!CloudEvent.isStrictEvent(ceErrorStrict)) // the same, but using static method
 // create an instance with a different content type
-const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content-type',
+const ceFullStrictOtherContentType = new CloudEvent('4/full-strict-other-content-type',
   ceNamespace,
   ceServerUrl,
   ceCommonData, // data
@@ -120,6 +136,28 @@ const ceFullStrictOtherContentType = new CloudEvent('3/full-strict-other-content
 )
 assert(ceFullStrictOtherContentType !== null)
 assert(ceFullStrictOtherContentType.isStrict)
+// create an instance with data as a string, but not strict (to validate it even in strict mode)
+const ceFullTextData = new CloudEvent('5/no-strict-text-data',
+  ceNamespace,
+  ceServerUrl,
+  ceDataAsString, // data
+  ceCommonOptions, // use common options
+  ceCommonExtensions
+)
+assert(ceFullTextData !== null)
+assert(!ceFullTextData.isStrict)
+assert(ceFullTextData.payload === ceDataAsString) // returned data is transformed
+// create an instance with data encoded in base64
+const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
+  ceNamespace,
+  ceServerUrl,
+  null, // data
+  { ...ceCommonOptionsStrict, datainbase64: ceDataEncoded }, // use common strict options, and set binary data in base64
+  ceCommonExtensions
+)
+assert(ceFullStrictBinaryData !== null)
+assert(ceFullStrictBinaryData.isStrict)
+assert(ceFullStrictBinaryData.payload === ceDataAsString) // returned data is transformed
 ```
 
 optional, do some validations/checks on created instances.
