@@ -385,13 +385,22 @@ class CloudEvent {
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
+        if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+          // if it's a string, ensure it's a valid JSON representation,
+          // otherwise ensure data is a plain object or collection, but not a string in this case
+          if (V.isString(event.data)) {
+            try {
+              JSON.parse(event.data)
+            } catch (e) {
+              ve.push(new Error('data is not a valid JSON string'))
+            }
+          } else {
+            ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+          }
+        } else {
           // ensure data is a plain object or collection, or even a string in this case
           // because in serialization/deserialization some validation can occur on the transformed object
           ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
-        } else {
-          // ensure data is a plain object or collection, but not a string in this case
-          ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
