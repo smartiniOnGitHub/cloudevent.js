@@ -411,10 +411,7 @@ class CloudEvent {
       ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
       if (V.isFunction(dataschemavalidator)) {
         try {
-          console.log('DEBUG - additional validation of event data with its dataschema using dataschemavalidator ...')
-          console.log(`DEBUG - data = ${event.data}, schema = ${event.dataschema}`)
           const success = dataschemavalidator(event.data, event.dataschema)
-          console.log('DEBUG - result: ' + success)
           if (success === false) throw Error()
         } catch (e) {
           ve.push(new Error('data does not respect the dataschema for the given validator'))
@@ -426,7 +423,6 @@ class CloudEvent {
         // error for extensions defined but empty (without properties), moved in constructor
         // then check for each extension name and value
         for (const [key, value] of Object.entries(event.extensions)) {
-          // console.log(`DEBUG: [key, value] = ${key}, ${value}; typeof key, value = ${typeof key}, ${typeof value}`)
           if (!CloudEvent.isExtensionNameValid(key)) ve.push(new Error(`extension name '${key}' not valid`))
           if (!CloudEvent.isExtensionValueValid(value)) ve.push(new Error(`extension value '${value}' not valid for extension '${key}'`))
         }
