@@ -222,7 +222,7 @@ class Validator {
    * @return {boolean} true if it's a function, false otherwise
    */
   static isFunction (arg) {
-    return (typeof arg === 'function')
+    return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'function'))
   }
 
   /**
