@@ -39,6 +39,7 @@ const {
 assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
 
 // create some sample instances but without mandatory fields (so not good for validation) ...
+// note that errors will be thrown at instance creation only when strict mode is true
 console.log('\nCreation of some CloudEvent (ce) instances, and related diagnostics:')
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
 assert(ceEmpty !== null)
@@ -51,7 +52,7 @@ console.log(`ce dump (but not good for validation): ${T.dumpObject(ceMinimalMand
 
 // define some common attributes
 const ceCommonOptions = {
-  time: new Date(),
+  time: new Date(), // same as default
   datacontenttype: 'application/json',
   dataschema: 'http://my-schema.localhost.localdomain/v1/',
   subject: 'subject',

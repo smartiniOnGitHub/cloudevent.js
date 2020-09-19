@@ -11,7 +11,7 @@
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
-Current release implements the v0.3 of the CloudEvents Spec.
+Current release implements the v1.0 of the CloudEvents Spec.
 
 The purpose of this library is to create instances of CloudEvents in a simple way 
 (with some useful defaults), or in a full way (all attributes).
@@ -46,14 +46,15 @@ assert(CloudEvent !== null && V !== null && T !== null)
 create some sample CloudEvent instances:
 
 ```js
-// create some sample instances but without mandatory fields (for validation) ...
+// create some sample instances but without mandatory fields (so not good for validation) ...
+// note that errors will be thrown at instance creation only when strict mode is true
 const ceEmpty = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
 const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false }) // expected success
 const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true }) // expected failure, so ceMinimalMandatoryUndefinedStrict will not be defined
 
 // define some common attributes
 const ceCommonOptions = {
-  time: new Date(),
+  time: new Date(), // same as default
   datacontenttype: 'application/json',
   dataschema: 'http://my-schema.localhost.localdomain/v1/',
   subject: 'subject',
