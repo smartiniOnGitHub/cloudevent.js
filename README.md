@@ -251,11 +251,12 @@ Node.js 8 LTS (but recommended 8.17.0) or later.
 ## Note
 
 Note that in this implementation there is even the ability to validate CloudEvent instances 
-in a stricter way, by setting to true the attribute 'strict' in options in constructor options; 
-or specify it during validation.
-That attribute when set will be put in the 'extensions' standard attribute of a CloudEvent.
+in a stricter way, by setting to true the attribute 'strict' in constructor options; 
+that attribute (when set) will be put in the extensions of the instance.
+Otherwise you can specify it only during validation, in validation options.
 
-You can find Code Documentation for the API of the library [here](https://smartiniongithub.github.io/cloudevent.js/).
+You can find Code Documentation for the API of the library 
+[here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
