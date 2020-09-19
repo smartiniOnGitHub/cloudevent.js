@@ -13,6 +13,9 @@ Summary Changelog:
   if datacontenttype is default or json-derived, and unparsed data in other cases; 
   if data_base64 is defined, an uncoded version of it will be returned
 - Feature: implement a getter method 'dataType' to tell if data is text or binary encoded
+- Feature: added as validation option a user defined function to validate data with dataschema
+- General: ensured some CloudEvent serialized instances pass some online validators for this spec version; 
+  for example [this](https://www.itb.ec.europa.eu/json/cloudevents/upload) from its Web UI
 
 ## [0.6.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.6.0) (2019-10-23)
 Summary Changelog:
