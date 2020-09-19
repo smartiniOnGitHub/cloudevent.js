@@ -881,7 +881,7 @@ test('ensure old strict mode is no more valid (as per updated spec)', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure internal methods on extensions checks are fully tested', (t) => {
-  t.plan(12)
+  t.plan(17)
   const { CloudEvent } = require('../src/')
 
   t.throws(function () {
@@ -913,7 +913,7 @@ test('ensure internal methods on extensions checks are fully tested', (t) => {
 
   {
     // try with not valid extension name/value, expect validation errors ...
-    const ceFull = new CloudEvent('1/full-strict',
+    const ceFull = new CloudEvent('1/no-strict',
       ceNamespace,
       ceServerUrl,
       null,
@@ -925,5 +925,21 @@ test('ensure internal methods on extensions checks are fully tested', (t) => {
     t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 2)
+  }
+
+  {
+    // ensure that functions in extension objects give a strict validation error ...
+    const ceFull = new CloudEvent('1/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      null,
+      ceCommonOptions,
+      { ...ceCommonExtensions, func (x) { return x }, exampleextension2: 'value2' }
+    )
+    t.ok(ceFull)
+    t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
+    t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
   }
 })
