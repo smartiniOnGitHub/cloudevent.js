@@ -349,10 +349,12 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  static validateEvent (event, { strict = false } = {}) {
+  static validateEvent (event, { strict = false, dataschemavalidator = null } = {}) {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
@@ -407,6 +409,17 @@ class CloudEvent {
       ve.push(V.ensureIsDatePast(event.time, 'time'))
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
       ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
+      if (V.isFunction(dataschemavalidator)) {
+        try {
+          console.log('DEBUG - additional validation of event data with its dataschema using dataschemavalidator ...')
+          console.log(`DEBUG - data = ${event.data}, schema = ${event.dataschema}`)
+          const success = dataschemavalidator(event.data, event.dataschema)
+          console.log('DEBUG - result: ' + success)
+          if (success === false) throw Error()
+        } catch (e) {
+          ve.push(new Error('data does not respect the dataschema for the given validator'))
+        }
+      }
       if (V.isDefinedAndNotNull(event.extensions)) {
         // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
@@ -430,11 +443,13 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
-  static isValidEvent (event, { strict = false } = {}) {
-    const validationErrors = CloudEvent.validateEvent(event, { strict })
+  static isValidEvent (event, { strict = false, dataschemavalidator = null } = {}) {
+    const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator })
     const size = V.getSize(validationErrors)
     return (size === 0)
   }
@@ -695,11 +710,13 @@ class CloudEvent {
    *
    * See {@link CloudEvent.validateEvent}.
    *
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  validate ({ strict = false } = {}) {
-    return this.constructor.validateEvent(this, { strict })
+  validate ({ strict = false, dataschemavalidator = null } = {}) {
+    return this.constructor.validateEvent(this, { strict, dataschemavalidator })
   }
 
   /**
@@ -707,11 +724,13 @@ class CloudEvent {
    *
    * See {@link CloudEvent.isValidEvent}.
    *
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
-  isValid ({ strict = false } = {}) {
-    return this.constructor.isValidEvent(this, { strict })
+  isValid ({ strict = false, dataschemavalidator = null } = {}) {
+    return this.constructor.isValidEvent(this, { strict, dataschemavalidator })
   }
 
   /**
