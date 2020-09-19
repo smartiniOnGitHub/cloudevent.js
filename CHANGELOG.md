@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (unreleased)
+Summary Changelog:
+- Implement the [v1.0 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0) 
+  with all breaking changes since its v0.3
+- Update dependencies for the development environment
+- Update JSON Schema to that of spec v1.0
+- Feature: keep compatibility with Node.js 8 (but this is latest release that supports it)
+- Breaking change: updated attributes as per spec
+- Breaking change: updated my extension/s to be compliant with updated spec
+- Breaking change: updated getter method 'payload' to return parsed JSON data 
+  if datacontenttype is default or json-derived, and unparsed data in other cases; 
+  if data_base64 is defined, an uncoded version of it will be returned
+- Feature: implement a getter method 'dataType' to tell if data is text or binary encoded
+- Feature: added as validation option a user defined function to validate data with dataschema
+- General: ensured some CloudEvent serialized instances pass some online validators for this spec version; 
+  for example [this](https://www.itb.ec.europa.eu/json/cloudevents/upload) from its Web UI
+
 ## [0.6.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.6.0) (2019-10-23)
 Summary Changelog:
 - Implement the [v0.3 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v0.3) with all breaking changes since its v0.2

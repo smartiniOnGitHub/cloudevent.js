@@ -646,7 +646,7 @@ test('ensure strings are encoded/decoded in th right way in base64', (t) => {
     const base64 = T.stringToBase64({}) // not a string
     assert(base64 === null) // never executed
   }, Error, 'Expected exception when transforming not a right string to a base64 (String)')
-  t.strictSame(T.stringToBase64('Hello World, 2019'), 'SGVsbG8gV29ybGQsIDIwMTk=')
+  t.strictSame(T.stringToBase64('Hello World, 2020'), 'SGVsbG8gV29ybGQsIDIwMjA=')
 
   t.strictSame(T.stringFromBase64(), '')
   t.strictSame(T.stringFromBase64(undefined), '')
@@ -656,7 +656,7 @@ test('ensure strings are encoded/decoded in th right way in base64', (t) => {
     const base64 = T.stringFromBase64({}) // not a string
     assert(base64 === null) // never executed
   }, Error, 'Expected exception when transforming not a right string from a base64 (String)')
-  t.strictSame(T.stringFromBase64('SGVsbG8gV29ybGQsIDIwMTk='), 'Hello World, 2019')
+  t.strictSame(T.stringFromBase64('SGVsbG8gV29ybGQsIDIwMjA='), 'Hello World, 2020')
 
-  t.strictSame(T.stringFromBase64(T.stringToBase64('Hello World, 2019')), 'Hello World, 2019')
+  t.strictSame(T.stringFromBase64(T.stringToBase64('Hello World, 2020')), 'Hello World, 2020')
 })

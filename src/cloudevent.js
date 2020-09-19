@@ -48,20 +48,20 @@ class CloudEvent {
    * @param {?(object|Map|Set|string)} data the real event data
    * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
    *        time (timestamp/date, default now),
-   *        datacontentencoding (string) optional in most cases here,
-   *        datacontenttype (string, default 'application/json') tell how the data attribute must be encoded,
-   *        schemaurl (uri) optional,
+   *        datainbase64 (string) base64 encoded value for the data (data attribute must not be present when this is defined),
+   *        datacontenttype (string, default 'application/json') is the content type of the data attribute,
+   *        dataschema (uri) optional, reference to the schema that data adheres to,
    *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
    *        strict (boolean, default false) tell if object instance will be validated in a more strict way
-   * @param {object} extensions optional, contains extension properties (recommended in nested objects) but if given any object must contain at least 1 property (key/value)
+   * @param {object} extensions optional, contains extension properties (each extension as a key/value property, and no nested objects) but if given any object must contain at least 1 property
    * @throws {Error} if strict is true and id or type is undefined or null
-   * @throws {Error} if datacontentencoding is defined and data is not a string or if encoding is not 'base64'
+   * @throws {Error} if data and data_base64 are defined
    */
   constructor (id, type, source, data, {
     time = new Date(),
-    datacontentencoding,
+    datainbase64,
     datacontenttype = CloudEvent.datacontenttypeDefault(),
-    schemaurl,
+    dataschema,
     subject,
     strict = false
   } = {},
@@ -69,7 +69,10 @@ class CloudEvent {
   ) {
     if (strict === true) {
       if (!id || !type || !source) {
-        throw new Error('Unable to create CloudEvent instance, mandatory field missing')
+        throw new Error('Unable to create CloudEvent instance, mandatory attributes missing')
+      }
+      if (V.isDefinedAndNotNull(data) && V.isDefinedAndNotNull(datainbase64)) {
+        throw new Error('Unable to create CloudEvent instance, data and data_base64 attributes are exclusive')
       }
     }
 
@@ -115,22 +118,25 @@ class CloudEvent {
      * @private
      */
     this.specversion = this.constructor.version()
+
     /**
-     * The content encoding for the data attribute
-     * for when the data field must be encoded as a string.
-     * This must be set if the data attribute contains string-encoded binary data,
-     * otherwise it must not be set.
-     * As (arbitrary) limitation, only 'base64' encoding is supported here.
+     * The real event data, but encoded in base64 format.
      * @type {string}
      * @private
      */
-    this.datacontentencoding = datacontentencoding
+    this.data_base64 = datainbase64
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
      * @type {string}
      * @private
      */
     this.datacontenttype = datacontenttype
+    /**
+     * The URI of the schema for event data, if any.
+     * @type {uri}
+     * @private
+     */
+    this.dataschema = dataschema
     /**
      * The event timestamp.
      * Copy the original object to avoid changing objects that could be shared.
@@ -139,12 +145,6 @@ class CloudEvent {
      * @private
      */
     this.time = new Date(time.valueOf())
-    /**
-     * The URL of schema for the event, if any.
-     * @type {uri}
-     * @private
-     */
-    this.schemaurl = schemaurl
     /**
      * The subject of the event in the context of the event producer.
      * @type {string}
@@ -176,7 +176,7 @@ class CloudEvent {
    * @return {string} the value
    */
   static version () {
-    return '0.3'
+    return '1.0'
   }
 
   /**
@@ -233,8 +233,8 @@ class CloudEvent {
     if (!CloudEvent.isCloudEvent(event)) {
       throw new TypeError('The given event is not a CloudEvent instance')
     }
-    if (V.isDefinedAndNotNull(event.com_github_smartiniOnGitHub_cloudevent)) {
-      return event.com_github_smartiniOnGitHub_cloudevent.strict === true
+    if (V.isDefinedAndNotNull(event.strictvalidation)) {
+      return event.strictvalidation === true
     } else {
       return false
     }
@@ -258,8 +258,7 @@ class CloudEvent {
     if (!V.isBoolean(strict)) {
       throw new TypeError('The given strict flag is not a boolean instance')
     }
-    obj.com_github_smartiniOnGitHub_cloudevent = {}
-    obj.com_github_smartiniOnGitHub_cloudevent.strict = strict
+    obj.strictvalidation = strict
   }
 
   /**
@@ -272,20 +271,17 @@ class CloudEvent {
    * @return {boolean} the strict flag value, or false if not found
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null
+   * @throws {Error} if strictvalidation property is undefined or null
    */
   static getStrictExtensionOfEvent (obj = {}) {
     if (!V.isObject(obj)) {
       throw new TypeError('The given extensions is not an object instance')
     }
-    const myExtensions = obj.com_github_smartiniOnGitHub_cloudevent || {}
-    if (!V.isObjectPlain(myExtensions)) {
-      throw new TypeError('The property com_github_smartiniOnGitHub_cloudevent is not an object instance')
+    const myExtensionStrict = obj.strictvalidation || false
+    if (!V.isBoolean(myExtensionStrict)) {
+      throw new TypeError("Extension property 'strictvalidation' has not a boolean value")
     }
-    const strict = myExtensions.strict || false
-    if (!V.isBoolean(strict)) {
-      throw new TypeError('The given strict flag is not a boolean instance')
-    }
-    return strict
+    return myExtensionStrict
   }
 
   /**
@@ -295,7 +291,7 @@ class CloudEvent {
    * @private
    * @static
    * @param {object} [obj={}] the object to fill, that will be enhanced inplace
-   * @param {object} [extensions=null] the extensions to fill (maybe already populated)
+   * @param {object} [extensions=null] the extensions to fill (each extension as a key/value property, and no nested properties)
    * @throws {TypeError} if obj is not an object, or strict is not a flag
    * @throws {Error} if obj is undefined or null, or strict is undefined or null
    */
@@ -353,10 +349,12 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  static validateEvent (event, { strict = false } = {}) {
+  static validateEvent (event, { strict = false, dataschemavalidator = null } = {}) {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
@@ -372,40 +370,62 @@ class CloudEvent {
     ve.push(V.ensureIsStringNotEmpty(event.id, 'id'))
     ve.push(V.ensureIsStringNotEmpty(event.type, 'type'))
     ve.push(V.ensureIsStringNotEmpty(event.source, 'source'))
-    if (V.isDefinedAndNotNull(event.schemaurl)) {
-      ve.push(V.ensureIsStringNotEmpty(event.schemaurl, 'schemaurl'))
+    if (V.isDefinedAndNotNull(event.dataschema)) {
+      ve.push(V.ensureIsStringNotEmpty(event.dataschema, 'dataschema'))
     }
     if (V.isDefinedAndNotNull(event.subject)) {
       ve.push(V.ensureIsStringNotEmpty(event.subject, 'subject'))
     }
-    if (V.isDefinedAndNotNull(event.datacontentencoding)) {
-      ve.push(V.ensureIsStringNotEmpty(event.datacontentencoding, 'datacontentencoding'))
+    if (V.isDefinedAndNotNull(event.data_base64)) {
+      ve.push(V.ensureIsStringNotEmpty(event.data_base64, 'data_base64'))
+      if (V.isDefinedAndNotNull(event.data)) {
+        ve.push(new Error('data and data_base64 attributes are exclusive'))
+      }
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
     if (strict === true || CloudEvent.isStrictEvent(event) === true) {
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
-        if (V.isDefinedAndNotNull(event.datacontentencoding)) {
-          // ensure data is a string in this case
-          ve.push(V.ensureIsString(event.data, 'data'))
-        } else if (event.datacontenttype !== CloudEvent.datacontenttypeDefault()) {
+        if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+          // if it's a string, ensure it's a valid JSON representation,
+          // otherwise ensure data is a plain object or collection, but not a string in this case
+          if (V.isString(event.data)) {
+            try {
+              JSON.parse(event.data)
+            } catch (e) {
+              ve.push(new Error('data is not a valid JSON string'))
+            }
+          } else {
+            ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+          }
+        } else {
           // ensure data is a plain object or collection, or even a string in this case
           // because in serialization/deserialization some validation can occur on the transformed object
           ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
-        } else {
-          // ensure data is a plain object or collection, but not a string in this case
-          ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
       ve.push(V.ensureIsDatePast(event.time, 'time'))
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
-      ve.push(V.ensureIsURI(event.schemaurl, null, 'schemaurl'))
+      ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
+      if (V.isFunction(dataschemavalidator)) {
+        try {
+          const success = dataschemavalidator(event.data, event.dataschema)
+          if (success === false) throw Error()
+        } catch (e) {
+          ve.push(new Error('data does not respect the dataschema for the given validator'))
+        }
+      }
       if (V.isDefinedAndNotNull(event.extensions)) {
         // get extensions via its getter
         ve.push(V.ensureIsObjectOrCollectionNotString(event.extensions, 'extensions'))
         // error for extensions defined but empty (without properties), moved in constructor
+        // then check for each extension name and value
+        for (const [key, value] of Object.entries(event.extensions)) {
+          if (!CloudEvent.isExtensionNameValid(key)) ve.push(new Error(`extension name '${key}' not valid`))
+          if (!CloudEvent.isExtensionValueValid(value)) ve.push(new Error(`extension value '${value}' not valid for extension '${key}'`))
+        }
       }
     }
 
@@ -419,11 +439,13 @@ class CloudEvent {
    *
    * @static
    * @param {!object} event the CloudEvent to validate
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
-  static isValidEvent (event, { strict = false } = {}) {
-    const validationErrors = CloudEvent.validateEvent(event, { strict })
+  static isValidEvent (event, { strict = false, dataschemavalidator = null } = {}) {
+    const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator })
     const size = V.getSize(validationErrors)
     return (size === 0)
   }
@@ -467,11 +489,6 @@ class CloudEvent {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
         const ser = JSON.stringify(event, function replacer (key, value) {
           switch (key) {
-            case 'data':
-              // return data as is, or encoded or nothing (if not supported)
-              if (V.isUndefinedOrNull(event.datacontentencoding)) return value
-              if (event.datacontentencoding === 'Base64') return T.stringToBase64(this.data)
-              else return undefined
             case 'extensions':
               // filtering out top level extensions (if any)
               return undefined
@@ -528,16 +545,10 @@ class CloudEvent {
     const parsed = JSON.parse(ser)
     // ensure it's an object (single), and not a string neither a collection or an array
     if (!V.isObject(parsed) || V.isArray(parsed)) throw new Error(`Wrong deserialized data: '${ser}' must represent an object and not an array or a string or other.`)
+    if (!V.isStringNotEmpty(parsed.specversion) || parsed.specversion !== CloudEvent.version()) throw new Error(`Unable to deserialize, not compatible specversion: got '${parsed.specversion}' expected '${CloudEvent.version()}'.`)
 
     const strict = CloudEvent.getStrictExtensionOfEvent(parsed)
     const extensions = CloudEvent.getExtensionsOfEvent(parsed)
-
-    if (V.isDefinedAndNotNull(parsed.datacontentencoding)) {
-      if (V.isStringNotEmpty(parsed.data)) {
-        // decode the given data
-        if (parsed.datacontentencoding === 'Base64') parsed.data = T.stringFromBase64(parsed.data)
-      }
-    }
 
     // fill a new CludEvent instance with parsed data
     const ce = new CloudEvent(parsed.id,
@@ -546,9 +557,9 @@ class CloudEvent {
       parsed.data,
       { // options
         time: T.timestampFromString(parsed.time, timezoneOffset),
-        datacontentencoding: parsed.datacontentencoding,
+        datainbase64: parsed.data_base64,
         datacontenttype: parsed.datacontenttype,
-        schemaurl: parsed.schemaurl,
+        dataschema: parsed.dataschema,
         subject: parsed.subject,
         strict: strict
       },
@@ -603,6 +614,39 @@ class CloudEvent {
   }
 
   /**
+   * Tell if the given extension name is valid, to respect the spec.
+   * Should not be used outside CloudEvent.
+   *
+   * @private
+   * @static
+   * @param {!string} the name to check
+   * @return {boolean} true if it's an extension name valid, otherwise false
+   * @throws {TypeError} if name is not an object or a string
+   * @throws {Error} if name is undefined or null
+   */
+  static isExtensionNameValid (name) {
+    if (V.isUndefinedOrNull(name)) throw new Error('Extension name undefined or null')
+    if (!V.isString(name)) throw new TypeError('Extension name must be a string')
+    return name.match(/^[a-z0-9]{1,20}$/)
+  }
+
+  /**
+   * Tell if the given extension value is valid, to respect the spec.
+   * Should not be used outside CloudEvent.
+   *
+   * @private
+   * @static
+   * @param {!string|!boolean|!number} the object to check
+   * @return {boolean} true if it's an extension value valid, otherwise false
+   * @throws {Error} if value is undefined
+   */
+  static isExtensionValueValid (value) {
+    if (V.isUndefined(value)) throw new Error('Extension value undefined')
+    if (!V.isString(value) && !V.isBoolean(value) && !V.isNumber(value)) return false
+    return true
+  }
+
+  /**
    * Get the JSON Schema for a CloudEvent.
    * Note that it's not used in standard serialization to JSON,
    * but only in some serialization libraries.
@@ -632,14 +676,13 @@ class CloudEvent {
         type: { type: 'string', minLength: 1 },
         source: { type: 'string', format: 'uri-reference' },
         datacontenttype: { type: 'string' },
-        // data: { type: ['object', 'string'] },
+        data: { type: ['object', 'string'] },
+        data_base64: { type: 'string' },
+        dataschema: { type: 'string', format: 'uri' },
         // time: { type: 'string', format: 'date-time' },
-        schemaurl: { type: 'string', format: 'uri-reference' },
         subject: { type: 'string', minLength: 1 }
       },
-      required: [
-        'specversion', 'id', 'type', 'source'
-      ],
+      required: ['specversion', 'id', 'type', 'source'],
       additionalProperties: true // to handle data, and maybe other (non-standard) properties (extensions)
     }
   }
@@ -663,11 +706,13 @@ class CloudEvent {
    *
    * See {@link CloudEvent.validateEvent}.
    *
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  validate ({ strict = false } = {}) {
-    return this.constructor.validateEvent(this, { strict })
+  validate ({ strict = false, dataschemavalidator = null } = {}) {
+    return this.constructor.validateEvent(this, { strict, dataschemavalidator })
   }
 
   /**
@@ -675,11 +720,13 @@ class CloudEvent {
    *
    * See {@link CloudEvent.isValidEvent}.
    *
-   * @param {object} [options={}] containing: strict (boolean, default false) to validate it in a more strict way
+   * @param {object} [options={}] containing:
+   *        strict (boolean, default false) to validate it in a more strict way,
+   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
-  isValid ({ strict = false } = {}) {
-    return this.constructor.isValidEvent(this, { strict })
+  isValid ({ strict = false, dataschemavalidator = null } = {}) {
+    return this.constructor.isValidEvent(this, { strict, dataschemavalidator })
   }
 
   /**
@@ -717,20 +764,53 @@ class CloudEvent {
   }
 
   /**
-   * Getter method to return a copy of CloudEvent data attribute,
-   * or original data payload.
+   * Getter method to return a copy of CloudEvent data attribute (or data_base64 if defined),
+   * but transformed/decoded if possible.
    *
-   * See {@link CloudEvent.data}.
+   * See {@link CloudEvent.data}, {@link CloudEvent.data_base64}.
    *
-   * @type {(object|Map|Set)}
+   * @type {(object|Map|Set|string)}
    */
   get payload () {
-    if (V.isString(this.data)) {
-      // handle an edge case: if data is a String, I need to clone in a different way ...
-      return this.data.slice()
+    if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
+      if (this.isDatacontenttypeJSON) {
+        try {
+          return JSON.parse(this.data)
+        } catch (e) {
+          // fallback in case of bad data (not parseable)
+          if (V.isString(this.data)) {
+            return this.data.slice()
+          } else {
+            return { ...this.data }
+          }
+        }
+      } else if (V.isString(this.data)) {
+        // handle an edge case: if data is a String, I need to clone in a different way ...
+        return this.data.slice()
+      } else {
+        return { ...this.data }
+      }
+    } else if (V.isDefinedAndNotNull(this.data_base64)) {
+      return T.stringFromBase64(this.data_base64)
     }
-    // else
-    return { ...this.data }
+    // else return the same empty object
+    return this.data
+  }
+
+  /**
+   * Getter method to tell if CloudEvent data is text or binary,
+   * or unknown if not clear.
+   *
+   * @type {string}
+   */
+  get dataType () {
+    if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
+      return 'Text'
+    } else if (V.isDefinedAndNotNull(this.data_base64)) {
+      return 'Binary'
+    }
+    // else return an unknown/wrong data type
+    return 'Unknown'
   }
 
   /**
@@ -781,8 +861,8 @@ class CloudEvent {
 CloudEvent.standardProps = [
   'specversion',
   'id', 'type', 'source', 'data',
-  'time', 'datacontentencoding', 'datacontenttype',
-  'schemaurl', 'subject'
+  'time', 'data_base64', 'datacontenttype',
+  'dataschema', 'subject'
 ]
 
 module.exports = CloudEvent
