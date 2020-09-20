@@ -619,9 +619,9 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {!string} the name to check
+   * @param {!object|!string} name the name to check
    * @return {boolean} true if it's an extension name valid, otherwise false
-   * @throws {TypeError} if name is not an object or a string
+   * @throws {TypeError} if name is not a string
    * @throws {Error} if name is undefined or null
    */
   static isExtensionNameValid (name) {
@@ -636,7 +636,7 @@ class CloudEvent {
    *
    * @private
    * @static
-   * @param {!string|!boolean|!number} the object to check
+   * @param {!string|!boolean|!number} value the object to check
    * @return {boolean} true if it's an extension value valid, otherwise false
    * @throws {Error} if value is undefined
    */
