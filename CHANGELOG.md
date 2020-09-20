@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (unreleased)
+## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:
 - Implement the [v1.0 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0) 
   with all breaking changes since its v0.3
