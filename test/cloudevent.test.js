@@ -666,7 +666,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.throws(function () {
       const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
       assert(isCloudEvent === undefined) // never executed
-    }, Error, 'Expected exception when calling \'CloudEvent.isCloudEvent\' with an undefined or null argument')
+    }, Error, "Expected exception when calling 'CloudEvent.isCloudEvent' with an undefined or null argument")
   }
 
   {
@@ -679,7 +679,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.throws(function () {
       const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
       assert(isCloudEvent === null) // never executed
-    }, Error, 'Expected exception when calling \'CloudEvent.isCloudEvent\' with an undefined or null argument')
+    }, Error, "Expected exception when calling 'CloudEvent.isCloudEvent' with an undefined or null argument")
   }
 
   {

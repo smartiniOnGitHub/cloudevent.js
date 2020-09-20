@@ -79,13 +79,13 @@ function getRandomString (length) {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(60)
+  t.plan(68)
 
   const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
   {
-    // create an instance with undefined data attribute, but with strict flag disabled: expected success ...
+    // create an instance with a sample data attribute, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
     const ceFull = new CloudEvent('1/full/sample-data/no-strict',
       ceNamespace,
@@ -95,7 +95,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       ceCommonExtensions
     )
     assert(ceFull !== null)
+    t.ok(CloudEvent.isCloudEvent(ceFull))
     t.ok(ceFull)
+    t.ok(!ceFull.isStrict)
     t.ok(ceFull.isValid())
     t.ok(ceFull.validate().length === 0)
     t.ok(ceFull.validate({ strict: false }).length === 0)
@@ -132,10 +134,13 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
     const ceFullSerializedComparison = `{"id":"1/full/sample-data/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${T.timestampToString(commonEventTime)}","subject":"subject","exampleextension":"value"}`
     t.strictSame(ceFullSerialized, ceFullSerializedComparison)
+    // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
     const ceFullDeserialized = JSON.parse(ceFullSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
     ceFullDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFull, ceFullDeserialized)
+    t.ok(!CloudEvent.isCloudEvent(ceFullDeserialized))
+    t.ok(!ceFullDeserialized.isStrict) // ok here, but doesn't mattter because is not a real CloudEvent instance
 
     const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
     t.ok(ceFullSerializedOnlyValidFalse)
@@ -177,7 +182,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       ceCommonExtensions
     )
     assert(ceFullStrict !== null)
+    t.ok(CloudEvent.isCloudEvent(ceFullStrict))
     t.ok(ceFullStrict)
+    t.ok(ceFullStrict.isStrict)
     t.ok(ceFullStrict.isValid())
     t.ok(ceFullStrict.validate().length === 0)
     t.ok(ceFullStrict.validate({ strict: true }).length === 0)
@@ -214,10 +221,13 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
 
     const ceFullStrictSerializedComparison = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain","time":"${T.timestampToString(commonEventTime)}","subject":"subject","strictvalidation":true,"exampleextension":"value"}`
     t.strictSame(ceFullStrictSerialized, ceFullStrictSerializedComparison)
+    // deserialization using standard function JSON.parse, so built instance is not a real CloudEvent instance
     const ceFullStrictDeserialized = JSON.parse(ceFullStrictSerialized) // note that some fields (like dates) will be different when deserialized in this way ...
     ceFullStrictDeserialized.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
     ceFullStrictDeserialized.data_base64 = undefined // quick fix for this not so common attribute in the deserialized object
     t.same(ceFullStrict, ceFullStrictDeserialized)
+    t.ok(!CloudEvent.isCloudEvent(ceFullStrictDeserialized))
+    t.ok(!ceFullStrictDeserialized.isStrict) // wrong here, but doesn't mattter because is not a real CloudEvent instance
 
     const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
     t.ok(ceFullStrictSerializedOnlyValidFalse)
@@ -1041,7 +1051,7 @@ test('deserialize generic strings (not JSON representation for an Object) into a
 
 /** @test {CloudEvent} */
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
-  t.plan(54)
+  t.plan(56)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
@@ -1089,6 +1099,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     // then ensure they are different object (references) ...
     t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
     t.notEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.ok(!ceDeserialized.isStrict)
   }
 
   {
@@ -1136,6 +1147,7 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     // then ensure they are different object (references) ...
     t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
     t.notEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.ok(ceDeserialized.isStrict)
   }
 })
 
