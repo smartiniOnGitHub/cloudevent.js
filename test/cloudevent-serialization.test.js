@@ -2060,7 +2060,7 @@ const ceFullSerializedJson03 = `{"id":"1/full/sample-data/no-strict","type":"com
 const ceFullStrictSerializedJson03 = `{"id":"1/full/sample-data/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent","source":"/test","data":{"hello":"world","year":2020},"specversion":"0.3","datacontenttype":"application/json","time":"${T.timestampToString(commonEventTime)}","schemaurl":"http://my-schema.localhost.localdomain","subject":"subject","com_github_smartiniOnGitHub_cloudevent":{"strict":true},"exampleExtension":"value"}`
 
 /** @test {CloudEvent} */
-test('deserialize some CloudEvent instances (but a previous specversion) from JSON, and ensure errora are raised', (t) => {
+test('deserialize some CloudEvent instances (but a previous specversion) from JSON, and ensure errors are raised', (t) => {
   t.plan(6)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
