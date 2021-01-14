@@ -1,6 +1,6 @@
 {
   "name": "cloudevent",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
@@ -26,12 +26,12 @@
     "esdoc-standard-plugin": "^1.0.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-node": "^1.0.5",
-    "standard": "^14.3.4",
-    "tap": "^14.10.8"
+    "standard": "^16.0.3",
+    "tap": "^14.11.0"
   },
   "peerDependencies": {},
   "engines": {
-    "node": ">=8.17.0"
+    "node": ">=10.13.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
