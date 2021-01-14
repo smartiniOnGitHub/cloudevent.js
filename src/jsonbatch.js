@@ -87,6 +87,8 @@ class JSONBatch {
         if (ceValidation.length > 0) {
           // return validation errors found
           return ceValidation
+        } else {
+          return null
         }
       })
       ve.push(...itemsValidation)
