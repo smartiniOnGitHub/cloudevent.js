@@ -1,0 +1,21 @@
+{
+    "source": {
+        "include": ["./src"],
+        "exclude": ["./example", "./test", "./lib"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+        "template": "templates/default",
+        "encoding": "utf8",
+        "destination": "./docs/",
+        "recurse": true
+    },
+    "plugins": [
+        "plugins/summarize"
+    ],
+    "tags": {
+        "allowUnknownTags": false,
+        "dictionaries": ["jsdoc"]
+    }
+}

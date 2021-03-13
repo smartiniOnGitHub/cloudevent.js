@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,21 @@
 
 /**
  * Get a reference to cloudevent Validator class.
- *
  * See {@link Validator}.
+ * @private
  */
 const V = require('./validator') // get validator from here
 
-/** Get the host name where this code is runninng */
+/**
+ * Get the host name where this code is runninng.
+ * @private
+ */
 const hostname = require('os').hostname()
 
-/** Get the process id (pid) where this code is runninng */
+/**
+ * Get the process id (pid) where this code is runninng.
+ * @private
+ */
 const pid = require('process').pid
 
 /**
@@ -205,9 +211,9 @@ class Transformer {
    * @static
    * @param {!Error} err the Error to transform
    * @param {object} [options={}] transformation options:
-   *        includeStackTrace flag (default false) to add the StackTrace into the object to return,
-   *        addStatus flag (default true) to add a 'status' attribute into the object to return,
-   *        addTimestamp flag (default false) to add the current 'timestamp' as attribute into the object to return,
+   *        - includeStackTrace flag (default false) to add the StackTrace into the object to return,
+   *        - addStatus flag (default true) to add a 'status' attribute into the object to return,
+   *        - addTimestamp flag (default false) to add the current 'timestamp' as attribute into the object to return,
    * @return {object} the object representation of the error
    * @throws {TypeError} if err is undefined or null, or is not an Error instance
    */
@@ -295,6 +301,8 @@ class Transformer {
 /**
  * Utility variable that returns the timezone offset value, in msec.
  *
+ * @readonly
+ * @type {number}
  * @static
  */
 Transformer.timezoneOffsetMsec = new Date().getTimezoneOffset() * 60 * 1000

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,15 @@
 
 /**
  * Get a reference to cloudevent CloudEvent class.
- *
  * @see Validator
+ * @private
  */
 const CloudEvent = require('./cloudevent') // get cloudevent from here
 
 /**
  * Get a reference to cloudevent Validator class.
- *
  * @see Validator
+ * @private
  */
 const V = require('./validator') // get validator from here
 
@@ -147,8 +147,8 @@ class JSONBatch {
    * @static
    * @param {!object} batch the JSONBatch to iterate
    * @param {object} [options={}] optional processing attributes:
-   *        onlyValid (boolean, default false) to extract only valid instances
-   *        strict (boolean, default false) to validate it in a more strict way
+   *        - onlyValid (boolean, default false) to extract only valid instances
+   *        - strict (boolean, default false) to validate it in a more strict way
    * @return {object} a CloudEvent (if any)
    * @throws {Error} if batch is undefined or null
    * @throws {TypeError} if batch is not a JSONBatch
@@ -180,8 +180,8 @@ class JSONBatch {
    * @static
    * @param {!object} batch the JSONBatch to extract CloudEvent instances (if any)
    * @param {object} [options={}] optional processing attributes:
-   *        onlyValid (boolean, default false) to extract only valid instances
-   *        strict (boolean, default false) to validate it in a more strict way
+   *        - onlyValid (boolean, default false) to extract only valid instances
+   *        - strict (boolean, default false) to validate it in a more strict way
    * @return {object[]} processed events, as an array
    * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
    * @throws {TypeError} if batch is not a JSONBatch
@@ -215,8 +215,8 @@ class JSONBatch {
    * @param {!object[]} batch the JSONBatch (so a CloudEvent array instance) to serialize
    * @param {object} [options={}] optional serialization attributes
    *        Additional options valid here:
-   *        logError (boolean, default false) to log to console serialization errors
-   *        throwError (boolean, default false) to throw serialization errors
+   *        - logError (boolean, default false) to log to console serialization errors
+   *        - throwError (boolean, default false) to throw serialization errors
    * @return {string} the serialized JSONBatch, as a string
    * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
    * @throws {TypeError} if batch is not a JSONBatch
@@ -268,8 +268,8 @@ class JSONBatch {
    * @param {!string} ser the serialized JSONBatch to parse/deserialize
    * @param {object} [options={}] optional deserialization attributes
    *        Additional options valid here:
-   *        logError (boolean, default false) to log to console deserialization errors
-   *        throwError (boolean, default false) to throw serialization errors
+   *        - logError (boolean, default false) to log to console deserialization errors
+   *        - throwError (boolean, default false) to throw serialization errors
    * @return {object[]} the deserialized batch as a JSONBatch (so a CloudEvent array instance)
    * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error

@@ -5,7 +5,7 @@
   "main": "src/index",
   "scripts": {
     "dependency:log": "npm list > ./temp/dependencies.log",
-    "docs": "npx esdoc",
+    "docs": "npx jsdoc -c .jsdoc.json",
     "example": "node example/nodejs-base",
     "example:debug": "node --inspect-brk example/nodejs-base",
     "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",
@@ -22,10 +22,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "esdoc": "^1.1.0",
-    "esdoc-standard-plugin": "^1.0.0",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "esdoc-node": "^1.0.5",
+    "jsdoc": "^3.6.6",
     "standard": "^16.0.3",
     "tap": "^14.11.0"
   },

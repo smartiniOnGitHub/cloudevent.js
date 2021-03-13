@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@
 
 /**
  * Get a reference to cloudevent Validator class.
- *
+ * @private
  * @see Validator
  */
 const V = require('./validator') // get validator from here
 
 /**
  * Get a reference to cloudevent Transformer class.
- *
+ * @private
  * @see Transformer
  */
 const T = require('./transformer') // get transformer from here
@@ -47,13 +47,13 @@ class CloudEvent {
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
    * @param {?(object|Map|Set|string)} data the real event data
    * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
-   *        time (timestamp/date, default now),
-   *        datainbase64 (string) base64 encoded value for the data (data attribute must not be present when this is defined),
-   *        datacontenttype (string, default 'application/json') is the content type of the data attribute,
-   *        dataschema (uri) optional, reference to the schema that data adheres to,
-   *        subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
-   *        strict (boolean, default false) tell if object instance will be validated in a more strict way
-   * @param {object} extensions optional, contains extension properties (each extension as a key/value property, and no nested objects) but if given any object must contain at least 1 property
+   *        - time (timestamp/date, default now),
+   *        - datainbase64 (string) base64 encoded value for the data (data attribute must not be present when this is defined),
+   *        - datacontenttype (string, default 'application/json') is the content type of the data attribute,
+   *        - dataschema (uri) optional, reference to the schema that data adheres to,
+   *        - subject (string) optional, describes the subject of the event in the context of the event producer (identified by source),
+   *        - strict (boolean, default false) tell if object instance will be validated in a more strict way
+   * @param {?object} extensions optional, contains extension properties (each extension as a key/value property, and no nested objects) but if given any object must contain at least 1 property
    * @throws {Error} if strict is true and id or type is undefined or null
    * @throws {Error} if data and data_base64 are defined
    */
@@ -350,8 +350,8 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @param {object} [options={}] containing:
-   *        strict (boolean, default false) to validate it in a more strict way,
-   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   static validateEvent (event, { strict = false, dataschemavalidator = null } = {}) {
@@ -440,8 +440,8 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @param {object} [options={}] containing:
-   *        strict (boolean, default false) to validate it in a more strict way,
-   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, { strict = false, dataschemavalidator = null } = {}) {
@@ -473,10 +473,10 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to serialize
    * @param {object} [options={}] optional serialization attributes:
-   *        encoder (function, no default) a function that takes data and returns encoded data as a string,
-   *        encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
-   *        onlyValid (boolean, default false) to serialize only if it's a valid instance,
-   *        onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
+   *        - encoder (function, no default) a function that takes data and returns encoded data as a string,
+   *        - encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
+   *        - onlyValid (boolean, default false) to serialize only if it's a valid instance,
+   *        - onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
@@ -525,11 +525,11 @@ class CloudEvent {
    * @static
    * @param {!string} ser the serialized CloudEvent to parse/deserialize
    * @param {object} [options={}] optional deserialization attributes:
-   *        decoder (function, no default) a function that takes data and returns decoder data as a string,
-   *        decodedData (string, no default) already decoded data (but consistency with the datacontenttype is not checked),
-   *        onlyValid (boolean, default false) to deserialize only if it's a valid instance,
-   *        onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
-   *        timezoneOffset (number, default 0) to apply a different timezone offset
+   *        - decoder (function, no default) a function that takes data and returns decoder data as a string,
+   *        - decodedData (string, no default) already decoded data (but consistency with the datacontenttype is not checked),
+   *        - onlyValid (boolean, default false) to deserialize only if it's a valid instance,
+   *        - onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
@@ -693,8 +693,8 @@ class CloudEvent {
    * See {@link CloudEvent.serializeEvent}.
    *
    * @param {object} [options={}] optional serialization attributes:
-   *        encoder (function, default null) a function that takes data and returns encoded data,
-   *        encodedData (string, default null) already encoded data (but consistency with the datacontenttype is not checked),
+   *        - encoder (function, default null) a function that takes data and returns encoded data,
+   *        - encodedData (string, default null) already encoded data (but consistency with the datacontenttype is not checked),
    * @return {string} the serialized event, as a string
    */
   serialize ({ encoder, encodedData } = {}) {
@@ -707,8 +707,8 @@ class CloudEvent {
    * See {@link CloudEvent.validateEvent}.
    *
    * @param {object} [options={}] containing:
-   *        strict (boolean, default false) to validate it in a more strict way,
-   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   validate ({ strict = false, dataschemavalidator = null } = {}) {
@@ -721,8 +721,8 @@ class CloudEvent {
    * See {@link CloudEvent.isValidEvent}.
    *
    * @param {object} [options={}] containing:
-   *        strict (boolean, default false) to validate it in a more strict way,
-   *        dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {boolean} true if valid, otherwise false
    */
   isValid ({ strict = false, dataschemavalidator = null } = {}) {
@@ -856,6 +856,8 @@ class CloudEvent {
 /**
  * Utility variable that returns all standard property names, in an array.
  *
+ * @readonly
+ * @type {string[]}
  * @static
  */
 CloudEvent.standardProps = [
