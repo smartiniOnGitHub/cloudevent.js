@@ -6,6 +6,7 @@ Summary Changelog:
   but ensure compatibility with release 1.0
 - Update requirements to Node.js 10 LTS (10.13.0 or later)
 - Update dependencies for the development environment
+- Generate documentation from sources with JSDoc, no more ESDoc
 
 ## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:

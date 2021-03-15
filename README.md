@@ -248,15 +248,21 @@ you can find even examples for using JSONBatch objects (array of CloudEvent inst
 Node.js 10 LTS (but recommended 10.23.1) or later.
 
 
+## Sources
+
+Source code is all inside main repo:
+[cloudevent.js](https://github.com/smartiniOnGitHub/cloudevent.js/).
+
+Documentation generated from source code (library API):
+[here](https://smartiniongithub.github.io/cloudevent.js/).
+
+
 ## Note
 
 Note that in this implementation there is even the ability to validate CloudEvent instances 
 in a stricter way, by setting to true the attribute 'strict' in constructor options; 
 that attribute (when set) will be put in the extensions of the instance.
 Otherwise you can specify it only during validation, in validation options.
-
-You can find Code Documentation for the API of the library 
-[here](https://smartiniongithub.github.io/cloudevent.js/).
 
 See the CloudEvents Specification [here](https://github.com/cloudevents/spec).
 
