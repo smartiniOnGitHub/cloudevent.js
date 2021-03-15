@@ -43,10 +43,10 @@ const V = require('./validator') // get validator from here
 class JSONBatch {
   /**
    * Create a new instance of a JSONBatch object.
-   *
    * Note that instancing is not allowed for this class because all its methods are static.
    *
-   * @throws {Error} because instancing not allowed for this class
+   * @throws {Error} instancing not allowed for this class
+   * @hideconstructor
    */
   constructor () {
     throw new Error('Instancing not allowed for this class')
@@ -145,6 +145,7 @@ class JSONBatch {
    * Generator to iterate across all CloudEvent instances in the JSONBatch.
    *
    * @static
+   * @generator
    * @param {!object} batch the JSONBatch to iterate
    * @param {object} [options={}] optional processing attributes:
    *        - onlyValid (boolean, default false) to extract only valid instances

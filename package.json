@@ -5,7 +5,9 @@
   "main": "src/index",
   "scripts": {
     "dependency:log": "npm list > ./temp/dependencies.log",
-    "docs": "npx jsdoc -c .jsdoc.json",
+    "docs:clean": "rm -rf ./docs/*",
+    "docs:generate": "npx jsdoc -c .jsdoc.json -R README.md",
+    "docs": "npm run docs:clean && npm run docs:generate",
     "example": "node example/nodejs-base",
     "example:debug": "node --inspect-brk example/nodejs-base",
     "lint": "standard \"./src/**/*.js\" \"./test/**/*.test.js\" \"./example/**/*.js\"",

@@ -48,10 +48,10 @@ const pid = require('process').pid
 class Transformer {
   /**
    * Create a new instance of a Transformer object.
-   *
    * Note that instancing is not allowed for this class because all its methods are static.
    *
-   * @throws {Error} because instancing not allowed for this class
+   * @throws {Error} instancing not allowed for this class
+   * @hideconstructor
    */
   constructor () {
     throw new Error('Instancing not allowed for this class')
