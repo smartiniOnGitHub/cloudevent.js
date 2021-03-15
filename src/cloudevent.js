@@ -675,12 +675,13 @@ class CloudEvent {
         id: { type: 'string', minLength: 1 },
         type: { type: 'string', minLength: 1 },
         source: { type: 'string', format: 'uri-reference' },
-        datacontenttype: { type: 'string' },
-        data: { type: ['object', 'string'] },
-        data_base64: { type: 'string' },
-        dataschema: { type: 'string', format: 'uri' },
-        // time: { type: 'string', format: 'date-time' },
-        subject: { type: 'string', minLength: 1 }
+        datacontenttype: { type: ['string', 'null'], minLength: 1 },
+        // data: { type: ['object', 'string', 'null'] },
+        data: { type: ['object', 'string', 'number', 'array', 'boolean', 'null'] },
+        data_base64: { type: ['string', 'null'], contentEncoding: 'base64' },
+        dataschema: { type: ['string', 'null'], format: 'uri', minLength: 1 },
+        // time: { type: ['string', 'null'], format: 'date-time', minLength: 1 },
+        subject: { type: ['string', 'null'], minLength: 1 }
       },
       required: ['specversion', 'id', 'type', 'source'],
       additionalProperties: true // to handle data, and maybe other (non-standard) properties (extensions)
