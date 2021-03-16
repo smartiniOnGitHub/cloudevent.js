@@ -17,5 +17,10 @@
     "tags": {
         "allowUnknownTags": false,
         "dictionaries": ["jsdoc"]
+    },
+    "templates": {
+        "default": {
+          "includeDate": false
+        }
     }
 }
