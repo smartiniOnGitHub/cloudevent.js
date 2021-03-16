@@ -23,7 +23,10 @@ const {
   // commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
   ceCommonExtensions,
+  ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
   ceNamespace,
   ceServerUrl,
@@ -129,7 +132,8 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.ok(!ceEmpty.isValid())
     t.strictSame(ceEmpty.validate().length, 3) // simplify comparison of results, check only the  number of expected errors ...
     t.ok(!ceEmpty.isStrict)
-    t.strictSame(ceEmpty.validate({ strict: true }).length, 5) // simplify comparison of results, check only the  number of expected errors ...
+    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceStrict')}`)
+    t.strictSame(ceEmpty.validate({ strict: true }).length, 4) // simplify comparison of results, check only the  number of expected errors ...
   }
 
   {
@@ -981,3 +985,60 @@ test('ensure internal methods on extensions checks are fully tested', (t) => {
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
   }
 })
+
+/** @test {CloudEvent} */
+test('ensure null values in some optional attributes are managed in the right way', (t) => {
+  t.plan(22)
+  const { CloudEvent } = require('../src/')
+
+  {
+    // create an instance with some optional attributes set to null, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ce = new CloudEvent('1/full/null-optionals/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithSomeOptionalsNull,
+      ceCommonExtensionsWithNullValue
+    )
+    assert(ce !== null)
+    t.ok(ce)
+    t.ok(CloudEvent.isValidEvent(ce))
+    t.ok(CloudEvent.isValidEvent(ce, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ce), [])
+    t.strictSame(CloudEvent.validateEvent(ce, { strict: false }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ce.isValid())
+    t.ok(ce.isValid({ strict: false }))
+    t.strictSame(ce.validate(), [])
+    t.strictSame(ce.validate({ strict: false }).length, 0)
+    t.strictSame(ce.payload, ce.data)
+    t.strictSame(ce.dataType, 'Unknown')
+    // the same but with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/null-optionals/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithSomeOptionalsNullStrict,
+      ceCommonExtensionsWithNullValue
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.ok(CloudEvent.isValidEvent(ceStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceStrict), [])
+    t.strictSame(CloudEvent.validateEvent(ceStrict, { strict: true }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceStrict.isValid())
+    t.ok(ceStrict.isValid({ strict: true }))
+    t.strictSame(ceStrict.validate(), [])
+    t.strictSame(ceStrict.validate({ strict: true }).length, 0)
+    t.strictSame(ceStrict.payload, ce.data)
+    t.strictSame(ceStrict.dataType, 'Unknown')
+  }
+
+  // TODO: test even with time null ... wip
+})
+
+// TODO: test with data as array ... wip

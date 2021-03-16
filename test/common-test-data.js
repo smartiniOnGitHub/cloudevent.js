@@ -29,10 +29,19 @@ const ceCommonOptions = {
   subject: 'subject',
   strict: false
 }
+const ceCommonOptionsWithSomeOptionalsNull = {
+  time: commonEventTime, // to simplify tests, keep it with a fixed value here
+  datacontenttype: null,
+  dataschema: null,
+  subject: null,
+  strict: false
+}
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
 /** create some common extensions, for better reuse in tests */
 const ceCommonExtensions = { exampleextension: 'value' }
+const ceCommonExtensionsWithNullValue = { exampleextension: null }
 /** create a common extension only for the strict mode, for better reuse in tests */
 const ceExtensionStrict = { strictvalidation: true }
 /** create a sample namespace for events here, for better reuse in tests */
@@ -51,7 +60,10 @@ module.exports = {
   commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
   ceCommonExtensions,
+  ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
   ceNamespace,
   ceServerUrl,

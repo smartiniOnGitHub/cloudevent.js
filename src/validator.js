@@ -787,7 +787,7 @@ class Validator {
    */
   static ensureIsURI (arg, base, name = 'arg') {
     if (!Validator.isURI(arg, base)) {
-      return new Error(`The argument '${name}' must be an URI or URL string, and not '${arg}', '${base}'`)
+      return new Error(`The argument '${name}' must be an URI or URL string and not '${arg}', '${base}'`)
     }
   }
 

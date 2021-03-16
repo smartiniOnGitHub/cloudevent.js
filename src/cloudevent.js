@@ -127,10 +127,11 @@ class CloudEvent {
     this.data_base64 = datainbase64
     /**
      * The MIME Type for the encoding of the data attribute, when serialized.
+     * If null, default value will be set.
      * @type {string}
      * @private
      */
-    this.datacontenttype = datacontenttype
+    this.datacontenttype = (!V.isNull(datacontenttype)) ? datacontenttype : CloudEvent.datacontenttypeDefault()
     /**
      * The URI of the schema for event data, if any.
      * @type {uri}
@@ -140,11 +141,12 @@ class CloudEvent {
     /**
      * The event timestamp.
      * Copy the original object to avoid changing objects that could be shared.
+     * If null, current timestamp will be set.
      * Note that here the object will be transformed into string when serialized.
      * @type {object}
      * @private
      */
-    this.time = new Date(time.valueOf())
+    this.time = (!V.isNull(time)) ? new Date(time.valueOf()) : new Date()
     /**
      * The subject of the event in the context of the event producer.
      * @type {string}
@@ -408,13 +410,15 @@ class CloudEvent {
       ve.push(V.ensureIsURI(event.source, null, 'source'))
       ve.push(V.ensureIsDatePast(event.time, 'time'))
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
-      ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
+      if (V.isDefinedAndNotNull(event.dataschema)) {
+        ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
+      }
       if (V.isFunction(dataschemavalidator)) {
         try {
           const success = dataschemavalidator(event.data, event.dataschema)
           if (success === false) throw Error()
         } catch (e) {
-          ve.push(new Error('data does not respect the dataschema for the given validator'))
+          ve.push(new Error(`data does not respect the dataschema '${event.dataschema}' for the given validator`))
         }
       }
       if (V.isDefinedAndNotNull(event.extensions)) {
@@ -642,7 +646,7 @@ class CloudEvent {
    */
   static isExtensionValueValid (value) {
     if (V.isUndefined(value)) throw new Error('Extension value undefined')
-    if (!V.isString(value) && !V.isBoolean(value) && !V.isNumber(value)) return false
+    if (!V.isString(value) && !V.isBoolean(value) && !V.isNumber(value) && !V.isNull(value)) return false
     return true
   }
 
@@ -676,7 +680,6 @@ class CloudEvent {
         type: { type: 'string', minLength: 1 },
         source: { type: 'string', format: 'uri-reference' },
         datacontenttype: { type: ['string', 'null'], minLength: 1 },
-        // data: { type: ['object', 'string', 'null'] },
         data: { type: ['object', 'string', 'number', 'array', 'boolean', 'null'] },
         data_base64: { type: ['string', 'null'], contentEncoding: 'base64' },
         dataschema: { type: ['string', 'null'], format: 'uri', minLength: 1 },
@@ -685,6 +688,29 @@ class CloudEvent {
       },
       required: ['specversion', 'id', 'type', 'source'],
       additionalProperties: true // to handle data, and maybe other (non-standard) properties (extensions)
+    }
+  }
+
+  /**
+   * Utility function that return a dump of validation results
+   * on the given CloudEvent.
+   *
+   * @static
+   * @param {(?object)} ce the CloudEvent object to dump
+   * @param {object} [options={}]   * @param {string} [name='noname'] the name to assign in the returned string, or 'noname' as default value
+   * @return {string} the dump of the object or a message when obj is undefined/null/not a CloudEvent
+   */
+  static dumpValidationResults (ce, options = {}, name = 'noname') {
+    if (V.isUndefined(ce)) {
+      return `${name}: undefined`
+    } else if (V.isNull(ce)) {
+      return `${name}: null`
+    } else if (CloudEvent.isCloudEvent(ce)) {
+      const opts = (options == null) ? {} : options
+      const ve = CloudEvent.validateEvent(ce, opts)
+      return `${name}: ${JSON.stringify(ve.map((i) => i.message))}`
+    } else {
+      return `${name}: 'is not a CloudEvent, no validation possible'`
     }
   }
 
