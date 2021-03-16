@@ -7,6 +7,8 @@ Summary Changelog:
 - Update requirements to Node.js 10 LTS (10.13.0 or later)
 - Update dependencies for the development environment
 - Generate documentation from sources with JSDoc, no more ESDoc
+- Fix: Manage in the right way optional values given as null (even extensions)
+- Feature: add to CloudEvent an utility (static) method to dump validation results
 
 ## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:
