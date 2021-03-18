@@ -683,7 +683,7 @@ class CloudEvent {
         data: { type: ['object', 'string', 'number', 'array', 'boolean', 'null'] },
         data_base64: { type: ['string', 'null'], contentEncoding: 'base64' },
         dataschema: { type: ['string', 'null'], format: 'uri', minLength: 1 },
-        // time: { type: ['string', 'null'], format: 'date-time', minLength: 1 },
+        time: { type: ['string', 'null'], format: 'date-time', minLength: 1 },
         subject: { type: ['string', 'null'], minLength: 1 }
       },
       required: ['specversion', 'id', 'type', 'source'],
