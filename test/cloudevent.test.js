@@ -25,6 +25,8 @@ const {
   ceCommonOptionsStrict,
   ceCommonOptionsWithSomeOptionalsNull,
   ceCommonOptionsWithSomeOptionalsNullStrict,
+  ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
@@ -988,13 +990,14 @@ test('ensure internal methods on extensions checks are fully tested', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure null values in some optional attributes are managed in the right way', (t) => {
-  t.plan(22)
+  t.plan(44)
+  // const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   const { CloudEvent } = require('../src/')
 
   {
     // create an instance with some optional attributes set to null, but with strict flag disabled: expected success ...
     // note that null values are not handled by default values, only undefined values ...
-    const ce = new CloudEvent('1/full/null-optionals/no-strict',
+    const ce = new CloudEvent('1/full/null-some-optionals/no-strict',
       ceNamespace,
       ceServerUrl,
       null, // data
@@ -1015,7 +1018,7 @@ test('ensure null values in some optional attributes are managed in the right wa
     t.strictSame(ce.payload, ce.data)
     t.strictSame(ce.dataType, 'Unknown')
     // the same but with strict mode enabled ...
-    const ceStrict = new CloudEvent('1/full/null-optionals/strict',
+    const ceStrict = new CloudEvent('1/full/null-some-optionals/strict',
       ceNamespace,
       ceServerUrl,
       null, // data
@@ -1025,6 +1028,7 @@ test('ensure null values in some optional attributes are managed in the right wa
     assert(ceStrict !== null)
     t.ok(ceStrict)
     // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.ok(CloudEvent.isValidEvent(ceStrict, { strict: true }))
     t.strictSame(CloudEvent.validateEvent(ceStrict), [])
@@ -1038,7 +1042,55 @@ test('ensure null values in some optional attributes are managed in the right wa
     t.strictSame(ceStrict.dataType, 'Unknown')
   }
 
-  // TODO: test even with time null ... wip
+  {
+    // create an instance with all optional attributes set to null, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ce = new CloudEvent('1/full/null-all-optionals/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithAllOptionalsNull,
+      // ceCommonExtensionsWithNullValue
+      null // set null extensions here
+    )
+    assert(ce !== null)
+    t.ok(ce)
+    t.ok(CloudEvent.isValidEvent(ce))
+    t.ok(CloudEvent.isValidEvent(ce, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ce), [])
+    t.strictSame(CloudEvent.validateEvent(ce, { strict: false }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ce.isValid())
+    t.ok(ce.isValid({ strict: false }))
+    t.strictSame(ce.validate(), [])
+    t.strictSame(ce.validate({ strict: false }).length, 0)
+    t.strictSame(ce.payload, ce.data)
+    t.strictSame(ce.dataType, 'Unknown')
+    // the same but with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/null-all-optionals/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithAllOptionalsNullStrict,
+      // ceCommonExtensionsWithNullValue
+      null // set null extensions here
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.ok(CloudEvent.isValidEvent(ceStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceStrict), [])
+    t.strictSame(CloudEvent.validateEvent(ceStrict, { strict: true }).length, 0)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceStrict.isValid())
+    t.ok(ceStrict.isValid({ strict: true }))
+    t.strictSame(ceStrict.validate(), [])
+    t.strictSame(ceStrict.validate({ strict: true }).length, 0)
+    t.strictSame(ceStrict.payload, ce.data)
+    t.strictSame(ceStrict.dataType, 'Unknown')
+  }
 })
 
 // TODO: test with data as array ... wip

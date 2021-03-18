@@ -36,9 +36,11 @@ const ceCommonOptionsWithSomeOptionalsNull = {
   subject: null,
   strict: false
 }
+const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
 /** create some common options with strict flag enabled, for better reuse in tests */
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
 const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
+const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, time: null, strict: true }
 /** create some common extensions, for better reuse in tests */
 const ceCommonExtensions = { exampleextension: 'value' }
 const ceCommonExtensionsWithNullValue = { exampleextension: null }
@@ -62,6 +64,8 @@ module.exports = {
   ceCommonOptionsStrict,
   ceCommonOptionsWithSomeOptionalsNull,
   ceCommonOptionsWithSomeOptionalsNullStrict,
+  ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
