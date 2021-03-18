@@ -309,6 +309,20 @@ class Validator {
   }
 
   /**
+   * Tell if the given argument is a plain object or a keyed collection or an array, but not a string.
+   *
+   * See {@link Validator.isObjectOrCollection}.
+   * See {@link Validator.isArray}.
+   *
+   * @static
+   * @param {?object} arg the object to check
+   * @return {boolean} true if it's a plain object or a keyed collection or an array but not a string, false otherwise
+   */
+   static isObjectOrCollectionOrArrayNotString (arg) {
+    return ((Validator.isObjectOrCollection(arg) || Validator.isArray(arg)) && (typeof arg !== 'string'))
+  }
+
+  /**
    * Tell if the given argument is a plain object or a keyed collection, or a string.
    *
    * See {@link Validator.isObjectOrCollection}.
@@ -319,6 +333,20 @@ class Validator {
    */
   static isObjectOrCollectionOrString (arg) {
     return (Validator.isObjectOrCollection(arg) || (typeof arg === 'string'))
+  }
+
+  /**
+   * Tell if the given argument is a plain object or a keyed collection or an array, or a string.
+   *
+   * See {@link Validator.isObjectOrCollection}.
+   * See {@link Validator.isArray}.
+   *
+   * @static
+   * @param {?object} arg the object to check
+   * @return {boolean} true if it's a plain object or a keyed collection or an array or a string, false otherwise
+   */
+   static isObjectOrCollectionOrArrayOrString (arg) {
+    return (Validator.isObjectOrCollection(arg) || Validator.isArray(arg) || (typeof arg === 'string'))
   }
 
   /**
@@ -663,6 +691,22 @@ class Validator {
   }
 
   /**
+   * Ensure that the given argument is a plain object or a collection or an array, not a string.
+   *
+   * See {@link Validator.isObjectOrCollectionOrArrayNotString}.
+   *
+   * @static
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
+   * @return {TypeError} if it's not a plain object nor a collection or it's a string, nothing otherwise
+   */
+   static ensureIsObjectOrCollectionOrArrayNotString (arg, name = 'arg') {
+    if (!Validator.isObjectOrCollectionOrArrayNotString(arg)) {
+      return new TypeError(`The argument '${name}' must be an object or a collection or an array and not a string, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
    * Ensure that the given argument is a plain object or a collection, or a string.
    *
    * See {@link Validator.isObjectOrCollectionOrString}.
@@ -675,6 +719,22 @@ class Validator {
   static ensureIsObjectOrCollectionOrString (arg, name = 'arg') {
     if (!Validator.isObjectOrCollectionOrString(arg)) {
       return new TypeError(`The argument '${name}' must be an object or a collection or a string, instead got a '${typeof arg}'`)
+    }
+  }
+
+  /**
+   * Ensure that the given argument is a plain object or a collection or an array, or a string.
+   *
+   * See {@link Validator.isObjectOrCollectionOrArrayOrString}.
+   *
+   * @static
+   * @param {?object} arg the object to check
+   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
+   * @return {TypeError} if it's not a plain object nor a collection nor a string, nothing otherwise
+   */
+   static ensureIsObjectOrCollectionOrArrayOrString (arg, name = 'arg') {
+    if (!Validator.isObjectOrCollectionOrArrayOrString(arg)) {
+      return new TypeError(`The argument '${name}' must be an object or a collection or an array or a string, instead got a '${typeof arg}'`)
     }
   }
 

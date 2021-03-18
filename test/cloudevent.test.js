@@ -33,7 +33,8 @@ const {
   ceNamespace,
   ceServerUrl,
   ceCommonData,
-  ceMapData
+  ceMapData,
+  ceArrayData
 } = require('./common-test-data')
 
 /** @test {CloudEvent} */
@@ -431,7 +432,7 @@ function dataValidationNotOk (data, schema) {
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
-  t.plan(117)
+  t.plan(139)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -647,6 +648,52 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataMapStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
     t.strictSame(ceFullDataMapStrict.payload, ceFullDataMapStrict.data)
     t.strictSame(ceFullDataMapStrict.dataType, 'Text')
+  }
+
+  {
+    // create an instance with a sample array data attribute, but with strict flag disabled: expected success ...
+    // note that null values are not handled by default values, only undefined values ...
+    const ceFullDataArray = new CloudEvent('1/full/array-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      ceArrayData, // data
+      ceCommonOptions,
+      ceCommonExtensions
+    )
+    assert(ceFullDataArray !== null)
+    t.ok(ceFullDataArray)
+    t.ok(CloudEvent.isValidEvent(ceFullDataArray))
+    t.ok(CloudEvent.isValidEvent(ceFullDataArray, { strict: false }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataArray), []) // data type errors handled only in strict mode currently ...
+    t.strictSame(CloudEvent.validateEvent(ceFullDataArray, { strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataArray.isValid())
+    t.ok(ceFullDataArray.isValid({ strict: false }))
+    t.strictSame(ceFullDataArray.validate(), []) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataArray.validate({ strict: false }).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataArray.payload, ceFullDataArray.data)
+    t.strictSame(ceFullDataArray.dataType, 'Text')
+    // the same but with strict mode enabled ...
+    const ceFullDataArrayStrict = new CloudEvent('1/full/array-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceArrayData, // data
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    assert(ceFullDataArrayStrict !== null)
+    t.ok(ceFullDataArrayStrict)
+    t.ok(CloudEvent.isValidEvent(ceFullDataArrayStrict))
+    t.ok(CloudEvent.isValidEvent(ceFullDataArrayStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataArrayStrict).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(CloudEvent.validateEvent(ceFullDataArrayStrict, { strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataArrayStrict.isValid())
+    t.ok(ceFullDataArrayStrict.isValid({ strict: true }))
+    t.strictSame(ceFullDataArrayStrict.validate().length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataArrayStrict.validate({ strict: true }).length, 0) // data type errors handled only in strict mode currently ...
+    t.strictSame(ceFullDataArrayStrict.payload, ceFullDataArrayStrict.data)
+    t.strictSame(ceFullDataArrayStrict.dataType, 'Text')
   }
 })
 
@@ -1092,5 +1139,3 @@ test('ensure null values in some optional attributes are managed in the right wa
     t.strictSame(ceStrict.dataType, 'Unknown')
   }
 })
-
-// TODO: test with data as array ... wip

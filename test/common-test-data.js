@@ -57,6 +57,8 @@ const ceMapData = new Map() // empty Map
 // const ceMapData = new Map(['key-1', 'value 1'], ['key-2', 'value 2'])
 ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
+/** create some common data from an array, for better reuse in tests */
+const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item as null
 
 module.exports = {
   commonEventTime,
@@ -72,5 +74,6 @@ module.exports = {
   ceNamespace,
   ceServerUrl,
   ceCommonData,
-  ceMapData
+  ceMapData,
+  ceArrayData
 }

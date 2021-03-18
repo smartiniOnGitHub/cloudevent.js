@@ -9,6 +9,7 @@ Summary Changelog:
 - Generate documentation from sources with JSDoc, no more ESDoc
 - Fix: Manage in the right way optional values given as null (even extensions)
 - Feature: add to CloudEvent an utility (static) method to dump validation results
+- Feature: handle 'data' as array (it was previously forbidden)
 
 ## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:

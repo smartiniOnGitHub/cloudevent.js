@@ -399,7 +399,7 @@ class CloudEvent {
               ve.push(new Error('data is not a valid JSON string'))
             }
           } else {
-            ve.push(V.ensureIsObjectOrCollectionNotString(event.data, 'data'))
+            ve.push(V.ensureIsObjectOrCollectionOrArrayNotString(event.data, 'data'))
           }
         } else {
           // ensure data is a plain object or collection, or even a string in this case
@@ -807,13 +807,17 @@ class CloudEvent {
           // fallback in case of bad data (not parseable)
           if (V.isString(this.data)) {
             return this.data.slice()
+          } else if (V.isArray(this.data)) {
+            return this.data.map((i) => i)
           } else {
             return { ...this.data }
           }
         }
-      } else if (V.isString(this.data)) {
-        // handle an edge case: if data is a String, I need to clone in a different way ...
+      } // this.isDatacontenttypeJSON
+      else if (V.isString(this.data)) {
         return this.data.slice()
+      } else if (V.isArray(this.data)) {
+        return this.data.map((i) => i)
       } else {
         return { ...this.data }
       }
