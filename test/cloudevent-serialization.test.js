@@ -54,7 +54,14 @@ const {
   commonEventTime,
   ceCommonOptions,
   ceCommonOptionsStrict,
+  // ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
+  // ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
+  // ceCommonOptionsForTextData,
+  // ceCommonOptionsForTextDataStrict,
   ceCommonExtensions,
+  ceCommonExtensionsWithNullValue,
   ceNamespace,
   ceServerUrl,
   ceCommonData
@@ -501,39 +508,39 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(ceFullOtherContentType.isValid())
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
-    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized1 = ceFullOtherContentType.serialize({
       encoder: encoderToXmlSample
     })
-    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized2 = ceFullOtherContentType.serialize({
       encodedData: ceDataAsXmlString
     })
-    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const fixedEncodedData = '<data "fixed"="encoded" />'
-    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
       encoder: encoderToXmlSample,
       // encodedData: undefined
       // encodedData: null
       // encodedData: ceDataAsXmlString
       encodedData: fixedEncodedData
     })
-    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(ceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
+    const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
-    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
+    const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
-    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
   }
 
@@ -678,39 +685,39 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     // when I try to serialize specifying right serialization options, expect success ...
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
-    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSON.serialize({
+    const ceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSON.serialize({
       encoder: encoderToJSON
     })
-    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
-    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSON.serialize({
+    const ceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSON.serialize({
       encodedData: ceDataAsJSONString
     })
-    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
     const fixedEncodedData = { fixed: 'encoded' }
-    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSON.serialize({
+    const ceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSON.serialize({
       encoder: encoderToJSON,
       // encodedData: undefined
       // encodedData: null
       // encodedData: ceDataAsJSONString
       encodedData: fixedEncodedData
     })
-    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(ceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
-    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+    const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
-    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
-    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
+    const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
-    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
 
     // the same for deserializtion ...
@@ -784,39 +791,39 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     // when I try to serialize specifying right serialization options, expect success ...
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
-    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSONStrict.serialize({
+    const ceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeJSONStrict.serialize({
       encoder: encoderToJSON
     })
-    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
-    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSONStrict.serialize({
+    const ceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSONStrict.serialize({
       encodedData: ceDataAsJSONString
     })
-    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
     const fixedEncodedData = { fixed: 'encoded' }
-    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSONStrict.serialize({
+    const ceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeJSONStrict.serialize({
       encoder: encoderToJSON,
       // encodedData: undefined
       // encodedData: null
       // encodedData: ceDataAsJSONString
       encodedData: fixedEncodedData
     })
-    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(ceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
-    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+    const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
-    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
-    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
+    const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
-    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
 
     // the same for deserializtion ...
@@ -1581,36 +1588,36 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     t.ok(ceFullOtherContentType.isValid())
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
-    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized1 = ceFullOtherContentType.serialize({
       encoder: encoderBigSample
     })
-    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized2 = ceFullOtherContentType.serialize({
       encodedData: `<data "random"="${ceBigString}" />`
     })
-    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const fixedEncodedData = `<data "fixed"="${ceBigString}" />`
-    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
+    const ceFullOtherContentTypeSerialized3 = ceFullOtherContentType.serialize({
       encoder: encoderBigSample,
       encodedData: fixedEncodedData
     })
-    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(ceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
+    const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
-    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
-    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
+    const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
-    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
 
     // set some flags
@@ -1725,36 +1732,36 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     t.ok(ceFullOtherContentTypeStrict.isValid())
     // test different combinations of serialization options
     // note that if given, encoder function has priority over encoded data
-    const cceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeStrict.serialize({
+    const ceFullOtherContentTypeSerialized1 = ceFullOtherContentTypeStrict.serialize({
       encoder: encoderBigSample
     })
-    t.ok(cceFullOtherContentTypeSerialized1)
+    t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-    const cceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeStrict.serialize({
+    const ceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeStrict.serialize({
       encodedData: `<data "random"="${ceBigString}" />`
     })
-    t.ok(cceFullOtherContentTypeSerialized2)
+    t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const fixedEncodedData = `<data "fixed"="${ceBigString}" />`
-    const cceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeStrict.serialize({
+    const ceFullOtherContentTypeSerialized3 = ceFullOtherContentTypeStrict.serialize({
       encoder: encoderBigSample,
       encodedData: fixedEncodedData
     })
-    t.ok(cceFullOtherContentTypeSerialized3)
+    t.ok(ceFullOtherContentTypeSerialized3)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-    const cceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+    const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
       onlyValid: false
     })
-    t.ok(cceFullOtherContentTypeSerialized4)
+    t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
-    const cceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
+    const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
       onlyValid: true
     })
-    t.ok(cceFullOtherContentTypeSerialized5)
+    t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
 
     // set some flags
@@ -2090,3 +2097,58 @@ test('deserialize some CloudEvent instances (but a previous specversion) from JS
     }, Error, 'Expected exception when creating a CloudEvent from a different specversion')
   }
 })
+
+/** @test {CloudEvent} */
+test('serialize and deserialize some CloudEvent instances with some optional attributes null, and ensure errors are raised', (t) => {
+  t.plan(12)
+
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
+  t.ok(CloudEvent)
+  t.ok(V)
+
+  {
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/null-some-optionals/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithSomeOptionalsNullStrict,
+      ceCommonExtensionsWithNullValue
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.ok(ceStrict.isValid())
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Unknown')
+  }
+
+  {
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/null-all-optionals/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceCommonOptionsWithAllOptionalsNullStrict,
+      // ceCommonExtensionsWithNullValue
+      null // set null extensions here
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.ok(ceStrict.isValid())
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Unknown')
+  }
+})
+
+/*
+// TODO: add serialization/deserialization tests even for these ... wip
+const ceDataAsString = 'Hello World, 2020'
+const ceDataAsBoolean = true
+const ceDataAsNumber = 3.14159
+ */
