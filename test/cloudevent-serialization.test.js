@@ -59,12 +59,13 @@ const {
   // ceCommonOptionsWithAllOptionalsNull,
   ceCommonOptionsWithAllOptionalsNullStrict,
   // ceCommonOptionsForTextData,
-  // ceCommonOptionsForTextDataStrict,
+  ceCommonOptionsForTextDataStrict,
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
   ceNamespace,
   ceServerUrl,
-  ceCommonData
+  ceCommonData,
+  ceArrayData
 } = require('./common-test-data')
 
 /** sample data as an xml string */
@@ -2100,11 +2101,10 @@ test('deserialize some CloudEvent instances (but a previous specversion) from JS
 
 /** @test {CloudEvent} */
 test('serialize and deserialize some CloudEvent instances with some optional attributes null, and ensure errors are raised', (t) => {
-  t.plan(12)
+  t.plan(14)
 
-  const { CloudEvent, CloudEventValidator: V } = require('../src/')
-  t.ok(CloudEvent)
-  t.ok(V)
+  const { CloudEvent } = require('../src/')
+  // t.ok(CloudEvent)
 
   {
     // use directly the event with strict mode enabled ...
@@ -2123,6 +2123,12 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 
   {
@@ -2143,12 +2149,118 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 })
 
-/*
-// TODO: add serialization/deserialization tests even for these ... wip
-const ceDataAsString = 'Hello World, 2020'
-const ceDataAsBoolean = true
-const ceDataAsNumber = 3.14159
- */
+/** @test {CloudEvent} */
+test('serialize and deserialize some CloudEvent instances with data as array, and ensure errors are raised', (t) => {
+  t.plan(6)
+
+  const { CloudEvent } = require('../src/')
+  // t.ok(CloudEvent)
+
+  {
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/array-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceArrayData, // data
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Text')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+  }
+})
+
+/** @test {CloudEvent} */
+test('serialize and deserialize some CloudEvent instances with data as value (string or boolean or number), and ensure errors are raised', (t) => {
+  t.plan(18)
+
+  const { CloudEvent } = require('../src/')
+  // t.ok(CloudEvent)
+
+  {
+    const value = 'Hello World, 2020'
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/string-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsForTextDataStrict,
+      ceCommonExtensions
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Text')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+  }
+
+  {
+    const value = true
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/string-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsForTextDataStrict,
+      ceCommonExtensions
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Text')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+  }
+
+  {
+    const value = 3.14159
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/string-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsForTextDataStrict,
+      ceCommonExtensions
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Text')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+  }
+})

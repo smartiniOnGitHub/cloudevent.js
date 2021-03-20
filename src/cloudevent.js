@@ -512,7 +512,11 @@ class CloudEvent {
       encodedData = encoder(event.payload)
     } else {
       // encoder not defined, check encodedData
-      if (!V.isDefinedAndNotNull(encodedData)) throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
+      // but mandatory only for non-value data
+      if (!V.isValue(event.data) && !V.isDefinedAndNotNull(encodedData)) throw new Error(`Missing encoder function: use encoder function or already encoded data with the given data content type: '${event.datacontenttype}'.`)
+      if (V.isValue(event.data) && !V.isDefinedAndNotNull(encodedData)) {
+        encodedData = `${event.data}`
+      }
     }
     if (!V.isStringNotEmpty(encodedData)) throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
     const newEvent = T.mergeObjects(event, { data: encodedData })
@@ -585,7 +589,11 @@ class CloudEvent {
       decodedData = decoder(parsed.data)
     } else {
       // decoder not defined, so decodedData must be defined
-      if (!V.isDefinedAndNotNull(decodedData)) throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
+      // but mandatory only for non-value data
+      if (!V.isValue(parsed.data) && !V.isDefinedAndNotNull(decodedData)) throw new Error(`Missing decoder function: use decoder function or already decoded data with the given data content type: '${parsed.datacontenttype}'.`)
+      if (V.isValue(parsed.data) && !V.isDefinedAndNotNull(decodedData)) {
+        decodedData = `${parsed.data}`
+      }
     }
     if (!V.isObjectOrCollectionOrString(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
     // overwrite data with decodedData before returning it
