@@ -399,12 +399,14 @@ class CloudEvent {
               ve.push(new Error('data is not a valid JSON string'))
             }
           } else {
-            ve.push(V.ensureIsObjectOrCollectionOrArrayNotString(event.data, 'data'))
+            ve.push(CloudEvent.ensureTypeOfDataIsRight(event))
           }
+          // end of default datacontenttype
         } else {
-          // ensure data is a plain object or collection, or even a string in this case
+          // ensure data is a plain object or collection,
+          // or even a value (string or boolean or number) in this case
           // because in serialization/deserialization some validation can occur on the transformed object
-          ve.push(V.ensureIsObjectOrCollectionOrString(event.data, 'data'))
+          ve.push(CloudEvent.ensureTypeOfDataIsRight(event))
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
@@ -691,6 +693,28 @@ class CloudEvent {
     }
   }
 
+  // TODO: add comments ... wip
+  static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
+    if (V.isUndefinedOrNull(ce)) throw new Error('CloudEvent undefined or null')
+    let ve
+    if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+      // TODO: exclude even boolean and number, and rename that method ... wip
+      // ve = V.ensureIsObjectOrCollectionOrArrayNotString(ce.data, name)
+      ve = V.ensureIsObjectOrCollectionOrArrayNotValue(ce.data, name) || null
+    } else {
+      // for example with: datacontenttype 'text/plain':
+      // ensure data is a plain object or collection,
+      // or even a string or boolean or number in this case
+      // because in serialization/deserialization some validation can occur on the transformed object
+      // TODO: add additional type checks, and rename that method ... wip
+      // ve = V.ensureIsObjectOrCollectionOrString(ce.data, name)
+      ve = V.ensureIsObjectOrCollectionOrValue(ce.data, name) || null
+      // TODO: check if enable the following instead ... wip
+      // ve = V.ensureIsObjectOrCollectionOrArrayOrValue(ce.data, name) || null
+    }
+    return ve
+  }
+
   /**
    * Utility function that return a dump of validation results
    * on the given CloudEvent.
@@ -813,11 +837,13 @@ class CloudEvent {
             return { ...this.data }
           }
         }
-      } // this.isDatacontenttypeJSON
-      else if (V.isString(this.data)) {
+        // end of this.isDatacontenttypeJSON
+      } else if (V.isString(this.data)) {
         return this.data.slice()
       } else if (V.isArray(this.data)) {
         return this.data.map((i) => i)
+      } else if (V.isBoolean(this.data) || V.isNumber(this.data)) {
+        return this.data
       } else {
         return { ...this.data }
       }

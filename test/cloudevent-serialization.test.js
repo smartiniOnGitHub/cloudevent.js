@@ -1694,15 +1694,15 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
 
   {
     // the same but with strict mode enabled ...
-    // bad because bad data type
+    // bad because of the default datacontenttype
     const ceFullOtherContentTypeBadStrict = new CloudEvent('1/non-default-contenttype/bad-data/strict',
       ceNamespace,
       ceServerUrl,
       1234567890, // data
       // Symbol('test-no-object-nor-string'), // data
       {
-        ...ceCommonOptionsStrict,
-        datacontenttype: 'application/xml'
+        ...ceCommonOptionsStrict
+        // datacontenttype: 'application/xml' // ok with a non default one
       },
       ceCommonExtensions
     )
