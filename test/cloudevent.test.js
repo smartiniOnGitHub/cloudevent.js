@@ -637,16 +637,19 @@ test('create CloudEvent instances with different kind of data attribute, and ens
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with a string data attribute, and ensure the validation is right', (t) => {
-  t.plan(77)
-  const { CloudEvent } = require('../src/')
+  t.plan(78)
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
+  const value = 'data as a string'
+  t.ok(V.isValue(value))
 
   {
     // create an instance with a string data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
+    // bad because of the default datacontenttype, but validation error only in strict mode
     const ceFullData = new CloudEvent('1/full/string-data/no-strict',
       ceNamespace,
       ceServerUrl,
-      'data as a string, bad here', // data
+      value, // data
       ceCommonOptions,
       ceCommonExtensions
     )
@@ -672,7 +675,7 @@ test('create CloudEvent instances with a string data attribute, and ensure the v
     const ceFullDataStrict = new CloudEvent('1/full/string-data/strict',
       ceNamespace,
       ceServerUrl,
-      'data as a string, bad here', // data
+      value, // data
       ceCommonOptionsStrict,
       ceCommonExtensions
     )
@@ -707,10 +710,11 @@ test('create CloudEvent instances with a string data attribute, and ensure the v
 
   {
     // create an instance with a string data attribute (and the right datacontenttype), but with strict flag disabled: expected success ...
+    // good because of the non default datacontenttype
     const ceFullData = new CloudEvent('1/full/string-data/no-strict',
       ceNamespace,
       ceServerUrl,
-      'data as a string, good here', // data
+      value, // data
       ceCommonOptionsForTextData,
       ceCommonExtensions
     )
@@ -736,7 +740,7 @@ test('create CloudEvent instances with a string data attribute, and ensure the v
     const ceFullDataStrict = new CloudEvent('1/full/string-data/strict',
       ceNamespace,
       ceServerUrl,
-      'data as a string, good here', // data
+      value, // data
       ceCommonOptionsForTextDataStrict,
       ceCommonExtensions
     )
@@ -772,16 +776,19 @@ test('create CloudEvent instances with a string data attribute, and ensure the v
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with a boolean data attribute, and ensure the validation is right', (t) => {
-  t.plan(31)
-  const { CloudEvent } = require('../src/')
+  t.plan(78)
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
+  const value = true
+  t.ok(V.isValue(value))
 
   {
     // create an instance with a boolean data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
+    // bad because of the default datacontenttype, but validation error only in strict mode
     const ceFullData = new CloudEvent('1/full/boolean-data/no-strict',
       ceNamespace,
       ceServerUrl,
-      true, // data
+      value, // data
       ceCommonOptions,
       ceCommonExtensions
     )
@@ -803,14 +810,11 @@ test('create CloudEvent instances with a boolean data attribute, and ensure the 
     t.strictSame(ceFullData.validate({ strict: true }).length, 1)
     t.strictSame(ceFullData.payload, ceFullData.data)
     t.strictSame(ceFullData.dataType, 'Text')
-    // TODO: update even payload method ... wip
-    /*
-    // TODO: ... wip
     // the same but with strict mode enabled: expected validation errors ...
     const ceFullDataStrict = new CloudEvent('1/full/boolean-data/strict',
       ceNamespace,
       ceServerUrl,
-      true, // data
+      value, // data
       ceCommonOptionsStrict,
       ceCommonExtensions
     )
@@ -841,15 +845,15 @@ test('create CloudEvent instances with a boolean data attribute, and ensure the 
     t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationNotOk }).length, 2)
     t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
     t.strictSame(ceFullDataStrict.dataType, 'Text')
-     */
   }
 
   {
     // create an instance with a boolean data attribute (and the right datacontenttype), but with strict flag disabled: expected success ...
+    // good because of the non default datacontenttype
     const ceFullData = new CloudEvent('1/full/boolean-data/no-strict',
       ceNamespace,
       ceServerUrl,
-      true, // data
+      value, // data
       ceCommonOptionsForTextData,
       ceCommonExtensions
     )
@@ -871,14 +875,11 @@ test('create CloudEvent instances with a boolean data attribute, and ensure the 
     t.strictSame(ceFullData.validate({ strict: true }).length, 0)
     t.strictSame(ceFullData.payload, ceFullData.data)
     t.strictSame(ceFullData.dataType, 'Text')
-    // TODO: update even payload method ... wip
-    /*
-    // TODO: ... wip
     // the same but with strict mode enabled: expected success ...
     const ceFullDataStrict = new CloudEvent('1/full/boolean-data/strict',
       ceNamespace,
       ceServerUrl,
-      true, // data
+      value, // data
       ceCommonOptionsForTextDataStrict,
       ceCommonExtensions
     )
@@ -909,16 +910,155 @@ test('create CloudEvent instances with a boolean data attribute, and ensure the 
     t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationNotOk }).length, 1)
     t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
     t.strictSame(ceFullDataStrict.dataType, 'Text')
-    */
+  }
+})
+
+/** @test {CloudEvent} */
+test('create CloudEvent instances with a number as data attribute, and ensure the validation is right', (t) => {
+  t.plan(78)
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
+  t.ok(CloudEvent)
+  const value = 1234567890
+  t.ok(V.isValue(value))
+
+  {
+    // create an instance with a boolean data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
+    // bad because of the default datacontenttype, but validation error only in strict mode
+    const ceFullData = new CloudEvent('1/full/number-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptions,
+      ceCommonExtensions
+    )
+    assert(ceFullData !== null)
+    t.ok(ceFullData)
+    // data type errors handled only in strict mode currently ...
+    t.ok(CloudEvent.isValidEvent(ceFullData))
+    t.ok(CloudEvent.isValidEvent(ceFullData, { strict: false })) // good the same
+    t.ok(!CloudEvent.isValidEvent(ceFullData, { strict: true })) // bad here (right)
+    t.strictSame(CloudEvent.validateEvent(ceFullData), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullData, { strict: false }).length, 0) // good the same
+    t.strictSame(CloudEvent.validateEvent(ceFullData, { strict: true }).length, 1) // bad here (right)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullData.isValid())
+    t.ok(ceFullData.isValid({ strict: false }))
+    t.ok(!ceFullData.isValid({ strict: true }))
+    t.strictSame(ceFullData.validate(), [])
+    t.strictSame(ceFullData.validate({ strict: false }).length, 0)
+    t.strictSame(ceFullData.validate({ strict: true }).length, 1)
+    t.strictSame(ceFullData.payload, ceFullData.data)
+    t.strictSame(ceFullData.dataType, 'Text')
+    // the same but with strict mode enabled: expected validation errors ...
+    const ceFullDataStrict = new CloudEvent('1/full/number-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsStrict,
+      ceCommonExtensions
+    )
+    assert(ceFullDataStrict !== null)
+    t.ok(ceFullDataStrict)
+    // data type errors handled only in strict mode currently ...
+    // note that in the following lines even if I force 'strict: false' it won't be used because already set in the object instance ...
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStrict))
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStrict, { strict: true }))
+    t.ok(!CloudEvent.isValidEvent(ceFullDataStrict, { strict: false }))
+    t.notOk(CloudEvent.isValidEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationOkIfDefined }))
+    t.notOk(CloudEvent.isValidEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationNotOk }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true }).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: false }).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationOkIfDefined }).length, 1)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationNotOk }).length, 2)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(!ceFullDataStrict.isValid())
+    t.ok(!ceFullDataStrict.isValid({ strict: true }))
+    t.ok(!ceFullDataStrict.isValid({ strict: false }))
+    t.notOk(ceFullDataStrict.isValid({ strict: true, dataschemavalidator: dataValidationOkIfDefined }))
+    t.notOk(ceFullDataStrict.isValid({ strict: true, dataschemavalidator: dataValidationNotOk }))
+    t.strictSame(ceFullDataStrict.validate().length, 1)
+    t.strictSame(ceFullDataStrict.validate({ strict: true }).length, 1)
+    t.strictSame(ceFullDataStrict.validate({ strict: false }).length, 1)
+    t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationOkIfDefined }).length, 1)
+    t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationNotOk }).length, 2)
+    t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
+    t.strictSame(ceFullDataStrict.dataType, 'Text')
+  }
+
+  {
+    // create an instance with a boolean data attribute (and the right datacontenttype), but with strict flag disabled: expected success ...
+    // good because of the non default datacontenttype
+    const ceFullData = new CloudEvent('1/full/number-data/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsForTextData,
+      ceCommonExtensions
+    )
+    assert(ceFullData !== null)
+    t.ok(ceFullData)
+    // data type errors handled only in strict mode currently ...
+    t.ok(CloudEvent.isValidEvent(ceFullData))
+    t.ok(CloudEvent.isValidEvent(ceFullData, { strict: false })) // good
+    t.ok(CloudEvent.isValidEvent(ceFullData, { strict: true })) // good
+    t.strictSame(CloudEvent.validateEvent(ceFullData), [])
+    t.strictSame(CloudEvent.validateEvent(ceFullData, { strict: false }).length, 0) // good
+    t.strictSame(CloudEvent.validateEvent(ceFullData, { strict: true }).length, 0) // good
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullData.isValid())
+    t.ok(ceFullData.isValid({ strict: false }))
+    t.ok(ceFullData.isValid({ strict: true }))
+    t.strictSame(ceFullData.validate(), [])
+    t.strictSame(ceFullData.validate({ strict: false }).length, 0)
+    t.strictSame(ceFullData.validate({ strict: true }).length, 0)
+    t.strictSame(ceFullData.payload, ceFullData.data)
+    t.strictSame(ceFullData.dataType, 'Text')
+    // the same but with strict mode enabled: expected success ...
+    const ceFullDataStrict = new CloudEvent('1/full/number-data/strict',
+      ceNamespace,
+      ceServerUrl,
+      value, // data
+      ceCommonOptionsForTextDataStrict,
+      ceCommonExtensions
+    )
+    assert(ceFullDataStrict !== null)
+    t.ok(ceFullDataStrict)
+    // data type errors handled only in strict mode currently ...
+    // note that in the following lines even if I force 'strict: false' it won't be used because already set in the object instance ...
+    t.ok(CloudEvent.isValidEvent(ceFullDataStrict))
+    t.ok(CloudEvent.isValidEvent(ceFullDataStrict, { strict: true }))
+    t.ok(CloudEvent.isValidEvent(ceFullDataStrict, { strict: false }))
+    t.ok(CloudEvent.isValidEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationOkIfDefined }))
+    t.notOk(CloudEvent.isValidEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationNotOk }))
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationOkIfDefined }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceFullDataStrict, { strict: true, dataschemavalidator: dataValidationNotOk }).length, 1)
+    // the same but using normal instance methods, to ensure they works good ...
+    t.ok(ceFullDataStrict.isValid())
+    t.ok(ceFullDataStrict.isValid({ strict: true }))
+    t.ok(ceFullDataStrict.isValid({ strict: false }))
+    t.ok(ceFullDataStrict.isValid({ strict: true, dataschemavalidator: dataValidationOkIfDefined }))
+    t.notOk(ceFullDataStrict.isValid({ strict: true, dataschemavalidator: dataValidationNotOk }))
+    t.strictSame(ceFullDataStrict.validate().length, 0)
+    t.strictSame(ceFullDataStrict.validate({ strict: true }).length, 0)
+    t.strictSame(ceFullDataStrict.validate({ strict: false }).length, 0)
+    t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationOkIfDefined }).length, 0)
+    t.strictSame(ceFullDataStrict.validate({ strict: true, dataschemavalidator: dataValidationNotOk }).length, 1)
+    t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
+    t.strictSame(ceFullDataStrict.dataType, 'Text')
   }
 })
 
 /** @test {CloudEvent} */
 test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, but not other objects', (t) => {
-  t.plan(36)
+  t.plan(37)
 
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
+  t.ok(V)
 
   /** create some classes, for better reuse in following tests */
   class NotCESubclass {
