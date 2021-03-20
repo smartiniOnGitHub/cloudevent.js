@@ -693,24 +693,30 @@ class CloudEvent {
     }
   }
 
-  // TODO: add comments ... wip
-  static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
-    if (V.isUndefinedOrNull(ce)) throw new Error('CloudEvent undefined or null')
+  /**
+   * Tell the type of data of the CloudEvent,
+   * if it's right (depending even on related datacontenttype),
+   * from the validator point of view.
+   *
+   * @static
+   * @param {!object} ce the CloudEvent to validate
+   * @param {object} [options={}] optional validation options
+   * @param {string} [name='data'] the name to assign in the returned error string (if any), or 'data' as default value
+   * @return {string|null} error message if the given data type is not right, otherwise null
+   * @throws {TypeError} if event is not a CloudEvent instance or subclass
+   * @throws {Error} if event is undefined or null
+   */
+   static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
+    if (!CloudEvent.isCloudEvent(ce)) throw new TypeError('The given event is not a CloudEvent instance')
     let ve
     if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
-      // TODO: exclude even boolean and number, and rename that method ... wip
-      // ve = V.ensureIsObjectOrCollectionOrArrayNotString(ce.data, name)
       ve = V.ensureIsObjectOrCollectionOrArrayNotValue(ce.data, name) || null
     } else {
       // for example with: datacontenttype 'text/plain':
       // ensure data is a plain object or collection,
       // or even a string or boolean or number in this case
       // because in serialization/deserialization some validation can occur on the transformed object
-      // TODO: add additional type checks, and rename that method ... wip
-      // ve = V.ensureIsObjectOrCollectionOrString(ce.data, name)
-      ve = V.ensureIsObjectOrCollectionOrValue(ce.data, name) || null
-      // TODO: check if enable the following instead ... wip
-      // ve = V.ensureIsObjectOrCollectionOrArrayOrValue(ce.data, name) || null
+      ve = V.ensureIsObjectOrCollectionOrArrayOrValue(ce.data, name) || null
     }
     return ve
   }
@@ -721,7 +727,8 @@ class CloudEvent {
    *
    * @static
    * @param {(?object)} ce the CloudEvent object to dump
-   * @param {object} [options={}]   * @param {string} [name='noname'] the name to assign in the returned string, or 'noname' as default value
+   * @param {object} [options={}] optional validation options
+   * @param {string} [name='noname'] the name to assign in the returned string, or 'noname' as default value
    * @return {string} the dump of the object or a message when obj is undefined/null/not a CloudEvent
    */
   static dumpValidationResults (ce, options = {}, name = 'noname') {
@@ -820,7 +827,7 @@ class CloudEvent {
    *
    * See {@link CloudEvent.data}, {@link CloudEvent.data_base64}.
    *
-   * @type {(object|Map|Set|string)}
+   * @type {(object|Map|Set|Array|string|boolean|number)}
    */
   get payload () {
     if (V.isDefinedAndNotNull(this.data) && !V.isDefinedAndNotNull(this.data_base64)) {
