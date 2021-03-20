@@ -706,7 +706,7 @@ class CloudEvent {
    * @throws {TypeError} if event is not a CloudEvent instance or subclass
    * @throws {Error} if event is undefined or null
    */
-   static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
+  static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
     if (!CloudEvent.isCloudEvent(ce)) throw new TypeError('The given event is not a CloudEvent instance')
     let ve
     if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
