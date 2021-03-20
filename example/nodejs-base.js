@@ -59,6 +59,7 @@ const ceCommonOptions = {
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 const ceCommonExtensions = { exampleextension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
@@ -152,7 +153,8 @@ const ceFullTextData = new CloudEvent('5/no-strict-text-data',
   ceNamespace,
   ceServerUrl,
   ceDataAsString, // data
-  ceCommonOptions, // use common options
+  // ceCommonOptions, // ok but not in strict validation
+  ceCommonOptionsForTextData, // ok even in strict validation
   ceCommonExtensions
 )
 assert(ceFullTextData !== null)
@@ -185,7 +187,7 @@ assert(ceFullStrictJSONTextData.isValid())
 assert(ceErrorStrict.isValid())
 assert(ceFullStrictOtherContentType.isValid())
 assert(ceFullTextData.isValid())
-assert(!ceFullTextData.isValid({ strict: true }))
+assert(ceFullTextData.isValid({ strict: true }))
 assert(ceFullStrictBinaryData.isValid())
 // the same, but using static method
 assert(!CloudEvent.isValidEvent(ceEmpty))
@@ -197,10 +199,12 @@ assert(CloudEvent.isValidEvent(ceFullStrictJSONTextData))
 assert(CloudEvent.isValidEvent(ceErrorStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
 assert(CloudEvent.isValidEvent(ceFullTextData))
-assert(!CloudEvent.isValidEvent(ceFullTextData, { strict: true }))
+assert(CloudEvent.isValidEvent(ceFullTextData, { strict: true }))
 assert(CloudEvent.isValidEvent(ceFullStrictBinaryData))
+// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, null, 'ceEmpty')}`)
 assert(CloudEvent.validateEvent(ceEmpty).length === 3)
-assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 5)
+// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceEmpty')}`)
+assert(CloudEvent.validateEvent(ceEmpty, { strict: true }).length === 4)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
 assert(CloudEvent.validateEvent(ceMinimal).length === 0)
 assert(CloudEvent.validateEvent(ceFull).length === 0)
@@ -217,7 +221,7 @@ assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: false })
 assert(CloudEvent.validateEvent(ceFullStrictOtherContentType, { strict: true }).length === 0)
 assert(CloudEvent.validateEvent(ceFullTextData).length === 0)
 assert(CloudEvent.validateEvent(ceFullTextData, { strict: false }).length === 0)
-assert(CloudEvent.validateEvent(ceFullTextData, { strict: true }).length === 1)
+assert(CloudEvent.validateEvent(ceFullTextData, { strict: true }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictBinaryData).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictBinaryData, { strict: false }).length === 0)
 assert(CloudEvent.validateEvent(ceFullStrictBinaryData, { strict: true }).length === 0)
@@ -225,6 +229,7 @@ assert(CloudEvent.validateEvent(ceFullStrictBinaryData, { strict: true }).length
 console.log('\nSome expected validation errors:')
 console.log(`Validation output for ceEmpty (default strict mode) is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty (force strict mode to true) is: size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
+console.log(`Validation output for ceEmpty, alternative way: ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceEmpty')}`)
 
 // serialization examples
 // default contenttype
@@ -302,21 +307,24 @@ const batch = [
   ceFullStrict,
   ceErrorStrict,
   ceFullStrictOtherContentType,
+  ceFullTextData,
+  ceFullStrictBinaryData,
   null,
   undefined
 ]
 assert(JSONBatch.isJSONBatch(batch))
 assert(!JSONBatch.isValidBatch(batch)) // it has some validation error (on its content)
 console.log(`JSONBatch contains ${batch.length} items, but only some are valid CloudEvent instances, see related sample code:`)
-console.log(`${JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length} CloudEvent instances`)
-console.log(`${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length} CloudEvent instances valid in strict mode`)
+console.log(`CloudEvent instances valid: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
+console.log(`CloudEvent instances valid in strict mode: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
 // sample validation, in normal and in strict mode
 assert(JSONBatch.validateBatch(batch, { strict: false }).length === 7)
-assert(JSONBatch.validateBatch(batch, { strict: true }).length === 8)
+assert(JSONBatch.validateBatch(batch, { strict: true }).length === 7)
 // sample filtering of events
-assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 5) // no filtering
-assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 5) // only valid
-assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length === 4) // only valid in strict mode
+// console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
+assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 7) // no filtering
+assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 7) // only valid
+assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length === 7) // only valid in strict mode
 console.log('JSONBatch events: get only valid instances, as a sample')
 const events = JSONBatch.getEvents(batch, {
   onlyValid: true,
@@ -328,7 +336,7 @@ assert(events !== null)
 // sample serialization/deserialization on it (batch) or a subset (events)
 // note that additional serialization options could be used, for example to handle non default data content types ...
 const ser = JSONBatch.serializeEvents(events, { prettyPrint: true, logError: true })
-console.log(`JSONBatch events: serialized = \n${ser}\n`)
+console.log(`JSONBatch events serialized = \n${ser}\n`)
 const deser = JSONBatch.deserializeEvents(ser, {
   logError: true,
   throwError: true,

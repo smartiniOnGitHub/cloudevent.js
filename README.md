@@ -61,6 +61,7 @@ const ceCommonOptions = {
   strict: false // same as default
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 const ceCommonExtensions = { exampleextension: 'value' }
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
@@ -142,7 +143,8 @@ const ceFullTextData = new CloudEvent('5/no-strict-text-data',
   ceNamespace,
   ceServerUrl,
   ceDataAsString, // data
-  ceCommonOptions, // use common options
+  // ceCommonOptions, // ok but not in strict validation
+  ceCommonOptionsForTextData, // ok even in strict validation
   ceCommonExtensions
 )
 assert(ceFullTextData !== null)
@@ -173,12 +175,15 @@ assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
 assert(ceErrorStrict.isValid())
 assert(ceFullStrictOtherContentType.isValid())
+assert(ceFullTextData.isValid())
+assert(ceFullTextData.isValid({ strict: true }))
 // etc ...
 
 console.log(`Validation on ceEmpty: isValid: ${ceEmpty.isValid()}`)
 
 console.log(`Validation output for ceEmpty, default strict mode is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
+console.log(`Validation output for ceEmpty, alternative way: ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceEmpty')}`)
 ```
 
 serialization examples:
