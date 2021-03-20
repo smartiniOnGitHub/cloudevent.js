@@ -18,7 +18,7 @@
     "license-check:log": "npx legally > ./temp/license-check.log",
     "license-checker": "npx license-checker --production --onlyAllow='Apache-2.0;BSD-2-Clause;BSD-3-Clause;MIT;ISC'",
     "license-checker:log": "npm run license-checker | tee ./temp/license-checker.log",
-    "test:clean": "rm -rf ./coverage/*",
+    "test:clean": "rm -rf .nyc_output/* ./coverage/*",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
     "test:unit": "tap -J --comments --no-esm --strict test/*.test.js",
     "test:unit:dev": "tap -J --comments --no-esm --strict --watch test/*.test.js",
