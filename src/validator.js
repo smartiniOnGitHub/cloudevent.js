@@ -159,7 +159,7 @@ class Validator {
    * @return {boolean} true if it's a valid date in the future (or now), false otherwise
    */
   static isDateFuture (arg) {
-    return (Validator.isDateValid(arg) && arg.getTime() >= Date.now())
+    return (Validator.isDateValid(arg) && arg.getTime() > Date.now())
   }
 
   /**
