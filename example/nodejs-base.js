@@ -260,6 +260,12 @@ const ceFullStrictOtherContentTypeSerialized = ceFullStrictOtherContentType.seri
 assert(ceFullStrictOtherContentTypeSerialized !== null)
 assert(ceFullStrictOtherContentTypeSerializedStatic === ceFullStrictOtherContentTypeSerialized)
 console.log('Serialization output for ceFullStrictOtherContentType, details:\n' + ceFullStrictOtherContentTypeSerialized)
+const ceFullTextDataSerialized = CloudEvent.serializeEvent(ceFullTextData, { onlyValid: true })
+assert(ceFullTextDataSerialized !== null)
+console.log('Serialization output for ceFullTextData, details:\n' + ceFullTextDataSerialized)
+const ceFullStrictBinaryDataSerialized = CloudEvent.serializeEvent(ceFullStrictBinaryData, { onlyValid: true })
+assert(ceFullStrictBinaryDataSerialized !== null)
+console.log('Serialization output for ceFullStrictBinaryData, details:\n' + ceFullStrictBinaryDataSerialized)
 
 // then use (send/store/etc) serialized instances ...
 
@@ -286,6 +292,18 @@ assert(ceFullStrictOtherContentTypeDeserialized.isValid())
 assert(ceFullStrictOtherContentTypeDeserialized.isStrict)
 assert(CloudEvent.isCloudEvent(ceFullStrictOtherContentTypeDeserialized))
 console.log(`ce dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeserialized, 'ceFullStrictOtherContentTypeDeserialized')}`)
+const ceFullTextDataDeserialized = CloudEvent.deserializeEvent(ceFullTextDataSerialized, { onlyValid: true })
+assert(ceFullTextDataDeserialized !== null)
+assert(ceFullTextDataDeserialized.isValid())
+assert(!ceFullTextDataDeserialized.isStrict)
+assert(CloudEvent.isCloudEvent(ceFullTextDataDeserialized))
+console.log(`ce dump: ${T.dumpObject(ceFullTextDataDeserialized, 'ceFullTextDataDeserialized')}`)
+const ceFullStrictBinaryDataDeserialized = CloudEvent.deserializeEvent(ceFullStrictBinaryDataSerialized, { onlyValid: true })
+assert(ceFullStrictBinaryDataDeserialized !== null)
+assert(ceFullStrictBinaryDataDeserialized.isValid())
+assert(ceFullStrictBinaryDataDeserialized.isStrict)
+assert(CloudEvent.isCloudEvent(ceFullStrictBinaryDataDeserialized))
+console.log(`ce dump: ${T.dumpObject(ceFullStrictBinaryDataDeserialized, 'ceFullStrictBinaryDataDeserialized')}`)
 
 // then use (validate/send/store/etc) deserialized instances ...
 
