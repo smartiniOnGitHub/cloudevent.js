@@ -12,6 +12,7 @@ Summary Changelog:
 - Feature: ensure 'data' works in the right way with a string value 
   and even with a boolean value, both with a non default datacontenttype (for example 'text/plain')
 - Feature: handle 'data' as array (it was previously forbidden)
+- Feature: update example and update/simplify README
 
 ## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:

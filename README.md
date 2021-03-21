@@ -25,6 +25,8 @@ Anyway, to be more future-proof the library now exports a main object, with all 
 (the class for CloudEvent, its Validator class as CloudEventValidator, etc); 
 using destructuring assignment (as seen in code samples) usage will be easier.
 
+For changes and release notes, see [CHANGELOG](./CHANGELOG.md).
+
 
 ## Usage
 
@@ -32,9 +34,6 @@ Get a reference to the library:
 
 ```js
 // Node.js example
-
-// reference the library, not needed if using destructuring assignment, see below
-const CloudEventExports = require('cloudevent')
 
 // minimal, most common usage
 // const { CloudEvent } = require('cloudevent')
@@ -74,10 +73,10 @@ const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 const ceMinimal = new CloudEvent('1', // id
   ceNamespace, // type
   '/', // source
-  {} // data (empty) // optional, but useful the same in this sample usage
+  {} // data (empty) // optional, even null is good is good in this case
 )
 
-// When creating some instances with an undefined mandatory argument (handled by defaults),
+// When creating instances with an undefined mandatory argument (handled by defaults),
 // but with strict flag disabled success is expected, otherwise with strict flag enabled a failure is expected ...
 // In JavaScript, null values are not handled as default values, only undefined values ...
 
@@ -89,6 +88,7 @@ const ceFull = new CloudEvent('1/full',
   ceCommonOptions,
   ceCommonExtensions
 )
+// create a sample instance with strict mode (for validation) enabled ...
 const ceFullStrict = new CloudEvent('2/full-strict',
   ceNamespace,
   ceServerUrl,
@@ -96,9 +96,6 @@ const ceFullStrict = new CloudEvent('2/full-strict',
   ceCommonOptionsStrict, // use common options, but set strict mode to true
   ceCommonExtensions
 )
-assert(ceFullStrict.isStrict)
-assert(!ceFull.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
-assert(!CloudEvent.isStrictEvent(ceFull)) // the same, but using static method
 // create an instance with a JSON string as data
 const ceFullStrictJSONTextData = new CloudEvent('2/full-strict-json-string-data',
   ceNamespace,
@@ -107,8 +104,6 @@ const ceFullStrictJSONTextData = new CloudEvent('2/full-strict-json-string-data'
   ceCommonOptionsStrict, // use strict options
   ceCommonExtensions
 )
-assert(ceFullStrictJSONTextData !== null)
-assert(ceFullStrictJSONTextData.isStrict)
 // create an instance that wrap an Error
 const error = new Error('sample error')
 error.code = 1000 // add a sample error code, as number
@@ -124,10 +119,6 @@ const ceErrorStrict = new CloudEvent('3/error-strict',
   ceCommonOptionsStrict, // use common options, but set strict mode to true
   ceCommonExtensions
 )
-assert(ceErrorStrict !== null)
-assert(ceErrorStrict.isStrict)
-assert(!ceErrorStrict.isStrict) // ensure common options object has not been changed when reusing some of its values for the second instance
-assert(!CloudEvent.isStrictEvent(ceErrorStrict)) // the same, but using static method
 // create an instance with a different content type
 const ceFullStrictOtherContentType = new CloudEvent('4/full-strict-other-content-type',
   ceNamespace,
@@ -136,9 +127,7 @@ const ceFullStrictOtherContentType = new CloudEvent('4/full-strict-other-content
   { ...ceCommonOptionsStrict, datacontenttype: 'application/xml' }, // use common strict options, but set strict mode to true
   ceCommonExtensions
 )
-assert(ceFullStrictOtherContentType !== null)
-assert(ceFullStrictOtherContentType.isStrict)
-// create an instance with data as a string, but not strict (to validate it even in strict mode)
+// create an instance with data as a string, but not strict (to validate later in strict mode if needed)
 const ceFullTextData = new CloudEvent('5/no-strict-text-data',
   ceNamespace,
   ceServerUrl,
@@ -147,9 +136,6 @@ const ceFullTextData = new CloudEvent('5/no-strict-text-data',
   ceCommonOptionsForTextData, // ok even in strict validation
   ceCommonExtensions
 )
-assert(ceFullTextData !== null)
-assert(!ceFullTextData.isStrict)
-assert(ceFullTextData.payload === ceDataAsString) // returned data is transformed
 // create an instance with data encoded in base64
 const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
   ceNamespace,
@@ -158,9 +144,6 @@ const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
   { ...ceCommonOptionsStrict, datainbase64: ceDataEncoded }, // use common strict options, and set binary data in base64
   ceCommonExtensions
 )
-assert(ceFullStrictBinaryData !== null)
-assert(ceFullStrictBinaryData.isStrict)
-assert(ceFullStrictBinaryData.payload === ceDataAsString) // returned data is transformed
 ```
 
 optional, do some validations/checks on created instances.
@@ -182,7 +165,6 @@ assert(CloudEvent.isValidEvent(ceFullStrictBinaryData))
 // etc ...
 
 console.log(`Validation on ceEmpty: isValid: ${ceEmpty.isValid()}`)
-
 console.log(`Validation output for ceEmpty, default strict mode is: size: ${CloudEvent.validateEvent(ceEmpty).length}, details:\n` + CloudEvent.validateEvent(ceEmpty))
 console.log(`Validation output for ceEmpty, force strict mode to true is size: ${CloudEvent.validateEvent(ceEmpty, { strict: true }).length}, details:\n` + CloudEvent.validateEvent(ceEmpty, { strict: true }))
 console.log(`Validation output for ceEmpty, alternative way: ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceEmpty')}`)
@@ -225,13 +207,8 @@ deserialization (parse) examples:
 // default contenttype
 console.log('\nSome deserialization/parse examples:')
 const ceFullDeserialized = CloudEvent.deserializeEvent(ceFullSerialized)
-assert(ceFullDeserialized !== null)
-assert(ceFullDeserialized.isValid())
-assert(!ceFullDeserialized.isStrict)
-assert(CloudEvent.isCloudEvent(ceFullDeserialized))
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullDeserialized, 'ceFullDeserialized')}`)
 const ceFullStrictDeserializedOnlyValid = CloudEvent.deserializeEvent(ceFullStrictSerialized, { onlyValid: true })
-assert(ceFullStrictDeserializedOnlyValid !== null)
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictDeserializedOnlyValid, 'ceFullStrictDeserializedOnlyValid')}`)
 // non default contenttype
 const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullStrictOtherContentTypeSerialized, {
@@ -239,29 +216,19 @@ const ceFullStrictOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceF
   decodedData: { hello: 'world', year: 2020 },
   onlyValid: true
 })
-assert(ceFullStrictOtherContentTypeDeserialized !== null)
-assert(ceFullStrictOtherContentTypeDeserialized.isValid())
-assert(ceFullStrictOtherContentTypeDeserialized.isStrict)
-assert(CloudEvent.isCloudEvent(ceFullStrictOtherContentTypeDeserialized))
 console.log(`cloudEvent dump: ${T.dumpObject(ceFullStrictOtherContentTypeDeserialized, 'ceFullStrictOtherContentTypeDeserialized')}`)
 const ceFullTextDataDeserialized = CloudEvent.deserializeEvent(ceFullTextDataSerialized, { onlyValid: true })
-assert(ceFullTextDataDeserialized !== null)
-assert(ceFullTextDataDeserialized.isValid())
-assert(!ceFullTextDataDeserialized.isStrict)
-assert(CloudEvent.isCloudEvent(ceFullTextDataDeserialized))
 console.log(`ce dump: ${T.dumpObject(ceFullTextDataDeserialized, 'ceFullTextDataDeserialized')}`)
 const ceFullStrictBinaryDataDeserialized = CloudEvent.deserializeEvent(ceFullStrictBinaryDataSerialized, { onlyValid: true })
-assert(ceFullStrictBinaryDataDeserialized !== null)
-assert(ceFullStrictBinaryDataDeserialized.isValid())
-assert(ceFullStrictBinaryDataDeserialized.isStrict)
-assert(CloudEvent.isCloudEvent(ceFullStrictBinaryDataDeserialized))
 console.log(`ce dump: ${T.dumpObject(ceFullStrictBinaryDataDeserialized, 'ceFullStrictBinaryDataDeserialized')}`)
 
 // then use (validate/send/store/etc) deserialized instances ...
 
 ```
 
-Look into the [example](./example/) folder for more sample scripts that uses the library 
+From previous code blocks, I remove most assert statements, to simplify 
+code reading and usage; but for a deeper comprension and usage,  
+look into the [example](./example/) folder for more sample scripts that uses the library 
 (inline but it's the same using it from npm registry); 
 you can find even examples for using JSONBatch objects (array of CloudEvent instances).
 
