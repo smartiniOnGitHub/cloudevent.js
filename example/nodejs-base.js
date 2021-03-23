@@ -68,6 +68,11 @@ const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
 const ceDataAsString = 'Hello World, 2020'
 const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 
+// create a sample minimal instance good for normal validation but not for strict validation ...
+const ceMinimalBadSource = new CloudEvent('1', ceNamespace, 'source (bad)', null)
+assert(ceMinimalBadSource !== null)
+console.log(`ce dump (good but not for strict validation): ${T.dumpObject(ceMinimalBadSource, 'ceMinimalBadSource')}`)
+
 // create a sample minimal instance ...
 const ceMinimal = new CloudEvent('1', // id
   ceNamespace, // type
@@ -180,7 +185,12 @@ console.log(`ce dump: ${T.dumpObject(ceFullStrictBinaryData, 'ceFullStrictBinary
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
 assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
+// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceMinimalBadSource, null, 'ceMinimalBadSource')}`)
+assert(ceMinimalBadSource.isValid())
+// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceMinimalBadSource, { strict: true }, 'ceMinimalBadSource')}`)
+assert(!ceMinimalBadSource.isValid({ strict: true }))
 assert(ceMinimal.isValid())
+assert(ceMinimal.isValid({ strict: true }))
 assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
 assert(ceFullStrictJSONTextData.isValid())
@@ -315,8 +325,10 @@ const batch = [
   null,
   'string', // bad
   1234567890, // bad
+  3.14159, // bad
   false, // bad
   true, // bad
+  ceMinimalBadSource, // good but not for strict validation
   ceMinimal,
   ceFull,
   new Date(), // bad
@@ -324,7 +336,7 @@ const batch = [
   [], // bad
   ceFullStrict,
   ceErrorStrict,
-  ceFullStrictOtherContentType,
+  ceFullStrictOtherContentType, // good, but to serialize/deserialize related options must be used
   ceFullTextData,
   ceFullStrictBinaryData,
   null,
@@ -333,15 +345,18 @@ const batch = [
 assert(JSONBatch.isJSONBatch(batch))
 assert(!JSONBatch.isValidBatch(batch)) // it has some validation error (on its content)
 console.log(`JSONBatch contains ${batch.length} items, but only some are valid CloudEvent instances, see related sample code:`)
-console.log(`CloudEvent instances valid: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
+console.log(`CloudEvent instances valid: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length}`)
 console.log(`CloudEvent instances valid in strict mode: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
 // sample validation, in normal and in strict mode
-assert(JSONBatch.validateBatch(batch, { strict: false }).length === 7)
-assert(JSONBatch.validateBatch(batch, { strict: true }).length === 7)
+// console.log(`DEBUG - JSONBatch.validateBatch, num: ${JSONBatch.validateBatch(batch, { strict: false }).length}`)
+// console.log(`DEBUG - JSONBatch.validateBatch in strict mode, num: ${JSONBatch.validateBatch(batch, { strict: true }).length}`)
+assert(JSONBatch.validateBatch(batch, { strict: false }).length === 8) // expected validation errors
+assert(JSONBatch.validateBatch(batch, { strict: true }).length === 9) // expected validation errors
 // sample filtering of events
 // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
-assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 7) // no filtering
-assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 7) // only valid
+assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 8) // no filtering
+assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: true }).length === 8) // no filtering (neither in strict mode)
+assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length === 8) // only valid
 assert(JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length === 7) // only valid in strict mode
 console.log('JSONBatch events: get only valid instances, as a sample')
 const events = JSONBatch.getEvents(batch, {

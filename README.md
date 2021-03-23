@@ -69,6 +69,9 @@ const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
 const ceDataAsString = 'Hello World, 2020'
 const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 
+// create a sample minimal instance good for normal validation but not for strict validation ...
+const ceMinimalBadSource = new CloudEvent('1', ceNamespace, 'source (bad)', null)
+
 // create a sample minimal instance ...
 const ceMinimal = new CloudEvent('1', // id
   ceNamespace, // type
@@ -153,7 +156,10 @@ or instance methods like 'isValid', 'validate', etc ...
 ```js
 assert(!ceEmpty.isValid())
 assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
+assert(ceMinimalBadSource.isValid())
+assert(!ceMinimalBadSource.isValid({ strict: true }))
 assert(ceMinimal.isValid())
+assert(ceMinimal.isValid({ strict: true }))
 assert(ceFull.isValid())
 assert(ceFullStrict.isValid())
 assert(ceErrorStrict.isValid())
