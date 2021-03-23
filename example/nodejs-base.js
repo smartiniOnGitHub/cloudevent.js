@@ -165,6 +165,7 @@ const ceFullTextData = new CloudEvent('5/no-strict-text-data',
 assert(ceFullTextData !== null)
 assert(!ceFullTextData.isStrict)
 assert(ceFullTextData.payload === ceDataAsString) // returned data is transformed
+console.log(`ce payload: '${ceFullTextData.payload}', length: ${ceFullTextData.payload.length}`)
 console.log(`ce dump: ${T.dumpObject(ceFullTextData, 'ceFullTextData')}`)
 console.log(`ce validation results on ceFullTextData (no strict validation) = ${CloudEvent.validateEvent(ceFullTextData)}`)
 console.log(`ce validation results on ceFullTextData (with strict validation) = ${CloudEvent.validateEvent(ceFullTextData, { strict: true })}`)
@@ -179,6 +180,7 @@ const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
 assert(ceFullStrictBinaryData !== null)
 assert(ceFullStrictBinaryData.isStrict)
 assert(ceFullStrictBinaryData.payload === ceDataAsString) // returned data is transformed
+console.log(`ce payload: '${ceFullStrictBinaryData.payload}', length: ${ceFullStrictBinaryData.payload.length}`)
 console.log(`ce dump: ${T.dumpObject(ceFullStrictBinaryData, 'ceFullStrictBinaryData')}`)
 
 // validate/check if valid instances (optional)

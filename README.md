@@ -139,6 +139,7 @@ const ceFullTextData = new CloudEvent('5/no-strict-text-data',
   ceCommonOptionsForTextData, // ok even in strict validation
   ceCommonExtensions
 )
+console.log(`cloudEvent payload: '${ceFullTextData.payload}', length: ${ceFullTextData.payload.length}`)
 // create an instance with data encoded in base64
 const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
   ceNamespace,
@@ -147,6 +148,7 @@ const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
   { ...ceCommonOptionsStrict, datainbase64: ceDataEncoded }, // use common strict options, and set binary data in base64
   ceCommonExtensions
 )
+console.log(`cloudEvent payload: '${ceFullStrictBinaryData.payload}', length: ${ceFullStrictBinaryData.payload.length}`)
 ```
 
 optional, do some validations/checks on created instances.
