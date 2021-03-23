@@ -162,7 +162,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on array and related items', (t) => {
-  t.plan(39)
+  t.plan(41)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -211,35 +211,51 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
   t.notOk(JSONBatch.isJSONBatch(ceFullStrict))
 
+  // create a sample minimal instance good for normal validation but not for strict validation ...
+  const ceMinimalBadSource = new CloudEvent('1', ceNamespace, 'source (bad)', null)
+  t.ok(ceMinimalBadSource)
+
+  // create a sample minimal instance ...
+  const ceMinimal = new CloudEvent('1', ceNamespace, '/', {})
+  t.ok(ceMinimal)
+
   // define an array containing different CloudEvent instances, and even other objects ...
   const arr = [
     undefined,
     null,
-    'string',
-    1234567890,
-    false,
-    true,
-    ceFull,
-    new Date(),
-    {},
-    [],
+    'string', // bad
+    1234567890, // bad
+    3.14159, // bad
+    false, // bad
+    true, // bad
+    ceMinimalBadSource, // good but not for strict validation
+    ceMinimal,
+    ceFull, // good but not for strict validation
+    new Date(), // bad
+    {}, // bad
+    [], // bad
     ceFullStrict,
+    // ceErrorStrict,
+    // ceFullStrictOtherContentType, // good, but to serialize/deserialize related options must be used
+    // ceFullTextData,
+    // ceFullStrictBinaryData,
     null,
     undefined
   ]
   t.ok(arr)
-  t.strictSame(arr.length, 13)
-  t.strictSame(arr.filter((i) => V.isDefinedAndNotNull(i)).length, 9) // number of not null items
+  t.strictSame(arr.length, 16)
+  t.strictSame(arr.filter((i) => V.isDefinedAndNotNull(i)).length, 12) // number of not null items
 
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.ok(JSONBatch.isJSONBatch(arr))
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: false }).length, 7)
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 8)
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 2) // no filtering
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: false }).length, 2) // both are valid
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: true }).length, 1) // only one is valid in strict mode
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: true }).length, 2) // strict true with onlyValid false makes no filtering
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: false }).length, 8) // expected validation errors
+  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 14) // expected validation errors
+  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length}`)
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 4) // no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: true }).length, 4) // strict true with onlyValid false makes no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: false }).length, 4) // only valid
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: true }).length, 2) // only valid in strict mode
 
   // additional test, ensure that all instances returned (only valid), are CloudEvent instances
   const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, strict: false })
