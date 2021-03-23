@@ -80,18 +80,16 @@ class JSONBatch {
     // standard validation
     const ve = [] // validation errors
     if (V.isArray(batch)) {
-      // additional validation on nested items (any not null item)
-      const itemsValidation = batch.filter((i) => V.isDefinedAndNotNull(i)
-      ).map((i) => {
-        const ceValidation = CloudEvent.validateEvent(i, { strict })
-        if (ceValidation.length > 0) {
-          // return validation errors found
-          return ceValidation
-        } else {
-          return null
+      batch.forEach((i, index) => {
+        if (V.isDefinedAndNotNull(i) || strict === true) {
+          // additional validation (and on all items) in strict mode
+          const ceValidation = CloudEvent.validateEvent(i, { strict })
+          if (ceValidation.length > 0) {
+            // append validation errors found
+            ve.push(...ceValidation)
+          }
         }
       })
-      ve.push(...itemsValidation)
     } else if (CloudEvent.isCloudEvent(batch)) {
       // validate the given (single) CloudEvent instance or subclass
       // in strict mode this is a validation error anyway, so add it

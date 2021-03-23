@@ -348,10 +348,11 @@ console.log(`JSONBatch contains ${batch.length} items, but only some are valid C
 console.log(`CloudEvent instances valid: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: false }).length}`)
 console.log(`CloudEvent instances valid in strict mode: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
 // sample validation, in normal and in strict mode
-// console.log(`DEBUG - JSONBatch.validateBatch, num: ${JSONBatch.validateBatch(batch, { strict: false }).length}`)
-// console.log(`DEBUG - JSONBatch.validateBatch in strict mode, num: ${JSONBatch.validateBatch(batch, { strict: true }).length}`)
+console.log(`JSONBatch validation errors, num: ${JSONBatch.validateBatch(batch, { strict: false }).length}`)
+console.log(`JSONBatch validation errors in strict mode, num: ${JSONBatch.validateBatch(batch, { strict: true }).length}`)
+console.log(`JSONBatch validation errors in strict mode, details:\n${JSONBatch.validateBatch(batch, { strict: true })}\n`)
 assert(JSONBatch.validateBatch(batch, { strict: false }).length === 8) // expected validation errors
-assert(JSONBatch.validateBatch(batch, { strict: true }).length === 9) // expected validation errors
+assert(JSONBatch.validateBatch(batch, { strict: true }).length === 13) // expected validation errors
 // sample filtering of events
 // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(batch, { onlyValid: true, strict: true }).length}`)
 assert(JSONBatch.getEvents(batch, { onlyValid: false, strict: false }).length === 8) // no filtering
