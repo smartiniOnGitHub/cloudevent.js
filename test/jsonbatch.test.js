@@ -30,7 +30,7 @@ const {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(26)
+  t.plan(28)
 
   const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -84,9 +84,12 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
     const ceMinimalStrict = new CloudEvent('1-strict', // id
       ceNamespace, // type
       '/', // source
-      null // data // optional, but useful the same in this sample usage
+      null, // data // optional, but useful the same in this sample usage
+      { strict: true }
     )
     t.ok(ceMinimalStrict)
+    t.ok(CloudEvent.isStrictEvent(ceMinimalStrict))
+    t.ok(ceMinimalStrict.isStrict)
 
     // check that created instances belongs to the right base class
     t.strictEqual(typeof ceMinimalStrict, 'object')

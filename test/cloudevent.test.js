@@ -41,7 +41,7 @@ const {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(20)
+  t.plan(22)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -83,9 +83,12 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     const ceMinimalStrict = new CloudEvent('1-strict', // id
       ceNamespace, // type
       '/', // source
-      null // data // optional, but useful the same in this sample usage
+      null, // data // optional, but useful the same in this sample usage
+      { strict: true }
     )
     t.ok(ceMinimalStrict)
+    t.ok(CloudEvent.isStrictEvent(ceMinimalStrict))
+    t.ok(ceMinimalStrict.isStrict)
 
     // check that created instances belongs to the right base class
     t.strictEqual(typeof ceMinimalStrict, 'object')
@@ -1494,4 +1497,39 @@ test('ensure null values in some optional attributes are managed in the right wa
     t.strictSame(ceStrict.payload, ce.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
   }
+})
+
+/** @test {CloudEvent} */
+test('ensure data type is managed in the right way', (t) => {
+  t.plan(13)
+  // const { CloudEvent, CloudEventTransformer: T } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
+
+  const ceNullDataStrict = new CloudEvent('1-null-data-strict', ceNamespace, '/', null, { strict: true })
+  t.ok(ceNullDataStrict)
+  t.ok(CloudEvent.isStrictEvent(ceNullDataStrict))
+  t.ok(ceNullDataStrict.isStrict)
+  t.ok(V.isClass(ceNullDataStrict, CloudEvent))
+  // console.log('ensureTypeOfDataIsRight on ceNullDataStrict: ' + CloudEvent.ensureTypeOfDataIsRight(ceNullDataStrict))
+  t.notOk(CloudEvent.ensureTypeOfDataIsRight(ceNullDataStrict)) // no errors returned, good
+  const ceEmptyObjectDataStrict = new CloudEvent('1-object-data-strict', ceNamespace, '/', {}, { strict: true })
+  t.ok(ceEmptyObjectDataStrict)
+  t.ok(CloudEvent.isStrictEvent(ceEmptyObjectDataStrict))
+  t.ok(ceEmptyObjectDataStrict.isStrict)
+  t.ok(V.isClass(ceEmptyObjectDataStrict, CloudEvent))
+  // console.log('ensureTypeOfDataIsRight on ceEmptyObjectDataStrict: ' + CloudEvent.ensureTypeOfDataIsRight(ceEmptyObjectDataStrict))
+  t.notOk(CloudEvent.ensureTypeOfDataIsRight(ceEmptyObjectDataStrict)) // no errors returned, good
+  // ensure it's good even with other common data types
+  const value = 'data as a string'
+  const ceBadStrict = new CloudEvent('1-strict', ceNamespace, '/', value, { strict: true })
+  t.ok(CloudEvent.ensureTypeOfDataIsRight(ceBadStrict))
+  const ceFullDataStrict = new CloudEvent('1/full/string-data/strict',
+    ceNamespace,
+    ceServerUrl,
+    value, // data
+    ceCommonOptionsForTextDataStrict,
+    ceCommonExtensions
+  )
+  t.ok(ceFullDataStrict)
+  t.notOk(CloudEvent.ensureTypeOfDataIsRight(ceNullDataStrict)) // no errors returned, good
 })

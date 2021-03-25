@@ -717,7 +717,9 @@ class CloudEvent {
   static ensureTypeOfDataIsRight (ce, options = {}, name = 'data') {
     if (!CloudEvent.isCloudEvent(ce)) throw new TypeError('The given event is not a CloudEvent instance')
     let ve
-    if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+    if (V.isUndefinedOrNull(ce.data)) {
+      ve = null // it's impossible to verify its type
+    }else if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       ve = V.ensureIsObjectOrCollectionOrArrayNotValue(ce.data, name) || null
     } else {
       // for example with: datacontenttype 'text/plain':
