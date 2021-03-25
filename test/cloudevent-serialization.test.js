@@ -1846,14 +1846,22 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
 
 /** @test {CloudEvent} */
 test('create and deserialize some CloudEvent instances with data encoded in base64, and ensure they are right', (t) => {
-  t.plan(100)
+  t.plan(106)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
   const ceDataAsString = 'Hello World, 2020'
-  const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
+  // const ceDataEncoded = T.stringToBase64(ceDataAsString) // ok
+  const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA=' // use a manually created encoding here
   const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataEncoded }
+
+  t.ok(ceDataAsString)
+  t.ok(V.isString(ceDataAsString))
+  t.ok(ceDataEncoded)
+  t.ok(V.isString(ceDataEncoded))
+  t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
+  t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
 
   {
     const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
@@ -2060,6 +2068,197 @@ test('create and deserialize some CloudEvent instances with data encoded in base
         assert(ceDeserialized === undefined) // never executed
       }, Error, 'Expected exception when creating a CloudEvent with data_base64 set but wrong')
     }
+  }
+})
+
+/** @test {CloudEvent} */
+test('create and deserialize some CloudEvent instances with (big) data encoded in base64, and ensure they are right', (t) => {
+  t.plan(102)
+
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
+
+  const ceDataAsString = ceBigString
+  const ceDataEncoded = T.stringToBase64(ceDataAsString)
+  const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataEncoded }
+
+  t.ok(ceDataAsString)
+  t.ok(V.isString(ceDataAsString))
+  t.ok(ceDataEncoded)
+  t.ok(V.isString(ceDataEncoded))
+  t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
+  t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+
+  {
+    const ceBig = new CloudEvent('1/full/sample-data-nested/no-strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceOptionsWithDataInBase64,
+      ceCommonExtensions
+    )
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceBig, 'ceBig')}`)
+    t.ok(ceBig)
+    t.ok(CloudEvent.isValidEvent(ceBig, { strict: false }))
+    t.ok(CloudEvent.isValidEvent(ceBig, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceBig, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceBig, { strict: true }).length, 0)
+    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+    t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
+    t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
+    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+
+    // use default serialization options, expected success
+    const ceSerialized = CloudEvent.serializeEvent(ceBig)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
+    t.ok(ceSerialized)
+    t.ok(V.isString(ceSerialized))
+    // force some options (big objects are already enabled anyway), expected success
+    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBig, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceBigSerializedWithGoodOptions)
+    t.ok(V.isString(ceBigSerializedWithGoodOptions))
+    t.strictSame(ceSerialized, ceBigSerializedWithGoodOptions)
+    // force some options (disable big objects), expect error
+    t.throws(function () {
+      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBig, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(ceBigSerializedNoBigObjects === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+
+    // use default deserialization options, expected success
+    const ceDeserialized = CloudEvent.deserializeEvent(ceSerialized)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
+    t.ok(ceDeserialized)
+    t.ok(V.isClass(ceDeserialized, CloudEvent))
+    t.ok(ceDeserialized.isValid())
+    t.ok(ceDeserialized.validate().length === 0)
+    t.ok(ceDeserialized.validate({ strict: false }).length === 0)
+    t.ok(ceDeserialized.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceDeserialized))
+    t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: true }).length === 0)
+    t.ok(CloudEvent.isCloudEvent(ceDeserialized))
+    // inspect content of deserialized CloudEvent, at least on some attributes
+    t.ok(ceDeserialized.data_base64)
+    t.ok(V.isString(ceDeserialized.data_base64))
+    t.ok(ceDeserialized.payload)
+    t.ok(V.isString(ceDeserialized.payload))
+    // then ensure the value of both are the same ...
+    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
+    // and that they are the same of initial value ...
+    t.strictSame(ceDeserialized.data, ceBig.data)
+    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictSame(ceDeserialized.payload, ceBig.payload)
+    // then ensure they are different object (references) ...
+    // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
+    // force some options (big objects are already enabled anyway), expected success
+    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceBigDeserializedWithGoodOptions)
+    t.ok(V.isClass(ceBigDeserializedWithGoodOptions, CloudEvent))
+    t.ok(ceBigDeserializedWithGoodOptions.isValid())
+    t.ok(ceBigDeserializedWithGoodOptions.validate().length === 0)
+    t.ok(ceBigDeserializedWithGoodOptions.validate({ strict: false }).length === 0)
+    t.ok(ceBigDeserializedWithGoodOptions.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceBigDeserializedWithGoodOptions))
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions).length === 0)
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions, { strict: true }).length === 0)
+    t.ok(CloudEvent.isCloudEvent(ceBigDeserializedWithGoodOptions))
+    t.strictSame(ceBigDeserializedWithGoodOptions.payload, ceBig.payload)
+    // force some options (disable big objects), expect error
+    t.throws(function () {
+      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(ceBigDeserializedNoBigObjects === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+  }
+
+  {
+    // the same but with strict mode enabled ...
+    const ceBigStrict = new CloudEvent('1/full/sample-data-nested/strict',
+      ceNamespace,
+      ceServerUrl,
+      null, // data
+      ceOptionsWithDataInBase64,
+      ceCommonExtensions
+    )
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceBigStrict, 'ceBigStrict')}`)
+    t.ok(ceBigStrict)
+    t.ok(CloudEvent.isValidEvent(ceBigStrict, { strict: false }))
+    t.ok(CloudEvent.isValidEvent(ceBigStrict, { strict: true }))
+    t.strictSame(CloudEvent.validateEvent(ceBigStrict, { strict: false }).length, 0)
+    t.strictSame(CloudEvent.validateEvent(ceBigStrict, { strict: true }).length, 0)
+    t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
+    t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
+    t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
+    t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+
+    // use default serialization options, expected success
+    const ceSerialized = CloudEvent.serializeEvent(ceBigStrict)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
+    t.ok(ceSerialized)
+    t.ok(V.isString(ceSerialized))
+    // force some options (big objects are already enabled anyway), expected success
+    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBigStrict, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceBigSerializedWithGoodOptions)
+    t.ok(V.isString(ceBigSerializedWithGoodOptions))
+    t.strictSame(ceSerialized, ceBigSerializedWithGoodOptions)
+    // force some options (disable big objects), expect error
+    t.throws(function () {
+      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBigStrict, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(ceBigSerializedNoBigObjects === null) // never executed
+    }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
+
+    // use default deserialization options, expected success
+    const ceDeserialized = CloudEvent.deserializeEvent(ceSerialized)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate({ strict: true })}`)
+    t.ok(ceDeserialized)
+    t.ok(V.isClass(ceDeserialized, CloudEvent))
+    t.ok(ceDeserialized.isValid())
+    t.ok(ceDeserialized.validate().length === 0)
+    t.ok(ceDeserialized.validate({ strict: false }).length === 0)
+    t.ok(ceDeserialized.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceDeserialized))
+    t.ok(CloudEvent.validateEvent(ceDeserialized).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceDeserialized, { strict: true }).length === 0)
+    t.ok(CloudEvent.isCloudEvent(ceDeserialized))
+    // inspect content of deserialized CloudEvent, at least on some attributes
+    t.ok(ceDeserialized.data_base64)
+    t.ok(V.isString(ceDeserialized.data_base64))
+    t.ok(ceDeserialized.payload)
+    t.ok(V.isString(ceDeserialized.payload))
+    // then ensure the value of both are the same ...
+    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
+    // and that they are the same of initial value ...
+    t.strictSame(ceDeserialized.data, ceBigStrict.data)
+    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictSame(ceDeserialized.payload, ceBigStrict.payload)
+    // then ensure they are different object (references) ...
+    // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
+    // force some options (big objects are already enabled anyway), expected success
+    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: true, onlyIfLessThan64KB: false })
+    t.ok(ceBigDeserializedWithGoodOptions)
+    t.ok(V.isClass(ceBigDeserializedWithGoodOptions, CloudEvent))
+    t.ok(ceBigDeserializedWithGoodOptions.isValid())
+    t.ok(ceBigDeserializedWithGoodOptions.validate().length === 0)
+    t.ok(ceBigDeserializedWithGoodOptions.validate({ strict: false }).length === 0)
+    t.ok(ceBigDeserializedWithGoodOptions.validate({ strict: true }).length === 0)
+    t.ok(CloudEvent.isValidEvent(ceBigDeserializedWithGoodOptions))
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions).length === 0)
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions, { strict: false }).length === 0)
+    t.ok(CloudEvent.validateEvent(ceBigDeserializedWithGoodOptions, { strict: true }).length === 0)
+    t.ok(CloudEvent.isCloudEvent(ceBigDeserializedWithGoodOptions))
+    t.strictSame(ceBigDeserializedWithGoodOptions.payload, ceBigStrict.payload)
+    // force some options (disable big objects), expect error
+    t.throws(function () {
+      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      assert(ceBigDeserializedNoBigObjects === null) // never executed
+    }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
 })
 
