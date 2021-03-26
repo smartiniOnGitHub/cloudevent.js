@@ -87,9 +87,9 @@ function getRandomString (length) {
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(68)
+  t.plan(74)
 
-  const { CloudEvent, CloudEventTransformer: T } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
   {
@@ -116,6 +116,13 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
     t.strictEqual(ceFull.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFull))
+    const ceFullAsString = ceFull.toString()
+    // console.log(`DEBUG - ceFullAsString: ${ceFullAsString}`)
+    t.ok(V.isString(ceFullAsString))
+    const ceFullPayloadDumped = T.dumpObject(ceFull.payload, 'payload')
+    // console.log(`DEBUG - ceFullPayloadDumped: ${ceFullPayloadDumped}`)
+    t.ok(V.isString(ceFullPayloadDumped))
+    t.ok(ceFullPayloadDumped.length < 1024)
 
     t.throws(function () {
       const ceFullSerialized = CloudEvent.serializeEvent(undefined)
@@ -203,6 +210,13 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
     t.strictEqual(ceFullStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullStrict))
+    const ceFullStrictAsString = ceFullStrict.toString()
+    // console.log(`DEBUG - ceFullStrictAsString: ${ceFullStrictAsString}`)
+    t.ok(V.isString(ceFullStrictAsString))
+    const ceFullStrictPayloadDumped = T.dumpObject(ceFullStrict.payload, 'payload')
+    // console.log(`DEBUG - ceFullStrictPayloadDumped: ${ceFullStrictPayloadDumped}`)
+    t.ok(V.isString(ceFullStrictPayloadDumped))
+    t.ok(ceFullStrictPayloadDumped.length < 1024)
 
     t.throws(function () {
       const ceFullSerialized = CloudEvent.serializeEvent(undefined)
@@ -2073,7 +2087,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
 
 /** @test {CloudEvent} */
 test('create and deserialize some CloudEvent instances with (big) data encoded in base64, and ensure they are right', (t) => {
-  t.plan(102)
+  t.plan(108)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
 
@@ -2106,7 +2120,13 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
-
+    const ceBigAsString = ceBig.toString()
+    // console.log(`DEBUG - ceBigAsString: ${ceBigAsString}`)
+    t.ok(V.isString(ceBigAsString))
+    const ceBigPayloadDumped = T.dumpObject(ceBig.payload, 'payload')
+    // console.log(`DEBUG - ceBigPayloadDumped: ${ceBigPayloadDumped}`)
+    t.ok(V.isString(ceBigPayloadDumped))
+    t.ok(ceBigPayloadDumped.length >= 1024)
     // use default serialization options, expected success
     const ceSerialized = CloudEvent.serializeEvent(ceBig)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
@@ -2193,6 +2213,13 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(T.stringToBase64(T.stringFromBase64(ceDataEncoded)), ceDataEncoded)
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
+    const ceBigStrictAsString = ceBigStrict.toString()
+    // console.log(`DEBUG - ceBigStrictAsString: ${ceBigStrictAsString}`)
+    t.ok(V.isString(ceBigStrictAsString))
+    const ceBigStrictPayloadDumped = T.dumpObject(ceBigStrict.payload, 'payload')
+    // console.log(`DEBUG - ceBigStrictPayloadDumped: ${ceBigStrictPayloadDumped}`)
+    t.ok(V.isString(ceBigStrictPayloadDumped))
+    t.ok(ceBigStrictPayloadDumped.length >= 1024)
 
     // use default serialization options, expected success
     const ceSerialized = CloudEvent.serializeEvent(ceBigStrict)
@@ -2358,10 +2385,10 @@ test('serialize and deserialize some CloudEvent instances with some optional att
 })
 
 /** @test {CloudEvent} */
-test('serialize and deserialize some CloudEvent instances with data as array, and ensure errors are raised', (t) => {
-  t.plan(6)
+test('serialize and deserialize some CloudEvent instances with data as array, and ensure all is good', (t) => {
+  t.plan(18)
 
-  const { CloudEvent } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   // t.ok(CloudEvent)
 
   {
@@ -2384,20 +2411,63 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    const ceStrictAsString = ceStrict.toString()
+    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    t.ok(V.isString(ceStrictAsString))
+    const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
+    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    t.ok(V.isString(ceStrictPayloadDumped))
+    t.ok(ceStrictPayloadDumped.length < 1024)
+  }
+
+  {
+    // use directly the event with strict mode enabled ...
+    const ceStrict = new CloudEvent('1/full/array-data-text-mime-type/strict',
+      ceNamespace,
+      ceServerUrl,
+      ceArrayData, // data
+      ceCommonOptionsForTextDataStrict,
+      ceCommonExtensions
+    )
+    assert(ceStrict !== null)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict))
+    t.strictSame(ceStrict.payload, ceStrict.data)
+    t.strictSame(ceStrict.dataType, 'Text')
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, {
+      encodedData: JSON.stringify(ceArrayData), // with a non default data content type, I need to specify encoder or encodedData
+      onlyValid: true
+    })
+    t.ok(ceSerializedOnlyValidTrue)
+    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue) // ok but shouldn't work in this case
+    const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue, { // sample, to show the right way
+      decodedData: ceArrayData, // with a non default data content type, I need to specify encoder or encodedData
+      onlyValid: true
+    })
+    t.ok(ceDeserializedOnlyValidTrue)
+    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    const ceStrictAsString = ceStrict.toString()
+    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    t.ok(V.isString(ceStrictAsString))
+    const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
+    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    t.ok(V.isString(ceStrictPayloadDumped))
+    t.ok(ceStrictPayloadDumped.length < 1024)
   }
 })
 
 /** @test {CloudEvent} */
 test('serialize and deserialize some CloudEvent instances with data as value (string or boolean or number), and ensure errors are raised', (t) => {
-  t.plan(18)
+  t.plan(21)
 
-  const { CloudEvent } = require('../src/')
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   // t.ok(CloudEvent)
 
   {
     const value = 'Hello World, 2020'
     // use directly the event with strict mode enabled ...
-    const ceStrict = new CloudEvent('1/full/string-data/strict',
+    const ceStrict = new CloudEvent('1/full/string-data-text-mime-type/strict',
       ceNamespace,
       ceServerUrl,
       value, // data
@@ -2415,12 +2485,19 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    const ceStrictAsString = ceStrict.toString()
+    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    t.ok(V.isString(ceStrictAsString))
+    const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
+    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    t.ok(V.isString(ceStrictPayloadDumped))
+    t.ok(ceStrictPayloadDumped.length < 1024)
   }
 
   {
     const value = true
     // use directly the event with strict mode enabled ...
-    const ceStrict = new CloudEvent('1/full/string-data/strict',
+    const ceStrict = new CloudEvent('1/full/boolean-data-text-mime-type/strict',
       ceNamespace,
       ceServerUrl,
       value, // data
@@ -2443,7 +2520,7 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
   {
     const value = 3.14159
     // use directly the event with strict mode enabled ...
-    const ceStrict = new CloudEvent('1/full/string-data/strict',
+    const ceStrict = new CloudEvent('1/full/number-data-text-mime-type/strict',
       ceNamespace,
       ceServerUrl,
       value, // data

@@ -41,7 +41,7 @@ const {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(22)
+  t.plan(25)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -100,6 +100,14 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     // set ceMinimalStrict.data to null, to ensure validation is good the same
     ceMinimalStrict.data = null
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
+
+    const ceStrictAsString = ceMinimalStrict.toString()
+    // console.log(`DEBUG - ceStrictAsString: ${ceMinimalStrict}`)
+    t.ok(V.isString(ceStrictAsString))
+    const ceStrictPayloadDumped = T.dumpObject(ceMinimalStrict.payload, 'payload')
+    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    t.ok(V.isString(ceStrictPayloadDumped))
+    t.ok(ceStrictPayloadDumped.length < 1024)
   }
 })
 
@@ -121,8 +129,50 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
 })
 
 /** @test {CloudEvent} */
+test('ensure dumpValidationResults works good on undefined, null, and wrong objects', (t) => {
+  t.plan(5)
+  const { CloudEvent } = require('../src/')
+  // t.ok(CloudEvent)
+
+  {
+    // undefined
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults(undefined, { strict: true })
+    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
+  }
+
+  {
+    // null
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults(null, { strict: true })
+    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
+  }
+
+  {
+    // object, not in strict mode
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults({})
+    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
+  }
+
+  {
+    // object, with null options
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults({}, null)
+    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
+  }
+
+  {
+    // object
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults({}, { strict: true })
+    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
+  }
+})
+
+/** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
-  t.plan(13)
+  t.plan(14)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -140,7 +190,9 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.ok(!ceEmpty.isValid())
     t.strictSame(ceEmpty.validate().length, 3) // simplify comparison of results, check only the  number of expected errors ...
     t.ok(!ceEmpty.isStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceStrict')}`)
+    const ceDumpValidationResults = CloudEvent.dumpValidationResults(ceEmpty, { strict: true }, 'ceStrict')
+    // console.log(`DEBUG - dump validation errors for ceEmpty: ${ceDumpValidationResults}`)
+    t.ok(ceDumpValidationResults.length > 0) // expected validation errors
     t.strictSame(ceEmpty.validate({ strict: true }).length, 4) // simplify comparison of results, check only the  number of expected errors ...
   }
 
@@ -1501,7 +1553,7 @@ test('ensure null values in some optional attributes are managed in the right wa
 
 /** @test {CloudEvent} */
 test('ensure data type is managed in the right way', (t) => {
-  t.plan(13)
+  t.plan(14)
   // const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
 
@@ -1532,4 +1584,8 @@ test('ensure data type is managed in the right way', (t) => {
   )
   t.ok(ceFullDataStrict)
   t.notOk(CloudEvent.ensureTypeOfDataIsRight(ceNullDataStrict)) // no errors returned, good
+  t.throws(function () {
+    const notCEDataTypeErrors = CloudEvent.ensureTypeOfDataIsRight({})
+    assert(notCEDataTypeErrors === null) // bad assertion
+  }, Error, 'Expected exception trying to check data type not for a CloudEvent instance')
 })
