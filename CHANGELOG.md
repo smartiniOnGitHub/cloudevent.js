@@ -14,6 +14,9 @@ Summary Changelog:
 - Feature: handle 'data' as array (it was previously forbidden)
 - Feature: update example and update/simplify README
 - Feature: update JSONBatch strict validation to consider even null/undefined items in the array
+- Feature: update to string representation including all mandatory attributes, 
+  and by using 'payload' instead of 'data' (shortened if more than 1024 chars) 
+  because it's more general
 
 ## [0.7.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.7.0) (2020-09-20)
 Summary Changelog:

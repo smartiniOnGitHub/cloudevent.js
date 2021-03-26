@@ -595,7 +595,7 @@ class CloudEvent {
         decodedData = `${parsed.data}`
       }
     }
-    if (!V.isObjectOrCollectionOrString(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
+    if (!V.isObjectOrCollectionOrArrayOrValue(decodedData)) throw new Error(`Missing or wrong decoded data: '${decodedData}' for the given data content type: '${parsed.datacontenttype}'.`)
     // overwrite data with decodedData before returning it
     ce.data = decodedData
     // return ce, depending on its validation option
@@ -719,7 +719,7 @@ class CloudEvent {
     let ve
     if (V.isUndefinedOrNull(ce.data)) {
       ve = null // it's impossible to verify its type
-    }else if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
+    } else if (ce.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       ve = V.ensureIsObjectOrCollectionOrArrayNotValue(ce.data, name) || null
     } else {
       // for example with: datacontenttype 'text/plain':
@@ -910,9 +910,13 @@ class CloudEvent {
    * @return {string} a string representation for object instance
    */
   toString () {
-    const dataDumped = T.dumpObject(this.data, 'data')
-    const dataSummary = (dataDumped.length < 1024) ? dataDumped : (dataDumped.substr(0, 1019) + ' ...}')
-    return `CloudEvent[specversion: ${this.specversion}, ${T.dumpObject(this.id, 'id')}, ${T.dumpObject(this.type, 'type')}, ${dataSummary}, ...]`
+    const payload = this.payload
+    const payloadDump = T.dumpObject(payload, 'payload')
+    let payloadSummary = (payloadDump.length < 1024) ? payloadDump : (payloadDump.substr(0, 1020) + '...')
+    if (V.isString(payload)) {
+      payloadSummary = payloadSummary + '\''
+    }
+    return `CloudEvent[specversion:${this.specversion}, id:'${this.id}', type:'${this.type}', source:'${this.source}', datacontenttype:'${this.datacontenttype}', ${payloadSummary}, ...]`
   }
 
   /**
