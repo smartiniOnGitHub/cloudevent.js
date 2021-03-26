@@ -366,6 +366,21 @@ class Validator {
   }
 
   /**
+   * Tell if the given argument is a plain object or a keyed collection,
+   * or a value (string or boolean or number).
+   *
+   * See {@link Validator.isObjectOrCollection}.
+    * See {@link Validator.isValuey}.
+   *
+   * @static
+   * @param {?object} arg the object to check
+   * @return {boolean} true if it's a plain object or a keyed collection or a value (string or boolean or number), false otherwise
+   */
+  static isObjectOrCollectionOrValue (arg) {
+    return (Validator.isObjectOrCollection(arg) || Validator.isValue(arg))
+  }
+
+  /**
    * Tell if the given argument is a plain object or a keyed collection or an array,
    * or a value (string or boolean or number).
    *
