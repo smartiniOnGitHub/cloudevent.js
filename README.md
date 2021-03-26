@@ -11,7 +11,7 @@
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
-Current release implements the v1.0 of the CloudEvents Spec.
+Current release implements the v1.0.1 of the CloudEvents Spec.
 
 The purpose of this library is to create instances of CloudEvents in a simple way 
 (with some useful defaults), or in a full way (all attributes).
@@ -281,6 +281,7 @@ Since v1.0 of the spec, some properties has been removed/simplified;
 extension properties must be simple (no nested properties) 
 and must contain only lowercase letters and numbers in the name (and less than 20 chars in total); 
 so for example my strict extension now is 'strictvalidation' with a boolean value.
+Since v1.0.1 of the spec, some properties has been expanded/clarified.
 
 
 ## Contributing

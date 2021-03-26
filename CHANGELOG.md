@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.8.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.8.0) (unreleased)
+## [0.8.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.8.0) (2021-03-26)
 Summary Changelog:
 - Implement the [v1.0.1 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.1) 
   but ensure compatibility with release 1.0
@@ -8,6 +8,7 @@ Summary Changelog:
 - Update dependencies for the development environment
 - Generate documentation from sources with JSDoc, no more ESDoc
 - Fix: Manage in the right way optional values given as null (even extensions)
+- Fix: remove the unnecessary executable attribute from sources and some other file in the repo
 - Feature: add to CloudEvent an utility (static) method to dump validation results
 - Feature: ensure 'data' works in the right way with a string value 
   and even with a boolean value, both with a non default datacontenttype (for example 'text/plain')
