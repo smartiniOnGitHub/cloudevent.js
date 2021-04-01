@@ -23,7 +23,7 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
   t.plan(5)
   const V = require('../src/validator') // direct reference to the library
   t.ok(V)
-  t.strictEqual(typeof V, 'function')
+  t.equal(typeof V, 'function')
 
   // optional, using some standard Node.js assert statements, as a sample
   assert(V !== null)
@@ -51,10 +51,10 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
   {
     const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(typeof CloudEvent.version, 'function')
-    t.strictEqual(typeof V.isClass, 'function')
-    t.strictEqual(typeof T.dumpObject, 'function')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(typeof CloudEvent.version, 'function')
+    t.equal(typeof V.isClass, 'function')
+    t.equal(typeof T.dumpObject, 'function')
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(V.isClass))
     t.ok(V.isFunction(T.dumpObject))
@@ -104,14 +104,14 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
   {
     const { CloudEventValidator: V } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof V, 'function')
-    t.strictEqual(typeof V.isClass, 'function')
+    t.equal(typeof V, 'function')
+    t.equal(typeof V.isClass, 'function')
     t.ok(V.isFunction(V))
     t.ok(V.isFunction(V.isClass))
 
     const { CloudEvent, CloudEventValidator } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(typeof CloudEventValidator, 'function')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(typeof CloudEventValidator, 'function')
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(CloudEventValidator))
   }

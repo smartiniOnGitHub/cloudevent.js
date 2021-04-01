@@ -44,19 +44,19 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
   assert.strictEqual(typeof JSONBatch, 'function')
   assert.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
   t.ok(V)
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(typeof JSONBatch, 'function')
-  t.strictEqual(typeof V, 'function')
-  t.strictEqual(typeof T, 'function')
+  t.equal(typeof CloudEvent, 'function')
+  t.equal(typeof JSONBatch, 'function')
+  t.equal(typeof V, 'function')
+  t.equal(typeof T, 'function')
   t.ok(V.isFunction(CloudEvent))
   t.ok(V.isFunction(JSONBatch))
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-  t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-  t.strictEqual(typeof JSONBatch, 'function')
-  t.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+  t.equal(typeof CloudEvent, 'function')
+  t.equal(new CloudEvent() instanceof CloudEvent, true)
+  t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
+  t.equal(typeof JSONBatch, 'function')
+  t.equal(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
 
   t.throws(function () {
     const jsonBatch = new JSONBatch()
@@ -75,7 +75,7 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
-    t.strictEqual(typeof ceMinimal, 'object')
+    t.equal(typeof ceMinimal, 'object')
     t.ok(V.isClass(ceMinimal, CloudEvent))
   }
 
@@ -92,10 +92,10 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
     t.ok(ceMinimalStrict.isStrict)
 
     // check that created instances belongs to the right base class
-    t.strictEqual(typeof ceMinimalStrict, 'object')
+    t.equal(typeof ceMinimalStrict, 'object')
     t.ok(V.isClass(ceMinimalStrict, CloudEvent))
 
-    t.strictEqual(typeof ceMinimalStrict.data, 'object') // data is wrapped in an object, so even when null it's an object
+    t.equal(typeof ceMinimalStrict.data, 'object') // data is wrapped in an object, so even when null it's an object
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
 
     // set ceMinimalStrict.data to null, to ensure validation is good the same

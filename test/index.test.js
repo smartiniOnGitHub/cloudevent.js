@@ -27,28 +27,28 @@ test('ensure objects exported by index script, exists and are of the right type'
     assert(CloudEventExports !== null)
     assert.strictEqual(typeof CloudEventExports, 'object')
     t.ok(CloudEventExports)
-    t.strictEqual(typeof CloudEventExports, 'object')
+    t.equal(typeof CloudEventExports, 'object')
     const CloudEventClass = CloudEventExports.CloudEvent // reference the implementation class
     t.ok(CloudEventClass)
-    t.strictEqual(typeof CloudEventClass, 'function')
+    t.equal(typeof CloudEventClass, 'function')
     const CloudEventValidator = CloudEventExports.CloudEventValidator // reference the validator class
     t.ok(CloudEventValidator)
-    t.strictEqual(typeof CloudEventValidator, 'function')
+    t.equal(typeof CloudEventValidator, 'function')
     const CloudEventTransformer = CloudEventExports.CloudEventTransformer // reference the transformer class
     t.ok(CloudEventTransformer)
-    t.strictEqual(typeof CloudEventTransformer, 'function')
+    t.equal(typeof CloudEventTransformer, 'function')
     const JSONBatchClass = CloudEventExports.JSONBatch // reference the implementation class
     t.ok(JSONBatchClass)
-    t.strictEqual(typeof JSONBatchClass, 'function')
+    t.equal(typeof JSONBatchClass, 'function')
   }
 
   {
     const { CloudEvent: CEClass, JSONBatch: JSONBClass, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
     // const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
-    t.strictEqual(typeof CEClass, 'function')
-    t.strictEqual(typeof V.isClass, 'function')
-    t.strictEqual(typeof T.dumpObject, 'function')
-    t.strictEqual(typeof JSONBClass, 'function')
+    t.equal(typeof CEClass, 'function')
+    t.equal(typeof V.isClass, 'function')
+    t.equal(typeof T.dumpObject, 'function')
+    t.equal(typeof JSONBClass, 'function')
     t.ok(V.isFunction(CEClass))
     t.ok(V.isFunction(V.isClass))
     t.ok(V.isFunction(T.dumpObject))
@@ -56,9 +56,9 @@ test('ensure objects exported by index script, exists and are of the right type'
 
     const { CloudEvent, JSONBatch } = require('../src/') // get references via destructuring
     t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
+    t.equal(typeof CloudEvent, 'function')
     t.ok(JSONBatch)
-    t.strictEqual(typeof JSONBatch, 'function')
+    t.equal(typeof JSONBatch, 'function')
 
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
     const ceMinimal = new CEClass('1', // id

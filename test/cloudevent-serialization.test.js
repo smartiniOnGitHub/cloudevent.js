@@ -31,21 +31,21 @@ test('ensure serialization functions exists (check only the static method here)'
     assert(new CloudEvent() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
     t.ok(CloudEvent)
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(new CloudEvent() instanceof CloudEvent, true)
+    t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
 
     const ceSerialize = CloudEvent.serializeEvent
     assert(ceSerialize !== null)
     assert(typeof ceSerialize === 'function')
     t.ok(ceSerialize)
-    t.strictEqual(typeof ceSerialize, 'function')
+    t.equal(typeof ceSerialize, 'function')
 
     const ceDeserialize = CloudEvent.deserializeEvent
     assert(ceDeserialize !== null)
     assert(typeof ceDeserialize === 'function')
     t.ok(ceDeserialize)
-    t.strictEqual(typeof ceDeserialize, 'function')
+    t.equal(typeof ceDeserialize, 'function')
   }
 })
 
@@ -114,7 +114,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFull).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: false }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFull, { strict: true }).length === 0)
-    t.strictEqual(ceFull.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.equal(ceFull.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFull))
     const ceFullAsString = ceFull.toString()
     // console.log(`DEBUG - ceFullAsString: ${ceFullAsString}`)
@@ -208,7 +208,7 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(CloudEvent.validateEvent(ceFullStrict).length === 0)
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length === 0)
     t.ok(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length === 0)
-    t.strictEqual(ceFullStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.equal(ceFullStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullStrict))
     const ceFullStrictAsString = ceFullStrict.toString()
     // console.log(`DEBUG - ceFullStrictAsString: ${ceFullStrictAsString}`)
@@ -648,7 +648,7 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     t.ok(ceFullOtherContentTypeJSON)
     t.ok(ceFullOtherContentTypeJSON.isValid())
     t.ok(!ceFullOtherContentTypeJSON.isStrict)
-    t.notStrictEqual(ceFullOtherContentTypeJSON.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.not(ceFullOtherContentTypeJSON.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullOtherContentTypeJSON))
 
     // improve coverage on that method
@@ -754,7 +754,7 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     t.ok(ceFullOtherContentTypeJSONStrict)
     t.ok(ceFullOtherContentTypeJSONStrict.isValid())
     t.ok(ceFullOtherContentTypeJSONStrict.isStrict)
-    t.notStrictEqual(ceFullOtherContentTypeJSONStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
+    t.not(ceFullOtherContentTypeJSONStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullOtherContentTypeJSONStrict))
 
     // improve coverage on that method
@@ -856,7 +856,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   const jsonSchemaStatic = CloudEvent.getJSONSchema()
   assert(jsonSchemaStatic !== null)
   t.ok(jsonSchemaStatic)
-  t.strictEqual(typeof jsonSchemaStatic, 'object')
+  t.equal(typeof jsonSchemaStatic, 'object')
 
   // create a sample CloudEvent instance ...
   const ceFullStrict = new CloudEvent('1/full/sample-data/strict',
@@ -872,7 +872,7 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   const jsonSchema = ceFullStrict.schema
   assert(jsonSchema !== null)
   t.ok(jsonSchema)
-  t.strictEqual(typeof jsonSchema, 'object')
+  t.equal(typeof jsonSchema, 'object')
 })
 
 /** create some common data with nested attributes, for better reuse in tests */
@@ -955,13 +955,13 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     assert(dataShallowClone !== null)
     assert(dataShallowClone !== ceFull.data) // they must be different object references
     assert(dataShallowClone !== ceFull.payload) // they must be different object references, at any invocation
-    t.notEqual(dataShallowClone, ceFull.data)
-    t.notStrictEqual(dataShallowClone, ceFull.data)
-    t.notEqual(dataShallowClone, ceFull.payload)
+    t.not(dataShallowClone, ceFull.data)
+    t.not(dataShallowClone, ceFull.data)
+    t.not(dataShallowClone, ceFull.payload)
     dataShallowClone = 'changed: true' // reassign to test that data won't be affected by that change
-    t.notEqual(dataShallowClone, ceFull.data)
+    t.not(dataShallowClone, ceFull.data)
     t.strictNotSame(dataShallowClone, ceFull.data)
-    t.notEqual(dataShallowClone, ceFull.payload)
+    t.not(dataShallowClone, ceFull.payload)
   }
 
   {
@@ -1016,13 +1016,13 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     assert(dataShallowCloneStrict !== null)
     assert(dataShallowCloneStrict !== ceFullStrict.data) // they must be different object references
     assert(dataShallowCloneStrict !== ceFullStrict.payload) // they must be different object references, at any invocation
-    t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
-    t.notStrictEqual(dataShallowCloneStrict, ceFullStrict.data)
-    t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+    t.not(dataShallowCloneStrict, ceFullStrict.data)
+    t.not(dataShallowCloneStrict, ceFullStrict.data)
+    t.not(dataShallowCloneStrict, ceFullStrict.payload)
     dataShallowCloneStrict = 'changed: true' // reassign to test that data won't be affected by that change
-    t.notEqual(dataShallowCloneStrict, ceFullStrict.data)
+    t.not(dataShallowCloneStrict, ceFullStrict.data)
     t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
-    t.notEqual(dataShallowCloneStrict, ceFullStrict.payload)
+    t.not(dataShallowCloneStrict, ceFullStrict.payload)
   }
 })
 
@@ -1108,8 +1108,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
     t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-    t.notStrictEqual(ceDeserialized.time, commonEventTime)
-    t.notEqual(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data)
@@ -1119,8 +1119,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     // then ensure the value of both are the same ...
     t.strictSame(ceDeserialized.data, ceDeserialized.payload)
     // then ensure they are different object (references) ...
-    t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
-    t.notEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.not(ceDeserialized.data, ceDeserialized.payload)
+    t.not(ceDeserialized.data, ceDeserialized.payload)
     t.ok(!ceDeserialized.isStrict)
   }
 
@@ -1156,8 +1156,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
     t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-    t.notStrictEqual(ceDeserialized.time, commonEventTime)
-    t.notEqual(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data)
@@ -1167,8 +1167,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     // then ensure the value of both are the same ...
     t.strictSame(ceDeserialized.data, ceDeserialized.payload)
     // then ensure they are different object (references) ...
-    t.notStrictEqual(ceDeserialized.data, ceDeserialized.payload)
-    t.notEqual(ceDeserialized.data, ceDeserialized.payload)
+    t.not(ceDeserialized.data, ceDeserialized.payload)
+    t.not(ceDeserialized.data, ceDeserialized.payload)
     t.ok(ceDeserialized.isStrict)
   }
 })
@@ -1935,8 +1935,8 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
     t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-    t.notStrictEqual(ceDeserialized.time, commonEventTime)
-    t.notEqual(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
     // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
@@ -1945,11 +1945,11 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
     t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFull.data)
-    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictNotSame(ceDeserialized.data, ceDataEncoded)
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
 
@@ -1964,7 +1964,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       // console.log(`DEBUG - original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
       // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
-      t.notStrictSame(ceFullDeserializedJSON, ceFull)
+      t.strictNotSame(ceFullDeserializedJSON, ceFull)
       t.strictSame(ceFullDeserializedJSON.data, ceFull.data)
       t.strictSame(ceFullDeserializedJSON.data_base64, ceFull.data_base64)
     }
@@ -2039,8 +2039,8 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(V.isDateValid(ceDeserialized.time))
     t.ok(V.isDatePast(ceDeserialized.time))
     t.strictSame(ceDeserialized.time.getTime(), commonEventTime.getTime())
-    t.notStrictEqual(ceDeserialized.time, commonEventTime)
-    t.notEqual(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
+    t.not(ceDeserialized.time, commonEventTime)
     // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
     // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
     // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
@@ -2049,11 +2049,11 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
     t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceFullStrict.data)
-    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictNotSame(ceDeserialized.data, ceDataEncoded)
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
 
@@ -2068,7 +2068,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       // console.log(`DEBUG - original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
       // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
-      t.notStrictSame(ceFullDeserializedJSON, ceFullStrict)
+      t.strictNotSame(ceFullDeserializedJSON, ceFullStrict)
       t.strictSame(ceFullDeserializedJSON.data, ceFullStrict.data)
       t.strictSame(ceFullDeserializedJSON.data_base64, ceFullStrict.data_base64)
     }
@@ -2165,11 +2165,11 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
     t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceBig.data)
-    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictNotSame(ceDeserialized.data, ceDataEncoded)
     t.strictSame(ceDeserialized.payload, ceBig.payload)
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
@@ -2259,11 +2259,11 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.ok(ceDeserialized.payload)
     t.ok(V.isString(ceDeserialized.payload))
     // then ensure the value of both are the same ...
-    t.notStrictSame(ceDeserialized.payload, ceDeserialized.data)
+    t.strictNotSame(ceDeserialized.payload, ceDeserialized.data)
     t.strictSame(ceDeserialized.payload, T.stringFromBase64(ceDeserialized.data_base64))
     // and that they are the same of initial value ...
     t.strictSame(ceDeserialized.data, ceBigStrict.data)
-    t.notStrictSame(ceDeserialized.data, ceDataEncoded)
+    t.strictNotSame(ceDeserialized.data, ceDataEncoded)
     t.strictSame(ceDeserialized.payload, ceBigStrict.payload)
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...

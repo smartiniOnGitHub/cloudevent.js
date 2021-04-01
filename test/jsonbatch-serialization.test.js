@@ -57,27 +57,27 @@ test('ensure serialization functions exists (check only the static method here)'
     assert(JSONBatch !== null)
     assert.strictEqual(typeof JSONBatch, 'function')
     assert.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
-    t.strictEqual(typeof CloudEvent, 'function')
-    t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-    t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
-    t.strictEqual(typeof JSONBatch, 'function')
+    t.equal(typeof CloudEvent, 'function')
+    t.equal(new CloudEvent() instanceof CloudEvent, true)
+    t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
+    t.equal(typeof JSONBatch, 'function')
     t.throws(function () {
       const batch = new JSONBatch()
       assert(batch === null) // never executed
     }, Error, 'Expected exception when creating a JSONBatch instance')
-    t.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
+    t.equal(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
 
     const batchSerialize = JSONBatch.serializeEvents
     assert(batchSerialize !== null)
     assert(typeof batchSerialize === 'function')
     t.ok(batchSerialize)
-    t.strictEqual(typeof batchSerialize, 'function')
+    t.equal(typeof batchSerialize, 'function')
 
     const batchDeserialize = JSONBatch.deserializeEvents
     assert(batchDeserialize !== null)
     assert(typeof batchDeserialize === 'function')
     t.ok(batchDeserialize)
-    t.strictEqual(typeof batchDeserialize, 'function')
+    t.equal(typeof batchDeserialize, 'function')
   }
 })
 

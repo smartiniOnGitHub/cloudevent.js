@@ -51,15 +51,15 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
   assert(new CloudEvent() instanceof CloudEvent)
   assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
   t.ok(V)
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(typeof V, 'function')
-  t.strictEqual(typeof T, 'function')
+  t.equal(typeof CloudEvent, 'function')
+  t.equal(typeof V, 'function')
+  t.equal(typeof T, 'function')
   t.ok(V.isFunction(CloudEvent))
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
-  t.strictEqual(typeof CloudEvent, 'function')
-  t.strictEqual(new CloudEvent() instanceof CloudEvent, true)
-  t.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
+  t.equal(typeof CloudEvent, 'function')
+  t.equal(new CloudEvent() instanceof CloudEvent, true)
+  t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
@@ -74,7 +74,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
 
     // check that created instances belongs to the right base class
-    t.strictEqual(typeof ceMinimal, 'object')
+    t.equal(typeof ceMinimal, 'object')
     t.ok(V.isClass(ceMinimal, CloudEvent))
   }
 
@@ -91,10 +91,10 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.ok(ceMinimalStrict.isStrict)
 
     // check that created instances belongs to the right base class
-    t.strictEqual(typeof ceMinimalStrict, 'object')
+    t.equal(typeof ceMinimalStrict, 'object')
     t.ok(V.isClass(ceMinimalStrict, CloudEvent))
 
-    t.strictEqual(typeof ceMinimalStrict.data, 'object') // data is wrapped in an object, so even when null it's an object
+    t.equal(typeof ceMinimalStrict.data, 'object') // data is wrapped in an object, so even when null it's an object
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
 
     // set ceMinimalStrict.data to null, to ensure validation is good the same
@@ -1124,8 +1124,8 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
   {
     // check that an undefined object is not seen as a CloudEvent
     const ceObject = undefined
-    t.strictEqual(ceObject, undefined)
-    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.equal(ceObject, undefined)
+    t.equal(ceObject instanceof CloudEvent, false)
     t.ok(!V.isClass(ceObject, CloudEvent))
     t.throws(function () {
       const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
@@ -1136,9 +1136,9 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
   {
     // check that a null object is not seen as a CloudEvent
     const ceObject = null
-    t.strictEqual(typeof ceObject, 'object')
-    t.strictEqual(ceObject, null)
-    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.equal(typeof ceObject, 'object')
+    t.equal(ceObject, null)
+    t.equal(ceObject instanceof CloudEvent, false)
     t.ok(!V.isClass(ceObject, CloudEvent))
     t.throws(function () {
       const isCloudEvent = !CloudEvent.isCloudEvent(ceObject)
@@ -1149,8 +1149,8 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
   {
     // check that a generic object is not seen as a CloudEvent
     const ceObject = {}
-    t.strictEqual(typeof ceObject, 'object')
-    t.strictEqual(ceObject instanceof CloudEvent, false)
+    t.equal(typeof ceObject, 'object')
+    t.equal(ceObject instanceof CloudEvent, false)
     t.ok(!V.isClass(ceObject, CloudEvent))
     t.ok(!CloudEvent.isCloudEvent(ceObject))
     t.ok(V.isStringNotEmpty(ceObject.toString()))
@@ -1159,8 +1159,8 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
   {
     // check that even an empty instance belongs to the right base class
     const ceEmpty = new CloudEvent()
-    t.strictEqual(typeof ceEmpty, 'object')
-    t.strictEqual(ceEmpty instanceof CloudEvent, true)
+    t.equal(typeof ceEmpty, 'object')
+    t.equal(ceEmpty instanceof CloudEvent, true)
     t.ok(!V.isClass(ceEmpty, NotCESubclass))
     t.ok(V.isClass(ceEmpty, CloudEvent))
     t.ok(!V.isClass(ceEmpty, CESubclass))
@@ -1169,8 +1169,8 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
 
     // check that a subclass instance is seen as a CloudEvent
     const ceEmptySubclass = new CESubclass()
-    t.strictEqual(typeof ceEmptySubclass, 'object')
-    t.strictEqual(ceEmptySubclass instanceof CloudEvent, true)
+    t.equal(typeof ceEmptySubclass, 'object')
+    t.equal(ceEmptySubclass instanceof CloudEvent, true)
     t.ok(!V.isClass(ceEmptySubclass, NotCESubclass))
     t.ok(V.isClass(ceEmptySubclass, CloudEvent))
     t.ok(V.isClass(ceEmptySubclass, CESubclass))
@@ -1179,8 +1179,8 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
 
     // check that a class instance outside CloudEvent class hierarchy is not seen as a CloudEvent
     const ceEmptyNoSubclass = new NotCESubclass()
-    t.strictEqual(typeof ceEmptyNoSubclass, 'object')
-    t.strictEqual(ceEmptyNoSubclass instanceof CloudEvent, false)
+    t.equal(typeof ceEmptyNoSubclass, 'object')
+    t.equal(ceEmptyNoSubclass instanceof CloudEvent, false)
     t.ok(V.isClass(ceEmptyNoSubclass, NotCESubclass))
     t.ok(!V.isClass(ceEmptyNoSubclass, CloudEvent))
     t.ok(!V.isClass(ceEmptyNoSubclass, CESubclass))
@@ -1263,7 +1263,7 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 1)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
     t.ok(V.isObject(ceFull.data))
-    t.notStrictSame(ceFull.data, ceDataAsString)
+    t.strictNotSame(ceFull.data, ceDataAsString)
     t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
   }
