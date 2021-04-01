@@ -1,6 +1,6 @@
 {
   "name": "cloudevent",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
@@ -29,7 +29,7 @@
   "devDependencies": {
     "jsdoc": "^3.6.6",
     "standard": "^16.0.3",
-    "tap": "^14.11.0"
+    "tap": "^15.0.1"
   },
   "peerDependencies": {},
   "engines": {
