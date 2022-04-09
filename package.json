@@ -4,32 +4,35 @@
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
+    "cache:cleanup": "npm cache clean --force",
+    "cache:verify": "npm cache verify",
+    "clean:install": "rm -rf ./package-lock.json ./node_modules/",
     "dependency:log": "npm list > ./temp/dependencies.log",
     "docs:clean": "rm -rf ./docs/*",
     "docs:generate": "npx jsdoc -c .jsdoc.json -R README.md",
     "docs": "npm run docs:clean && npm run docs:generate",
-    "example": "node example/nodejs-base",
     "example:debug": "node --inspect-brk example/nodejs-base",
-    "lint": "npm run lint:standard",
-    "lint:fix": "standard --fix",
-    "lint:standard": "standard --verbose",
-    "lint:log": "npm run lint > ./temp/lint-standard.log",
-    "license-check": "npx legally",
+    "example": "node example/nodejs-base",
     "license-check:log": "npx legally > ./temp/license-check.log",
-    "license-checker": "npx license-checker --production --onlyAllow='Apache-2.0;BSD-2-Clause;BSD-3-Clause;MIT;ISC'",
+    "license-check": "npx legally",
     "license-checker:log": "npm run license-checker | tee ./temp/license-checker.log",
+    "license-checker": "npx license-checker --production --onlyAllow='Apache-2.0;BSD-2-Clause;BSD-3-Clause;MIT;ISC'",
+    "lint:fix": "standard --fix",
+    "lint:log": "npm run lint > ./temp/lint-standard.log",
+    "lint:standard": "standard --verbose",
+    "lint": "npm run lint:standard",
     "test:clean": "rm -rf .nyc_output/* ./coverage/*",
     "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
-    "test:unit": "tap -J test/*.test.js",
-    "test:unit:dev": "tap -J --watch test/*.test.js",
     "test:unit:debug": "tap -T --node-arg=--inspect-brk test/*.test.js",
+    "test:unit:dev": "tap -J --watch test/*.test.js",
+    "test:unit": "tap -J test/*.test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {},
   "devDependencies": {
-    "jsdoc": "^3.6.6",
-    "standard": "^16.0.3",
-    "tap": "^15.0.1"
+    "jsdoc": "^3.6.10",
+    "standard": "^16.0.4",
+    "tap": "^15.2.3"
   },
   "peerDependencies": {},
   "engines": {
@@ -48,6 +51,5 @@
     "cloudevents"
   ],
   "author": "Sandro Martini <sandro.martini@gmail.com>",
-  "license": "Apache-2.0",
-  "snyk": true
+  "license": "Apache-2.0"
 }

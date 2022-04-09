@@ -4,8 +4,6 @@
   [![NPM Downloads](https://img.shields.io/npm/dm/cloudevent.svg?style=flat)](https://npmjs.org/package/cloudevent/)
   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
   [![Coverage Status](https://coveralls.io/repos/github/smartiniOnGitHub/cloudevent.js/badge.svg?branch=master)](https://coveralls.io/github/smartiniOnGitHub/cloudevent.js/?branch=master)
-  [![dependencies Status](https://david-dm.org/smartiniOnGitHub/cloudevent.js/status.svg)](https://david-dm.org/smartiniOnGitHub/cloudevent.js)
-  [![devDependencies Status](https://david-dm.org/smartiniOnGitHub/cloudevent.js/dev-status.svg)](https://david-dm.org/smartiniOnGitHub/cloudevent.js?type=dev)
   [![Known Vulnerabilities](https://snyk.io//test/github/smartiniOnGitHub/cloudevent.js/badge.svg?targetFile=package.json)](https://snyk.io//test/github/smartiniOnGitHub/cloudevent.js?targetFile=package.json)
   [![license - APACHE-2.0](https://img.shields.io/npm/l/cloudevent.svg)](http://opensource.org/licenses/APACHE-2.0)
 
@@ -243,7 +241,7 @@ you can find even examples for using JSONBatch objects (array of CloudEvent inst
 
 ## Requirements
 
-Node.js 10 LTS (but recommended 10.23.1) or later.
+Node.js 10 LTS (but recommended 10.24.1) or later.
 
 
 ## Sources
