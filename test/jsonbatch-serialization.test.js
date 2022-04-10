@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,16 +34,16 @@ const ceBigString = getRandomString(ceBigStringLength) // a random string with n
 
 // sample function to calculate a random string, given the length, to use in tests here
 function getRandomString (length) {
-  let str = Math.random().toString(36).substr(2)
+  let str = Math.random().toString(36).substring(2)
   while (str.length < length) {
-    str += Math.random().toString(36).substr(2)
+    str += Math.random().toString(36).substring(2)
   }
-  return str.substr(0, length)
+  return str.substring(0, length)
 }
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
-  t.plan(12)
+  // t.plan(12)
 
   {
     const { CloudEvent, JSONBatch } = require('../src/') // get references via destructuring
@@ -79,11 +79,12 @@ test('ensure serialization functions exists (check only the static method here)'
     t.ok(batchDeserialize)
     t.equal(typeof batchDeserialize, 'function')
   }
+
+  t.end()
 })
 
 /** @test {JSONBatch} */
 test('ensure serialization functions works good on undefined and null arguments, and even on empty and bad ones', (t) => {
-  t.plan(20)
   const { JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -184,11 +185,12 @@ test('ensure serialization functions works good on undefined and null arguments,
       assert(deser === null) // never executed
     }, Error, 'Missing or wrong serialized data ...')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure serialization functions works in the right way', (t) => {
-  t.plan(19)
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -318,4 +320,6 @@ test('ensure serialization functions works in the right way', (t) => {
     })
     assert(deserStrictRaiseError === null) // never executed
   }, Error, 'No deserialization here due to selected flags (and errors in deserialization content) ...')
+
+  t.end()
 })

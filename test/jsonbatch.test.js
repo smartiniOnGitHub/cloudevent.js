@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ const {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(28)
+  // t.plan(28)
 
   const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -102,11 +102,12 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
     ceMinimalStrict.data = null
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
   }
+
+  t.end()
 })
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on undefined and null arguments, and even on empty and bad ones', (t) => {
-  t.plan(23)
   const { JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
@@ -161,11 +162,12 @@ test('ensure isValid and validate works good on undefined and null arguments, an
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
     t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
   }
+
+  t.end()
 })
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on array and related items', (t) => {
-  t.plan(41)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -265,11 +267,12 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(eventsGot.every((i) => CloudEvent.isCloudEvent(i)))
   // test with other instances returned (filtered in a different way)
   t.ok(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).every((i) => CloudEvent.isCloudEvent(i)))
+
+  t.end()
 })
 
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on plain object and even CloudEvent instance and CloudEvent subclasses and not', (t) => {
-  t.plan(33)
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(JSONBatch)
@@ -355,4 +358,6 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   }, Error, 'Expected exception when checking for a JSONBatch with bad data')
   t.notOk(JSONBatch.isJSONBatch({}))
   t.ok(JSONBatch.isJSONBatch([]))
+
+  t.end()
 })

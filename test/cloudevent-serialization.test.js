@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
-  t.plan(9)
+  // t.plan(9)
 
   {
     const { CloudEvent } = require('../src/') // get references via destructuring
@@ -47,6 +47,8 @@ test('ensure serialization functions exists (check only the static method here)'
     t.ok(ceDeserialize)
     t.equal(typeof ceDeserialize, 'function')
   }
+
+  t.end()
 })
 
 // import some common test data
@@ -78,17 +80,15 @@ const ceBigString = getRandomString(ceBigStringLength) // a random string with n
 
 // sample function to calculate a random string, given the length, to use in tests here
 function getRandomString (length) {
-  let str = Math.random().toString(36).substr(2)
+  let str = Math.random().toString(36).substring(2)
   while (str.length < length) {
-    str += Math.random().toString(36).substr(2)
+    str += Math.random().toString(36).substring(2)
   }
-  return str.substr(0, length)
+  return str.substring(0, length)
 }
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
-  t.plan(74)
-
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -281,12 +281,12 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(ceFullStrictSerializedStaticWithoutExtensionsProperty)
     t.strictSame(ceFullStrictSerializedStaticWithoutExtensionsProperty.search('exampleexttoskip'), -1)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contenttype and empty serialization options, expect error', (t) => {
-  t.plan(34)
-
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -486,6 +486,8 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
   }
+
+  t.end()
 })
 
 // sample encoding function, to use in tests here
@@ -497,8 +499,6 @@ function encoderToXmlSample (data) {
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contenttype and right serialization options, expect success', (t) => {
-  t.plan(28)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(encoderToXmlSample)
@@ -614,6 +614,8 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(ceFullOtherContentTypeStrictSerialized5)
     t.ok(V.isStringNotEmpty(ceFullOtherContentTypeStrictSerialized5))
   }
+
+  t.end()
 })
 
 // sample encoding function to JSON, to use in tests here
@@ -624,8 +626,6 @@ function encoderToJSON (data) {
 
 /** @test {CloudEvent} */
 test('serialize a CloudEvent instance with a non default contenttype (but in the JSON-like family) and right serialization options, expect success', (t) => {
-  t.plan(54)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(encoderToJSON)
@@ -843,12 +843,12 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
 
     // the same for deserializtion ...
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure the JSON Schema for a CloudEvent (static and for a normal instance) is available', (t) => {
-  t.plan(6)
-
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -873,6 +873,8 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   assert(jsonSchema !== null)
   t.ok(jsonSchema)
   t.equal(typeof jsonSchema, 'object')
+
+  t.end()
 })
 
 /** create some common data with nested attributes, for better reuse in tests */
@@ -899,8 +901,6 @@ const ceFullOtherContentTypeStrictSerializedBadJson = `{"data":"<data 'hello'='w
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON with nested data, and ensure they are right', (t) => {
-  t.plan(52)
-
   const { CloudEvent } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -1024,12 +1024,12 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictNotSame(dataShallowCloneStrict, ceFullStrict.data)
     t.not(dataShallowCloneStrict, ceFullStrict.payload)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('deserialize generic strings (not JSON representation for an Object) into a CloudEvent instance, expected Errors', (t) => {
-  t.plan(10)
-
   const { CloudEvent } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
 
@@ -1069,12 +1069,12 @@ test('deserialize generic strings (not JSON representation for an Object) into a
     const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', { onlyValid: true })
     assert(deserialized === null) // never executed
   }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('deserialize some CloudEvent instances from JSON, and ensure built instances are right', (t) => {
-  t.plan(56)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
   {
@@ -1171,12 +1171,12 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.not(ceDeserialized.data, ceDeserialized.payload)
     t.ok(ceDeserialized.isStrict)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contenttype and empty/wrong deserialization options, expect error', (t) => {
-  t.plan(18)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
   {
@@ -1286,6 +1286,8 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
   }
+
+  t.end()
 })
 
 // sample decoding function, to use in tests here
@@ -1297,8 +1299,6 @@ function decoderFromXmlSample (data) {
 
 /** @test {CloudEvent} */
 test('deserialize a CloudEvent instance with a non default contenttype and right deserialization options, expect success', (t) => {
-  t.plan(18)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
   t.ok(decoderFromXmlSample)
@@ -1383,12 +1383,12 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     })
     t.ok(ceFullOtherContentTypeDeserialized5)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t) => {
-  t.plan(55)
-
   const { CloudEvent } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
 
@@ -1563,6 +1563,8 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
   }
+
+  t.end()
 })
 
 // sample encoding function, to use in tests here
@@ -1577,8 +1579,6 @@ function decoderBigSample () {
 
 /** @test {CloudEvent} */
 test('serialize and deserialize a big CloudEvent instance with a non default contenttype (more than 64 KB)', (t) => {
-  t.plan(54)
-
   const { CloudEvent } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
 
@@ -1856,12 +1856,12 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create and deserialize some CloudEvent instances with data encoded in base64, and ensure they are right', (t) => {
-  t.plan(106)
-
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -2083,12 +2083,12 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       }, Error, 'Expected exception when creating a CloudEvent with data_base64 set but wrong')
     }
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create and deserialize some CloudEvent instances with (big) data encoded in base64, and ensure they are right', (t) => {
-  t.plan(108)
-
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
 
   const ceDataAsString = ceBigString
@@ -2287,6 +2287,8 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
       assert(ceBigDeserializedNoBigObjects === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
+
+  t.end()
 })
 
 // define some events valid in the spec version 0.3
@@ -2295,8 +2297,6 @@ const ceFullStrictSerializedJson03 = `{"id":"1/full/sample-data/strict","type":"
 
 /** @test {CloudEvent} */
 test('deserialize some CloudEvent instances (but a previous specversion) from JSON, and ensure errors are raised', (t) => {
-  t.plan(6)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
 
   {
@@ -2323,12 +2323,12 @@ test('deserialize some CloudEvent instances (but a previous specversion) from JS
       assert(ceDeserialized === undefined) // never executed
     }, Error, 'Expected exception when creating a CloudEvent from a different specversion')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('serialize and deserialize some CloudEvent instances with some optional attributes null, and ensure errors are raised', (t) => {
-  t.plan(14)
-
   const { CloudEvent } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -2382,12 +2382,12 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     t.ok(ceDeserializedOnlyValidTrue)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('serialize and deserialize some CloudEvent instances with data as array, and ensure all is good', (t) => {
-  t.plan(18)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -2455,12 +2455,12 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('serialize and deserialize some CloudEvent instances with data as value (string or boolean or number), and ensure errors are raised', (t) => {
-  t.plan(21)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -2539,4 +2539,6 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.ok(ceDeserializedOnlyValidTrue)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
+
+  t.end()
 })

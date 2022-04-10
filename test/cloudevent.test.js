@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ const {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
-  t.plan(25)
+  // t.plan(25)
 
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
@@ -109,11 +109,12 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure isValid and validate works good on undefined and null objects', (t) => {
-  t.plan(7)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -126,11 +127,12 @@ test('ensure isValid and validate works good on undefined and null objects', (t)
   t.notOk(null)
   t.notOk(CloudEvent.isValidEvent(null))
   t.strictSame(CloudEvent.validateEvent(null), [new Error('CloudEvent undefined or null')])
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure dumpValidationResults works good on undefined, null, and wrong objects', (t) => {
-  t.plan(5)
   const { CloudEvent } = require('../src/')
   // t.ok(CloudEvent)
 
@@ -168,11 +170,12 @@ test('ensure dumpValidationResults works good on undefined, null, and wrong obje
     // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (empty, without minimal arguments set or not set) and ensure they are different objects', (t) => {
-  t.plan(14)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -215,11 +218,12 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
       assert(ce === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create some CloudEvent instances (with minimal fields set) and ensure they are different objects', (t) => {
-  t.plan(41)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -313,11 +317,12 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       assert(ceMinimalMandatoryNullStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure strict mode is managed in the right way', (t) => {
-  t.plan(16)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -349,11 +354,12 @@ test('ensure strict mode is managed in the right way', (t) => {
     CloudEvent.getStrictExtensionOfEvent({ strictvalidation: 'bad flag' })
     assert(false) // never executed
   }, TypeError, 'Expected exception when getting a bad strict extension flag')
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure extensions are managed in the right way', (t) => {
-  t.plan(19)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -419,11 +425,12 @@ test('ensure extensions are managed in the right way', (t) => {
     )
     assert(ceFullStrictEmptyExtensions === undefined) // never executed
   }, Error, 'Expected exception when creating a CloudEvent with extensions defined but empty, in strict mode')
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create two CloudEvent instances with all arguments (mandatory and optional arguments) and ensure they are different objects', (t) => {
-  t.plan(23)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -471,6 +478,8 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   assert(ceFull1 !== ceFull1Clone) // they must be different object references
   t.same(ceFull1, ceFull1Clone)
   t.strictSame(ceFull1, ceFull1Clone)
+
+  t.end()
 })
 
 // sample validation function for the data of the given CloudEvent, using the given dataschema
@@ -489,7 +498,6 @@ function dataValidationNotOk (data, schema) {
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different kind of data attribute, and ensure the validation is right', (t) => {
-  t.plan(101)
   const { CloudEvent } = require('../src/')
   t.ok(CloudEvent)
 
@@ -688,11 +696,12 @@ test('create CloudEvent instances with different kind of data attribute, and ens
     t.strictSame(ceFullDataArrayStrict.payload, ceFullDataArrayStrict.data)
     t.strictSame(ceFullDataArrayStrict.dataType, 'Text')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with a string data attribute, and ensure the validation is right', (t) => {
-  t.plan(78)
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   const value = 'data as a string'
@@ -827,11 +836,12 @@ test('create CloudEvent instances with a string data attribute, and ensure the v
     t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
     t.strictSame(ceFullDataStrict.dataType, 'Text')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with a boolean data attribute, and ensure the validation is right', (t) => {
-  t.plan(78)
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   const value = true
@@ -966,11 +976,12 @@ test('create CloudEvent instances with a boolean data attribute, and ensure the 
     t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
     t.strictSame(ceFullDataStrict.dataType, 'Text')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with a number as data attribute, and ensure the validation is right', (t) => {
-  t.plan(78)
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   const value = 1234567890
@@ -1105,12 +1116,12 @@ test('create CloudEvent instances with a number as data attribute, and ensure th
     t.strictSame(ceFullDataStrict.payload, ceFullDataStrict.data)
     t.strictSame(ceFullDataStrict.dataType, 'Text')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, but not other objects', (t) => {
-  t.plan(37)
-
   const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(CloudEvent)
   t.ok(V)
@@ -1187,12 +1198,12 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
     t.ok(!CloudEvent.isCloudEvent(ceEmptyNoSubclass))
     t.ok(V.isStringNotEmpty(ceEmptyNoSubclass.toString()))
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and objects are merged in the right way', (t) => {
-  t.plan(14)
-
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(CloudEvent))
   t.ok(V.isFunction(V))
@@ -1222,12 +1233,12 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(obj.isValid({ strict: true }))
     t.ok(obj.isStrict)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent with data encoded in base64 are managed in the right way', (t) => {
-  t.plan(48)
-
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
   const ceDataAsString = 'Hello World, 2020'
@@ -1364,6 +1375,8 @@ test('ensure CloudEvent with data encoded in base64 are managed in the right way
     t.strictSame(ceFull.payload, T.stringFromBase64(ceFull.data_base64))
     t.strictSame(ceFull.dataType, 'Binary')
   }
+
+  t.end()
 })
 
 // define my extension, valid in the spec version 0.3
@@ -1371,7 +1384,6 @@ const ceExtensionStrict03 = { com_github_smartiniOnGitHub_cloudevent: { strict: 
 
 /** @test {CloudEvent} */
 test('ensure old strict mode is no more valid (as per updated spec)', (t) => {
-  t.plan(2)
   const { CloudEvent } = require('../src/')
 
   t.throws(function () {
@@ -1379,11 +1391,12 @@ test('ensure old strict mode is no more valid (as per updated spec)', (t) => {
     assert(false) // never executed
   }, TypeError, 'Expected exception when setting a non valid strict extension flag')
   t.ok(!CloudEvent.getStrictExtensionOfEvent({ ...ceExtensionStrict03 })) // ok but false return value
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure internal methods on extensions checks are fully tested', (t) => {
-  t.plan(17)
   const { CloudEvent } = require('../src/')
 
   t.throws(function () {
@@ -1444,11 +1457,12 @@ test('ensure internal methods on extensions checks are fully tested', (t) => {
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: false }).length, 0)
     t.strictSame(CloudEvent.validateEvent(ceFull, { strict: true }).length, 1)
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure null values in some optional attributes are managed in the right way', (t) => {
-  t.plan(44)
   // const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   const { CloudEvent } = require('../src/')
 
@@ -1549,11 +1563,12 @@ test('ensure null values in some optional attributes are managed in the right wa
     t.strictSame(ceStrict.payload, ce.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
   }
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('ensure data type is managed in the right way', (t) => {
-  t.plan(14)
   // const { CloudEvent, CloudEventTransformer: T } = require('../src/')
   const { CloudEvent, CloudEventValidator: V } = require('../src/')
 
@@ -1588,4 +1603,6 @@ test('ensure data type is managed in the right way', (t) => {
     const notCEDataTypeErrors = CloudEvent.ensureTypeOfDataIsRight({})
     assert(notCEDataTypeErrors === null) // bad assertion
   }, Error, 'Expected exception trying to check data type not for a CloudEvent instance')
+
+  t.end()
 })

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {Validator} */
 test('ensure the Validator class (direct reference to it) works good', (t) => {
-  t.plan(5)
+  // t.plan(5)
   const V = require('../src/validator') // direct reference to the library
   t.ok(V)
   t.equal(typeof V, 'function')
@@ -36,12 +36,12 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
     const v = new V()
     assert(v === null) // never executed
   }, Error, 'Expected exception when creating a Validator instance')
+
+  t.end()
 })
 
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
-  t.plan(35)
-
   /** create some classes, for better reuse in following tests */
   const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
   class NotCESubclass {
@@ -115,12 +115,12 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
     t.ok(V.isFunction(CloudEvent))
     t.ok(V.isFunction(CloudEventValidator))
   }
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure some (edge cases for) validation functions are right', (t) => {
-  t.plan(26)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -161,12 +161,12 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
   }
 
   // similar tests for all other is / ensure methods ...
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure some (less used) validation functions are right', (t) => {
-  t.plan(190)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -455,12 +455,12 @@ test('ensure some (less used) validation functions are right', (t) => {
     t.ok(V.isNumber(V.getSizeInBytes('π')))
     t.strictSame(V.getSizeInBytes('π'), 2)
   }
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure some (utility) functions are right', (t) => {
-  t.plan(30)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -503,12 +503,12 @@ test('ensure some (utility) functions are right', (t) => {
 
   t.ok(V.isURI('protocol://sample'))
   t.notOk(V.isURI('sample'))
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure validation functions on standard properties are right', (t) => {
-  t.plan(21)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -539,12 +539,12 @@ test('ensure validation functions on standard properties are right', (t) => {
   t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard, 'test') instanceof Error, true) // expected error returned
   t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ property: 'value' }, isPropStandard), undefined) // no error returned
   t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard) instanceof Error, true) // expected error returned
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure validation functions to filter bad object instances raise exceptions', (t) => {
-  t.plan(3)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -561,12 +561,12 @@ test('ensure validation functions to filter bad object instances raise exception
     const objFiltered = V.getObjectFilteredProperties({}, 'isPropStandard')
     assert(objFiltered !== null) // never executed
   }, Error, 'Expected exception when trying to filter a plain object but with a wrong filtering function')
+
+  t.end()
 })
 
 /** @test {Validator} */
 test('ensure validation functions to throw exceptions, works good', (t) => {
-  t.plan(12)
-
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
 
@@ -600,4 +600,6 @@ test('ensure validation functions to throw exceptions, works good', (t) => {
     V.throwOnFalse(false)
     assert(false) // never executed
   }, Error, 'Expected exception when trying to throw from a false value')
+
+  t.end()
 })

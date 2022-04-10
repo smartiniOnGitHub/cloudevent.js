@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {Transformer} */
 test('ensure the Transformer class (direct reference to it) works good', (t) => {
-  t.plan(4)
+  // t.plan(4)
 
   {
     const T = require('../src/transformer') // direct reference to the library
@@ -40,11 +40,12 @@ test('ensure the Transformer class (direct reference to it) works good', (t) => 
       assert(t === null) // never executed
     }, Error, 'Expected exception when creating a Transformer instance')
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure the Transformer class is good and expose some functions to transform timestamps', (t) => {
-  t.plan(10)
   const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.equal(typeof CloudEvent, 'function')
   t.equal(typeof V.isClass, 'function')
@@ -56,6 +57,8 @@ test('ensure the Transformer class is good and expose some functions to transfor
   t.ok(V.isFunction(T.dumpObject))
   t.ok(V.isFunction(T.timestampFromString))
   t.ok(V.isFunction(T.timestampToString))
+
+  t.end()
 })
 
 /** create some common options, for better reuse in tests */
@@ -65,8 +68,6 @@ const endOf2018TimestampAsNumber = 1546300799999 // Date.parse(endOf2018Timestam
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed to string in the right way', (t) => {
-  t.plan(14)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
   t.ok(endOf2018TimestampAsString)
@@ -111,12 +112,12 @@ test('ensure timestamps are transformed to string in the right way', (t) => {
     t.ok(V.isString(timestampAsString))
     // console.log(`timestampAsString: '${timestampAsString}'`)
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from string in the right way', (t) => {
-  t.plan(23)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
@@ -179,12 +180,12 @@ test('ensure timestamps are transformed from string in the right way', (t) => {
     const timestamp = T.timestampFromString(commonEventTime) // ok but no Date accepted here
     assert(timestamp === null) // never executed
   }, Error, 'Expected exception when transforming not a right timestamp string to a timestamp (Date)')
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to string and back as date in the right way', (t) => {
-  t.plan(13)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
@@ -214,12 +215,12 @@ test('ensure the current timestamp is transformed to string and back as date in 
     t.not(timestampFromString, commonEventTime)
     t.not(timestampFromString, commonEventTime)
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from number in the right way', (t) => {
-  t.plan(29)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
@@ -288,12 +289,12 @@ test('ensure timestamps are transformed from number in the right way', (t) => {
     const timestamp = T.timestampFromNumber(commonEventTime) // ok but no Date accepted here
     assert(timestamp === null) // never executed
   }, Error, 'Expected exception when transforming not a right timestamp number to a timestamp (Date)')
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to number and back as date in the right way', (t) => {
-  t.plan(17)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
@@ -338,12 +339,12 @@ test('ensure the current timestamp is transformed to number and back as date in 
     t.not(timestampFromNumber, commonEventTime)
     t.not(timestampFromNumber, commonEventTime)
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure errors are transformed into data attribute in the right way', (t) => {
-  t.plan(60)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
@@ -483,12 +484,12 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
     t.ok(!data.timestamp)
     t.strictSame(data, { name: 'TypeError', message: 'sample type error', stack: null, code: '1000' })
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure dumpObject works in the right way', (t) => {
-  t.plan(12)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
 
@@ -503,12 +504,12 @@ test('ensure dumpObject works in the right way', (t) => {
   t.ok(T.dumpObject('12345 67890 ', 'string'))
   t.ok(T.dumpObject(1234567890, 'number'))
   t.ok(T.dumpObject(true, 'boolean'))
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure process info are transformed into data attribute in the right way', (t) => {
-  t.plan(10)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
@@ -528,12 +529,12 @@ test('ensure process info are transformed into data attribute in the right way',
     t.strictSame(data.hostname, hostname)
     t.strictSame(data.pid, pid)
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure uri/url are stripped by query arguments in the right way', (t) => {
-  t.plan(22)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   // t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
@@ -598,12 +599,12 @@ test('ensure uri/url are stripped by query arguments in the right way', (t) => {
     t.ok(V.isString(url))
     t.strictSame(url, '/path/nested')
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure objects are merged in the right way', (t) => {
-  t.plan(8)
-
   const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
   t.ok(V.isFunction(T))
   t.ok(V.isFunction(T.mergeObjects))
@@ -630,12 +631,12 @@ test('ensure objects are merged in the right way', (t) => {
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
   }
+
+  t.end()
 })
 
 /** @test {Transformer} */
 test('ensure strings are encoded/decoded in th right way in base64', (t) => {
-  t.plan(13)
-
   const { CloudEventTransformer: T } = require('../src/') // get references via destructuring
 
   t.strictSame(T.stringToBase64(), '')
@@ -659,4 +660,6 @@ test('ensure strings are encoded/decoded in th right way in base64', (t) => {
   t.strictSame(T.stringFromBase64('SGVsbG8gV29ybGQsIDIwMjA='), 'Hello World, 2020')
 
   t.strictSame(T.stringFromBase64(T.stringToBase64('Hello World, 2020')), 'Hello World, 2020')
+
+  t.end()
 })
