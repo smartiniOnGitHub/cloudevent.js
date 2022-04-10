@@ -218,7 +218,8 @@ class CloudEvent {
     }
     return (
       (event.datacontenttype === CloudEvent.datacontenttypeDefault()) ||
-      (event.datacontenttype.includes('json'))
+      (event.datacontenttype.endsWith('/json')) ||
+      (event.datacontenttype.endsWith('+json'))
     )
   }
 
