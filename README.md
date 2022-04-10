@@ -9,7 +9,7 @@
 
 JavaScript/Node.js implementation of [CloudEvents](http://cloudevents.io/)
 
-Current release implements the v1.0.1 of the CloudEvents Spec.
+Current release implements the v1.0.2 of the CloudEvents Spec.
 
 The purpose of this library is to create instances of CloudEvents in a simple way 
 (with some useful defaults), or in a full way (all attributes).
@@ -241,7 +241,8 @@ you can find even examples for using JSONBatch objects (array of CloudEvent inst
 
 ## Requirements
 
-Node.js 10 LTS (but recommended 10.24.1) or later.
+Node.js 10 LTS (but recommended 10.24.1) or later 
+(recommended an active LTS version).
 
 
 ## Sources
@@ -280,6 +281,8 @@ extension properties must be simple (no nested properties)
 and must contain only lowercase letters and numbers in the name (and less than 20 chars in total); 
 so for example my strict extension now is 'strictvalidation' with a boolean value.
 Since v1.0.1 of the spec, some properties has been expanded/clarified.
+Since v1.0.2 of the spec, the check on 'datacontenttype' if it's JSON-like 
+has been updated.
 
 
 ## Contributing

@@ -2,6 +2,8 @@
 
 ## [0.9.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.9.0) (unreleased)
 Summary Changelog:
+- Implement the [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2) 
+  but ensure compatibility with release 1.0 of the spec
 - Update dependencies but keep compatibility with Node.js 10
 - General cleanup
 
