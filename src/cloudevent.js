@@ -860,7 +860,7 @@ class CloudEvent {
    *
    * @type {Date}
    */
-   get timeAsDate () {
+  get timeAsDate () {
     return T.timestampFromString(this.time)
   }
 

@@ -5,7 +5,14 @@ Summary Changelog:
 - Implement the [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2) 
   but ensure compatibility with release 1.0 of the spec
 - Update dependencies but keep compatibility with Node.js 10
+- Update internals about 'time', to be managed as a string (as in spec); 
+  in costructor now is accepted even as a string (that could be checked later 
+  during validation); added a getter method to get its value as a Date
+- Update JSONBatch serialize/deserialize with an additional argument: 
+  a callback function to notify when each item has been processed 
+  (in the right way or not), it could be useful
 - General cleanup
+- No features implemented as async functions here at the moment
 
 ## [0.8.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.8.0) (2021-03-26)
 Summary Changelog:

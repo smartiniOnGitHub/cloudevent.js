@@ -216,13 +216,17 @@ class JSONBatch {
    *        Additional options valid here:
    *        - logError (boolean, default false) to log to console serialization errors
    *        - throwError (boolean, default false) to throw serialization errors
+   * @param {object} callback a callback with usual arguments (err, data) to notify after processing each item
    * @return {string} the serialized JSONBatch, as a string
-   * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong
+   * @throws {Error} if batch is undefined or null, or an option is undefined/null/wrong or callback is not a function
    * @throws {TypeError} if batch is not a JSONBatch
    */
-  static serializeEvents (batch, options = {}) {
+  static serializeEvents (batch, options = {}, callback) {
     if (!JSONBatch.isJSONBatch(batch)) {
       throw new TypeError('The given batch is not a JSONBatch')
+    }
+    if (V.isDefinedAndNotNull(callback) && !V.isFunction(callback)) {
+      throw new Error('The given callback is not a function')
     }
 
     let ser = '[' // serialized CloudEvent instances
@@ -234,9 +238,11 @@ class JSONBatch {
       ser += ((options.prettyPrint === true) ? '\n' : '')
       try {
         ser += CloudEvent.serializeEvent(val, options)
+        if (V.isFunction(callback)) callback(null, { item: val, num })
         num++
       } catch (e) {
         ser += 'null' // as a fallback placeholder
+        if (V.isFunction(callback)) callback(e, { item: null, num })
         if (options.logError === true) {
           console.error(e)
         }
@@ -269,13 +275,17 @@ class JSONBatch {
    *        Additional options valid here:
    *        - logError (boolean, default false) to log to console deserialization errors
    *        - throwError (boolean, default false) to throw serialization errors
+   * @param {object} callback a callback with usual arguments (err, data) to notify after processing each item
    * @return {object[]} the deserialized batch as a JSONBatch (so a CloudEvent array instance)
    * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
    * @throws {Error} in case of JSON parsing error
    * @throws {TypeError} if ser is not a JSONBatch representation
    */
-  static deserializeEvents (ser, options = {}) {
+  static deserializeEvents (ser, options = {}, callback) {
     if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
+    if (V.isDefinedAndNotNull(callback) && !V.isFunction(callback)) {
+      throw new Error('The given callback is not a function')
+    }
 
     // first deserialize to normal object instances
     let deser = null
@@ -318,9 +328,11 @@ class JSONBatch {
           (options.onlyValid === true && CloudEvent.isValidEvent(ce, { strict: options.strict }))
         ) {
           batch.push(ce)
+          if (V.isFunction(callback)) callback(null, { item: ce, num })
           num++
         }
       } catch (e) {
+        if (V.isFunction(callback)) callback(e, { item: null, num })
         if (options.logError === true) {
           console.error(e)
         }

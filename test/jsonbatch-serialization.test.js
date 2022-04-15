@@ -138,6 +138,31 @@ test('ensure serialization functions works good on undefined and null arguments,
     t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
   }
   {
+    // empty array with bad callback
+    const arg = []
+    t.throws(function () {
+      const ser = JSONBatch.serializeEvents(arg, {}, 'callback(err, data) // but not a function')
+      assert(ser !== null) // never executed
+    }, Error, 'Wrong callback ...')
+    t.pass()
+    t.throws(function () {
+      const deser = JSONBatch.deserializeEvents(JSON.stringify(arg), {}, 'callback(err, data) // but not a function')
+      assert(deser !== null) // never executed
+    }, Error, 'Wrong callback ...')
+    t.pass()
+    // deserialize a string containing only an empty array
+    let deser = JSONBatch.deserializeEvents(JSON.stringify(arg))
+    t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
+    t.pass()
+    // deserialize a string containing only an empty array and a sample callback
+    deser = JSONBatch.deserializeEvents(JSON.stringify(arg), {}, (err, data) => {
+      console.log(err, data)  // empty array, so never called
+      t.pass()
+    })
+    t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
+    t.pass()
+  }
+  {
     // empty object (not a CloudEvent/subclass instance)
     const arg = {}
     t.throws(function () {
@@ -237,8 +262,15 @@ test('ensure serialization functions works in the right way', (t) => {
     ceFullBad
   ]
 
+  function dumpCallback(err, data) {
+    console.log(err, data)
+  }
+
   // in following tests to simplify comparison of results, do only some brief checks ...
-  const ser = JSONBatch.serializeEvents(arr, { prettyPrint: true, logError: true })
+  const ser = JSONBatch.serializeEvents(arr, {
+    prettyPrint: true,
+    logError: true
+  }, null) // callback set to null here to avoid a lot of stuff in console
   // console.log(`DEBUG: serialized JSONBatch (prettyPrint enabled) = ${ser}`)
   assert(ser !== null)
   t.ok(ser)
@@ -250,7 +282,7 @@ test('ensure serialization functions works in the right way', (t) => {
       throwError: true,
       // onlyValid: true, // commented otherwise it will be filtered out by getEvents ...
       onlyIfLessThan64KB: true // to force throw here ...
-    })
+    }, dumpCallback)
     assert(serNoBig === null) // never executed
   }, Error, 'No serialization here due to selected flags (and a big instance) ...')
 
@@ -266,10 +298,10 @@ test('ensure serialization functions works in the right way', (t) => {
 
   const deser = JSONBatch.deserializeEvents(ser, {
     logError: true,
-    throwError: true,
+    throwError: false,
     onlyValid: true // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true // to force throw here ...
-  })
+  }, dumpCallback)
   // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
   // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
   assert(deser !== null)
@@ -295,7 +327,7 @@ test('ensure serialization functions works in the right way', (t) => {
     const deserNoWrongArrayRaiseError = JSONBatch.deserializeEvents('[,]', {
       logError: true,
       throwError: true
-    })
+    }, dumpCallback)
     assert(deserNoWrongArrayRaiseError === null) // never executed
   }, Error, 'No deserialization here due to selected flags (and a bad deserialization string) ...')
 
@@ -317,7 +349,7 @@ test('ensure serialization functions works in the right way', (t) => {
       onlyValid: true, // sample, to filter out not valid serialized instances ...
       // onlyIfLessThan64KB: true, // to force throw here ...
       strict: true // to force strict validation ...
-    })
+    }, dumpCallback)
     assert(deserStrictRaiseError === null) // never executed
   }, Error, 'No deserialization here due to selected flags (and errors in deserialization content) ...')
 
