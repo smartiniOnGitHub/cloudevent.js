@@ -156,7 +156,7 @@ test('ensure serialization functions works good on undefined and null arguments,
     t.pass()
     // deserialize a string containing only an empty array and a sample callback
     deser = JSONBatch.deserializeEvents(JSON.stringify(arg), {}, (err, data) => {
-      console.log(err, data)  // empty array, so never called
+      console.log(err, data) // empty array, so never called
       t.pass()
     })
     t.ok(deser && deser.length === 0 && JSONBatch.isJSONBatch(deser))
@@ -262,9 +262,10 @@ test('ensure serialization functions works in the right way', (t) => {
     ceFullBad
   ]
 
-  function dumpCallback(err, data) {
+  function dumpCallback (err, data) {
     console.log(err, data)
   }
+  t.ok(dumpCallback)
 
   // in following tests to simplify comparison of results, do only some brief checks ...
   const ser = JSONBatch.serializeEvents(arr, {
