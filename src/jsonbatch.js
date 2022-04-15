@@ -302,7 +302,7 @@ class JSONBatch {
       // create a CloudEvent instance from the current object (if possible)
       try {
         const extensions = V.getObjectFilteredProperties(i, CloudEvent.isExtensionProperty)
-        // note that strict is handleg both as strict and inside extensions, but it's good the same
+        // note that strict is handled both as strict and inside extensions, but it's good the same
         const ce = new CloudEvent(i.id, i.type, i.source, i.data, {
           time: i.time,
           data_base64: i.data_base64,

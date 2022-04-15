@@ -47,7 +47,7 @@ class CloudEvent {
    * @param {!uri} source the source uri of the event (use '/' if empty), mandatory
    * @param {?(object|Map|Set|string)} data the real event data
    * @param {object} [options={}] optional attributes of the event; some has default values chosen here:
-   *        - time (timestamp/date, default now),
+   *        - time (timestamp in string ISO representation, from a date, default now),
    *        - datainbase64 (string) base64 encoded value for the data (data attribute must not be present when this is defined),
    *        - datacontenttype (string, default 'application/json') is the content type of the data attribute,
    *        - dataschema (uri) optional, reference to the schema that data adheres to,
@@ -140,19 +140,30 @@ class CloudEvent {
     this.dataschema = dataschema
     /**
      * The event timestamp.
-     * Copy the original object to avoid changing objects that could be shared.
-     * If null, current timestamp will be set.
-     * Note that here the object will be transformed into string when serialized.
+     * If null, current timestamp will be set
+     * but directly transformed into a string representation.
+     * If a not empty string is passed here, it will be set
+     * (then later validator could check it).
+     * See under for more details.
      * @type {object}
      * @private
      */
-    this.time = (!V.isNull(time)) ? new Date(time.valueOf()) : new Date()
+    this.time = (V.isNull(time)) ? T.timestampToString(new Date()) : null
     /**
      * The subject of the event in the context of the event producer.
      * @type {string}
      * @private
      */
     this.subject = subject
+
+    // set time depending on the given input type, for be safer
+    if (V.isDate(time)) {
+      // convert the given timestamp in the right string representation
+      this.time = T.timestampToString(time)
+    } else if (V.isStringNotEmpty(time)) {
+      // assign the value directly, maybe the validator will check later
+      this.time = time
+    }
 
     // add strict to extensions, but only when defined
     if (strict === true) {
@@ -355,9 +366,14 @@ class CloudEvent {
    * @param {object} [options={}] containing:
    *        - strict (boolean, default false) to validate it in a more strict way,
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  static validateEvent (event, { strict = false, dataschemavalidator = null } = {}) {
+  static validateEvent (event, {
+    strict = false,
+    dataschemavalidator = null,
+    timezoneOffset = 0
+  } = {}) {
     if (V.isUndefinedOrNull(event)) {
       return [new Error('CloudEvent undefined or null')]
     }
@@ -411,7 +427,7 @@ class CloudEvent {
         }
       }
       ve.push(V.ensureIsURI(event.source, null, 'source'))
-      ve.push(V.ensureIsDatePast(event.time, 'time'))
+      ve.push(V.ensureIsDatePast(T.timestampFromString(event.time, timezoneOffset), 'time'))
       ve.push(V.ensureIsStringNotEmpty(event.datacontenttype, 'datacontenttype'))
       if (V.isDefinedAndNotNull(event.dataschema)) {
         ve.push(V.ensureIsURI(event.dataschema, null, 'dataschema'))
@@ -449,10 +465,15 @@ class CloudEvent {
    * @param {object} [options={}] containing:
    *        - strict (boolean, default false) to validate it in a more strict way,
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
-  static isValidEvent (event, { strict = false, dataschemavalidator = null } = {}) {
-    const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator })
+  static isValidEvent (event, {
+    strict = false,
+    dataschemavalidator = null,
+    timezoneOffset = 0
+  } = {}) {
+    const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator, timezoneOffset })
     const size = V.getSize(validationErrors)
     return (size === 0)
   }
@@ -484,16 +505,18 @@ class CloudEvent {
    *        - encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        - onlyValid (boolean, default false) to serialize only if it's a valid instance,
    *        - onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
    */
   static serializeEvent (event, {
     encoder, encodedData,
-    onlyValid = false, onlyIfLessThan64KB = false
+    onlyValid = false, onlyIfLessThan64KB = false,
+    timezoneOffset = 0
   } = {}) {
     if (V.isUndefinedOrNull(event)) throw new Error('CloudEvent undefined or null')
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
-      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event) === true)) {
+      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event, { timezoneOffset }) === true)) {
         const ser = JSON.stringify(event, function replacer (key, value) {
           switch (key) {
             case 'extensions':
@@ -521,7 +544,7 @@ class CloudEvent {
     }
     if (!V.isStringNotEmpty(encodedData)) throw new Error(`Missing or wrong encoded data: '${encodedData}' for the given data content type: '${event.datacontenttype}'.`)
     const newEvent = T.mergeObjects(event, { data: encodedData })
-    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent) === true)) {
+    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent, { timezoneOffset }) === true)) {
       const ser = JSON.stringify(newEvent)
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
       else throw new Error('Unable to return a serialized CloudEvent bigger than 64 KB.')
@@ -567,7 +590,7 @@ class CloudEvent {
       parsed.source,
       parsed.data,
       { // options
-        time: T.timestampFromString(parsed.time, timezoneOffset),
+        time: parsed.time,
         datainbase64: parsed.data_base64,
         datacontenttype: parsed.datacontenttype,
         dataschema: parsed.dataschema,
@@ -579,7 +602,7 @@ class CloudEvent {
     // depending on the datacontenttype, decode the data attribute (the payload)
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       // return ce, depending on its validation option
-      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
+      if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce, { timezoneOffset }) === true)) {
         if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
         else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
       } else throw new Error('Unable to deserialize a not valid CloudEvent.')
@@ -600,7 +623,7 @@ class CloudEvent {
     // overwrite data with decodedData before returning it
     ce.data = decodedData
     // return ce, depending on its validation option
-    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce) === true)) {
+    if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce, { timezoneOffset }) === true)) {
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
       else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
     } else throw new Error('Unable to deserialize a not valid CloudEvent.')
@@ -669,9 +692,6 @@ class CloudEvent {
    * but I need to keep them commented here and to set the flag
    * additionalProperties to true,
    * or when used both data and extensions will be empty in JSON output.
-   * Note that for time I had to keep its schema definition commented
-   * or schema validation on object instances would fail (because in the
-   * object model I store it as a timestamp/date currently and not as a string).
    *
    * See JSON Schema.
    *
@@ -792,10 +812,11 @@ class CloudEvent {
    * @param {object} [options={}] containing:
    *        - strict (boolean, default false) to validate it in a more strict way,
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
-  isValid ({ strict = false, dataschemavalidator = null } = {}) {
-    return this.constructor.isValidEvent(this, { strict, dataschemavalidator })
+  isValid ({ strict = false, dataschemavalidator = null, timezoneOffset = 0 } = {}) {
+    return this.constructor.isValidEvent(this, { strict, dataschemavalidator, timezoneOffset })
   }
 
   /**
@@ -830,6 +851,17 @@ class CloudEvent {
    */
   get schema () {
     return this.constructor.getJSONSchema()
+  }
+
+  /**
+   * Getter method to return the CloudEvent time but as a Date object.
+   *
+   * See {@link CloudEvent.time}.
+   *
+   * @type {Date}
+   */
+   get timeAsDate () {
+    return T.timestampFromString(this.time)
   }
 
   /**

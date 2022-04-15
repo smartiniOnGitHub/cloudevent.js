@@ -108,6 +108,18 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
+
+    // ensure getter for time as Date works in the right way
+    const ceStrictTimeAsString = ceMinimalStrict.time
+    const ceStrictTimeAsDate = ceMinimalStrict.timeAsDate
+    // console.log(`DEBUG - ceStrictTimeAsString: ${ceStrictTimeAsString}, ceStrictTimeAsDate: ${ceStrictTimeAsDate}`)
+    t.ok(ceStrictTimeAsString)
+    t.ok(V.isStringNotEmpty(ceStrictTimeAsString))
+    t.ok(ceStrictTimeAsDate)
+    t.ok(V.isDate(ceStrictTimeAsDate))
+    t.ok(V.isDatePast(ceStrictTimeAsDate))
+    t.ok(T.timestampFromString(ceStrictTimeAsString).toString())
+    t.equal(ceStrictTimeAsDate.toString(), T.timestampFromString(ceStrictTimeAsString).toString())
   }
 
   t.end()
@@ -1227,6 +1239,8 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(!base.isStrict)
     const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, ceExtensionStrict)
     // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'obj')}`)
+    // after the merge now I have to transform time from Date to the right string representation (like in the constructor)
+    obj.time = T.timestampToString(obj.time)
     t.ok(obj)
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
