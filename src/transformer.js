@@ -252,8 +252,8 @@ class Transformer {
    */
   static processInfoToData () {
     return {
-      hostname: hostname,
-      pid: pid
+      hostname,
+      pid
     }
   }
 

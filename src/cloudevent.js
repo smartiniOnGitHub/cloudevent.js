@@ -595,7 +595,7 @@ class CloudEvent {
         datacontenttype: parsed.datacontenttype,
         dataschema: parsed.dataschema,
         subject: parsed.subject,
-        strict: strict
+        strict
       },
       extensions
     )

@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.10.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.10.0) (unreleased)
+Summary Changelog:
+- Update requirements to Node.js 14 LTS (14.15.0)
+- Ensure all is good as before
+
 ## [0.9.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.9.0) (2022-04-16)
 Summary Changelog:
 - Implement the [v1.0.2 - CloudEvents Spec](https://github.com/cloudevents/spec/releases/tag/v1.0.2) 
