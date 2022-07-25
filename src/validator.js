@@ -983,7 +983,7 @@ class Validator {
    * @param {string} [name='arg'] the name to use in generated error (for the first argument)
    * @return {boolean} true if the object contains theat property, otherwise false
    */
-   static ensureObjectContainsProperty (obj, propName, includeInherited = false, name = 'arg') {
+  static ensureObjectContainsProperty (obj, propName, includeInherited = false, name = 'arg') {
     if (!Validator.doesObjectContainsProperty(obj, propName, includeInherited)) {
       return new Error(`The object with name '${name}' does not contains the property '${propName}' with search in inherited: ${includeInherited}`)
     }
