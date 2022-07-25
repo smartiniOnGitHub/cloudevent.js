@@ -11,6 +11,7 @@
     "docs:clean": "rm -rf ./docs/*",
     "docs:generate": "npx jsdoc -c .jsdoc.json -R README.md",
     "docs": "npm run docs:clean && npm run docs:generate",
+    "example:benchmark": "node example/nodejs-bench",
     "example:debug": "node --inspect-brk example/nodejs-base",
     "example": "node example/nodejs-base",
     "license-check:log": "npx legally > ./temp/license-check.log",
