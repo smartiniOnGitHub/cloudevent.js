@@ -508,6 +508,34 @@ test('ensure some (utility) functions are right', (t) => {
 })
 
 /** @test {Validator} */
+test('ensure validation functions on object properties are right', (t) => {
+  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  t.ok(V)
+
+  t.ok(!V.doesObjectContainsProperty())
+  t.ok(!V.doesObjectContainsProperty(undefined, undefined, undefined))
+  t.ok(!V.doesObjectContainsProperty(null, null, null))
+  t.ok(!V.doesObjectContainsProperty('no object')) // bad object
+  t.ok(!V.doesObjectContainsProperty({}, 42)) // good object, bad property name
+  t.ok(!V.doesObjectContainsProperty({}, 'property', 42)) // good object, good property name, bad flag
+  t.ok(!V.doesObjectContainsProperty({}, 'property', true)) // all arguments fine, but no property found
+
+  const obj = {}
+  obj.property1 = 42
+  t.ok(V.doesObjectContainsProperty(obj, 'property1', false))
+  t.ok(V.doesObjectContainsProperty(obj, 'property1', true))
+  t.ok(!V.doesObjectContainsProperty(obj, 'toString', false))
+  t.ok(V.doesObjectContainsProperty(obj, 'toString', true))
+
+  t.strictSame(V.ensureObjectContainsProperty(obj, 'property1', false, 'test object (obj)'), undefined) // no error returned
+  t.strictSame(V.ensureObjectContainsProperty(obj, 'propertyMissing', false, 'test object (obj)') instanceof Error, true) // expected error returned
+  t.strictSame(V.ensureObjectContainsProperty(obj, 'toString', false, 'test object (obj)') instanceof Error, true) // expected error returned
+  t.strictSame(V.ensureObjectContainsProperty(obj, 'toString', true, 'test object (obj)'), undefined) // no error returned
+
+  t.end()
+})
+
+/** @test {Validator} */
 test('ensure validation functions on standard properties are right', (t) => {
   const { CloudEventValidator: V } = require('../src/') // get references via destructuring
   t.ok(V)
@@ -535,10 +563,10 @@ test('ensure validation functions on standard properties are right', (t) => {
   t.ok(!V.doesObjectContainsStandardProperty({ property: 'value' }, {}))
   t.ok(!V.doesObjectContainsStandardProperty({ standard: 'value' }, {}))
 
-  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ property: 'value' }, isPropStandard, 'test'), undefined) // no error returned
-  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard, 'test') instanceof Error, true) // expected error returned
-  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ property: 'value' }, isPropStandard), undefined) // no error returned
-  t.strictSame(V.ensureObjectDoesNotContainStandardProperty({ standard: 'value' }, isPropStandard) instanceof Error, true) // expected error returned
+  t.strictSame(V.ensureObjectDoesNotContainsStandardProperty({ property: 'value' }, isPropStandard, 'test'), undefined) // no error returned
+  t.strictSame(V.ensureObjectDoesNotContainsStandardProperty({ standard: 'value' }, isPropStandard, 'test') instanceof Error, true) // expected error returned
+  t.strictSame(V.ensureObjectDoesNotContainsStandardProperty({ property: 'value' }, isPropStandard), undefined) // no error returned
+  t.strictSame(V.ensureObjectDoesNotContainsStandardProperty({ standard: 'value' }, isPropStandard) instanceof Error, true) // expected error returned
 
   t.end()
 })

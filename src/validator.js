@@ -455,6 +455,28 @@ class Validator {
   }
 
   /**
+   * Tell if the given object contains the given property.
+   *
+   * @static
+   * @param {?object} obj the object to check
+   * @param {?string} propName the name of the property
+   * @param {boolean} [includeInherited=false] specify if search in nested/inherited properties
+   * @return {boolean} true if the object contains theat property, otherwise false
+   */
+  static doesObjectContainsProperty (obj, propName, includeInherited = false) {
+    if (!Validator.isObject(obj)) return false
+    if (!Validator.isStringNotEmpty(propName)) return false
+    if (!Validator.isBoolean(includeInherited)) return false
+    let propFound = false
+    if (includeInherited === false) {
+      propFound = Object.prototype.hasOwnProperty.call(obj, propName)
+    } else {
+      propFound = propName in obj
+    }
+    return propFound
+  }
+
+  /**
    * Tell if the given object contains at least one property
    * that has a standard (reserved) property name.
    *
@@ -950,6 +972,24 @@ class Validator {
   }
 
   /**
+   * Ensure that the given object contains the given property.
+   *
+   * See {@link Validator.doesObjectContainsProperty}.
+   *
+   * @static
+   * @param {?object} obj the object to check
+   * @param {?string} propName the name of the property
+   * @param {boolean} [includeInherited=false] specify if search in nested/inherited properties
+   * @param {string} [name='arg'] the name to use in generated error (for the first argument)
+   * @return {boolean} true if the object contains theat property, otherwise false
+   */
+   static ensureObjectContainsProperty (obj, propName, includeInherited = false, name = 'arg') {
+    if (!Validator.doesObjectContainsProperty(obj, propName, includeInherited)) {
+      return new Error(`The object with name '${name}' does not contains the property '${propName}' with search in inherited: ${includeInherited}`)
+    }
+  }
+
+  /**
    * Ensure that the given object does not contain any property
    * that has a standard (reserved) property name.
    *
@@ -958,10 +998,10 @@ class Validator {
    * @static
    * @param {?object} arg the object to check
    * @param {?function} isPropStandard the function that tell the given argument (property), if it's standard
-   * @param {string} [name='arg'] the name to use in generated error (or the value of first argument if not given)
+   * @param {string} [name='arg'] the name to use in generated error (for the first argument)
    * @return {Error} if at least one property with a standard name is found, nothing otherwise
    */
-  static ensureObjectDoesNotContainStandardProperty (arg, isPropStandard, name = 'arg') {
+  static ensureObjectDoesNotContainsStandardProperty (arg, isPropStandard, name = 'arg') {
     if (Validator.doesObjectContainsStandardProperty(arg, isPropStandard)) {
       return new Error(`The object with name '${name}' contains at least one property with a standard name`)
     }

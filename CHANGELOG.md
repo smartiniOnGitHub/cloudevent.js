@@ -4,6 +4,7 @@
 Summary Changelog:
 - Update requirements to Node.js 14 LTS (14.15.0)
 - Ensure all is good as before
+- Small improvements in Validator
 
 ## [0.9.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.9.0) (2022-04-16)
 Summary Changelog:
