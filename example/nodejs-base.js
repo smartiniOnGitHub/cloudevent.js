@@ -19,7 +19,22 @@
  * Sample Node.js script to show usage of CloudEvent library
  */
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
+
+// import some common example data
+const {
+  // commonEventTime,
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  ceCommonOptionsForTextData,
+  ceCommonExtensions,
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData,
+  ceDataAsJSONString,
+  ceDataAsString,
+  ceDataAsStringEncoded
+} = require('./common-example-data')
 
 console.log('Sample script: start execution ...\n')
 
@@ -49,24 +64,6 @@ assert(ceMinimalMandatoryUndefinedNoStrict !== null)
 console.log(`ce dump (but not good for validation): ${T.dumpObject(ceMinimalMandatoryUndefinedNoStrict, 'ceMinimalMandatoryUndefinedNoStrict')}`)
 // const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, { strict: true }) // expected failure
 // assert(ceMinimalMandatoryUndefinedStrict == null) // no, ReferenceError: ceMinimalMandatoryUndefinedStrict is not defined
-
-// define some common attributes
-const ceCommonOptions = {
-  time: new Date(), // same as default
-  datacontenttype: 'application/json',
-  dataschema: 'http://my-schema.localhost.localdomain/v1/',
-  subject: 'subject',
-  strict: false // same as default
-}
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
-const ceCommonExtensions = { exampleextension: 'value' }
-const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
-const ceServerUrl = '/test'
-const ceCommonData = { hello: 'world', year: 2020, enabled: true }
-const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
-const ceDataAsString = 'Hello World, 2020'
-const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 
 // create a sample minimal instance good for normal validation but not for strict validation ...
 const ceMinimalBadSource = new CloudEvent('1', ceNamespace, 'source (bad)', null)
@@ -174,7 +171,7 @@ const ceFullStrictBinaryData = new CloudEvent('6/full-strict-binary-data',
   ceNamespace,
   ceServerUrl,
   null, // data
-  { ...ceCommonOptionsStrict, datainbase64: ceDataEncoded }, // use common strict options, and set binary data in base64
+  { ...ceCommonOptionsStrict, datainbase64: ceDataAsStringEncoded }, // use common strict options, and set binary data in base64
   ceCommonExtensions
 )
 assert(ceFullStrictBinaryData !== null)
@@ -386,5 +383,6 @@ assert(deser !== null)
 // other ...
 
 console.log('\nSample script: end execution.')
+console.log('----')
 assert(true) // all good here
 // end of script
