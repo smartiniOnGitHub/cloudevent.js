@@ -24,7 +24,8 @@
 const commonEventTime = new Date()
 const ceCommonOptions = {
   // time: new Date(), // same as default
-  time: commonEventTime, // to simplify tests, keep it with a fixed value here
+  // time: commonEventTime, // to simplify tests, keep it with a fixed value here
+  time: null, // more useufl here, like in normal situations where event timestamp has to be created each time
   datacontenttype: 'application/json',
   dataschema: 'http://my-schema.localhost.localdomain/v1/',
   subject: 'subject',

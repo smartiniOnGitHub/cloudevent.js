@@ -22,10 +22,27 @@
 const assert = require('node:assert').strict
 const { performance } = require('node:perf_hooks')
 
+// import some common example data
+const {
+  // commonEventTime,
+  ceCommonOptions,
+  ceCommonOptionsStrict,
+  ceCommonOptionsForTextData,
+  ceCommonExtensions,
+  ceNamespace,
+  ceServerUrl,
+  ceCommonData,
+  ceDataAsJSONString,
+  ceDataAsString,
+  ceDataAsStringEncoded
+} = require('./common-example-data')
+
 // definition of my simple benchmark runner
-// arguments: benchmark name, number of repetitions, the function to run (that should return a value),
-// a function to dump returned object from the last run
-function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResult = null) {
+// arguments: benchmark name, number of repetitions,
+// the function to run (that should return a value),
+// a function to dump returned object (from the last benchmark run),
+// a function to validate the returned object
+function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResult = null, validateResult = null) {
   console.log(`Benchmark: '${name}', repeat ${repeat} times; start execution ...`)
   const start = performance.now()
   // later check if wrap in a try/catch block ...
@@ -39,13 +56,24 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
   if (dumpResult !== null) {
     dumpResult(name, result)
   }
+  // validate last returned object
+  // but not part of local performance count
+  if (validateResult !== null) {
+    validateResult(name, result)
+  }
   console.log(`Benchmark: '${name}'; end execution (took ${end - start} msec) \n`)
 }
 
 // generic function to dump created CloudEvent object
 function dumpCE (name = '', ce) {
   assert(ce !== null)
-  console.log(`Dump generated ce object (in the last run):\n${T.dumpObject(ce, 'ce')}`)
+  console.log(`Generated ce object (in the last run): is strict: ${CloudEvent.isStrictEvent(ce)}, dump:\n${T.dumpObject(ce, 'ce')}`)
+}
+
+// generic function to validate the given CloudEvent object and print info/results
+function validateCE (name = '', ce) {
+  assert(ce !== null)
+  console.log(`Validate generated ce object (in the last run): is valid: ${CloudEvent.isValidEvent(ce)}, validation details:\n${CloudEvent.validateEvent(ce)}`)
 }
 
 // definition of test functions
@@ -79,8 +107,8 @@ const {
 assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
 
 // call benchmark functions, repeated n times each one
-benchmarkRunner('ce empty (not good for validation)', numRun, createEmpty, dumpCE)
-benchmarkRunner('ce minimal (not good for validation)', numRun, createMinimalMandatoryUndefinedNoStrict, dumpCE)
+benchmarkRunner('ce empty (not good for validation)', numRun, createEmpty, dumpCE, validateCE)
+benchmarkRunner('ce minimal (not good for validation)', numRun, createMinimalMandatoryUndefinedNoStrict, dumpCE, validateCE)
 // TODO: others ... wip
 
 console.log('\nSample script: end execution.')
