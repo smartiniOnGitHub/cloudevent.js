@@ -22,20 +22,21 @@
 const assert = require('node:assert').strict
 const { performance } = require('node:perf_hooks')
 
-// import some common example data
+// get a reference only to cloudevent class definition/s
 const {
-  // commonEventTime,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  ceCommonOptionsForTextData,
-  ceCommonExtensions,
-  ceNamespace,
-  ceServerUrl,
-  ceCommonData,
-  ceDataAsJSONString,
-  ceDataAsString,
-  ceDataAsStringEncoded
-} = require('./common-example-data')
+  CloudEvent,
+  CloudEventValidator: V,
+  CloudEventTransformer: T,
+  JSONBatch
+} = require('../src') // from local path
+assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
+
+// get factory for instances to test, in its own source
+const ceFactory = require('./common-example-factory')
+
+// number of times to repeat each test
+const numRun = 1_000
+const numIntDigits = 3 // to align benchmark results: 2 or 3 is good for 1_000 iterations, 5 for 1_000_000
 
 // definition of my simple benchmark runner
 // arguments: benchmark name, number of repetitions,
@@ -61,7 +62,8 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
     for (let i = 0; i < repeat; i++) {
       isValid = validateResult(name, result)
     }
-    console.log(`Validation results (show only after last run): is valid: ${isValid}, validation details:\n\t${CloudEvent.validateEvent(result)}`)
+    const validationResults = CloudEvent.validateEvent(result)
+    console.log(`Validation results (show only after last run): is valid: ${isValid} (${validationResults.length} errors), validation details:\n\t${validationResults}`)
   }
   const endValidation = performance.now()
 
@@ -74,12 +76,12 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
   }
 
   // print results
-  console.log(`Benchmark partial results:`)
+  console.log('Benchmark partial results:')
   if (functionToRun !== null) {
-    console.log(`\tMain function execution took:       ${formatNumber(endMainFunction - startMainFunction, 5)} msec`)
+    console.log(`\tMain function execution took:       ${formatNumber(endMainFunction - startMainFunction, numIntDigits)} msec`)
   }
   if (validateResult !== null) {
-    console.log(`\tValidation function execution took: ${formatNumber(endValidation - startValidation, 5)} msec`)
+    console.log(`\tValidation function execution took: ${formatNumber(endValidation - startValidation, numIntDigits)} msec`)
   }
   console.log(`Benchmark: '${name}'; end. Execution took: ${formatNumber(endBenchmark - startBenchmark)} msec\n`)
 }
@@ -87,10 +89,10 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
 // utility function to format numbers with the desired length and precision
 // note that rounding could be applied
 function formatNumber (num = 0, minIntDigits = 1) {
-  let formatted = new Intl.NumberFormat([], {
+  const formatted = new Intl.NumberFormat([], {
     minimumFractionDigits: 3,
     maximumFractionDigits: 3, // <- implicit rounding!
-    minimumIntegerDigits: minIntDigits,
+    minimumIntegerDigits: minIntDigits
     // style: 'unit',
     // unit: 'millisecond'
   }).format(num)
@@ -99,55 +101,51 @@ function formatNumber (num = 0, minIntDigits = 1) {
 
 // generic function to dump created CloudEvent object
 function dumpCE (name = '', ce) {
-  assert(ce !== null)
-  console.log(`Generated ce object (in the last run): is strict: ${CloudEvent.isStrictEvent(ce)}, dump:\n\t${T.dumpObject(ce, 'ce')}`)
+  // assert(ce !== null)
+  if (ce !== null) {
+    console.log(`Generated ce object (in the last run): is strict: ${CloudEvent.isStrictEvent(ce)}, dump:\n\t${T.dumpObject(ce, 'ce')}`)
+  } else {
+    console.log('Generated ce object (in the last run): null')
+  }
 }
 
-// generic function to validate the given CloudEvent object and print info/results
+// generic function to validate the given CloudEvent object
 function validateCE (name = '', ce) {
-  // assert(ce !== null)
   return CloudEvent.isValidEvent(ce)
 }
 
-// definition of test functions
-function createEmpty () {
-  const ce = new CloudEvent() // create an empty CloudEvent instance (not valid for the validator, even in default case, when strict mode flag is disabled)
-  // assert(ce !== null)
-  return ce
+// generic function to validate the given CloudEvent object but with strict mode enabled
+function validateCEInStrictMode (name = '', ce) {
+  return CloudEvent.isValidEvent(ce, { strict: true })
 }
 
-function createMinimalMandatoryUndefinedNoStrict () {
-  const ce = new CloudEvent(undefined, undefined, undefined, undefined, { strict: false }) // expected success
-  return ce
-}
-
-// number of times to repeat each test
-const numRun = 1_000
-
+// start timer for the execution
 const startTime = performance.now()
 
 console.log('Sample script: start execution ...\n')
 console.log(`Repeat each test: ${numRun} times`)
 console.log(`Script file: ${__filename}`)
 
-// get a reference only to cloudevent class definition/s
-const {
-  CloudEvent,
-  CloudEventValidator: V,
-  CloudEventTransformer: T,
-  JSONBatch
-} = require('../src') // from local path
-assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
-
 // call benchmark functions, repeated n times each one
-benchmarkRunner('ce empty (not good for validation)', numRun, createEmpty, dumpCE, validateCE)
-benchmarkRunner('ce minimal (not good for validation)', numRun, createMinimalMandatoryUndefinedNoStrict, dumpCE, validateCE)
-// TODO: others ... wip
+benchmarkRunner('1 - ce empty (not good for validation)', numRun, ceFactory.createEmpty, dumpCE, validateCE)
+benchmarkRunner('2 - ce empty (not good for validation, forced strict validation here)', numRun, ceFactory.createEmpty, dumpCE, validateCEInStrictMode)
+benchmarkRunner('3 - ce minimal (not good for validation)', numRun, ceFactory.createMinimalMandatoryUndefinedNoStrict, dumpCE, validateCE)
+benchmarkRunner('4 - ce minimal (good but not for strict validation)', numRun, ceFactory.createMinimalBadSource, dumpCE, validateCE)
+benchmarkRunner('5 - ce minimal (good but not for strict validation, used/forced here)', numRun, ceFactory.createMinimalBadSource, dumpCE, validateCEInStrictMode)
+benchmarkRunner('6 - ce minimal (good)', numRun, ceFactory.createMinimal, dumpCE, validateCE)
+benchmarkRunner('7 - ce minimal and strict (good)', numRun, ceFactory.createMinimalStrict, dumpCE, validateCE)
+benchmarkRunner('8 - ce complete (good)', numRun, ceFactory.createFull, dumpCE, validateCE)
+benchmarkRunner('9 - ce complete and strict (good)', numRun, ceFactory.createFullStrict, dumpCE, validateCE)
+benchmarkRunner('10 - ce complete with standard property in extensions (not good and not created)', numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
+benchmarkRunner('11 - ce complete with text data (good)', numRun, ceFactory.createFullTextData, dumpCE, validateCE)
+benchmarkRunner('12 - ce complete with binary data ecoded in base64 (good)', numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)
+benchmarkRunner('13 - ce complete with JSON data (good)', numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCE)
+// TODO: check for a last test, on a ce instance with a long string as data ... wip
 
 console.log('\nSample script: end execution.')
 
 const endTime = performance.now()
-console.log(`Total execution time: ${formatNumber((endTime - startTime) / 1_000)} sec`)
+console.log(`Total execution time: ${formatNumber(endTime - startTime)} msec, or ${formatNumber((endTime - startTime) / 1_000)} sec`)
 console.log('----')
 assert(true) // all good here
 // end of script

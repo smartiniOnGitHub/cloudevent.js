@@ -25,15 +25,18 @@ const commonEventTime = new Date()
 const ceCommonOptions = {
   // time: new Date(), // same as default
   // time: commonEventTime, // to simplify tests, keep it with a fixed value here
-  time: null, // more useufl here, like in normal situations where event timestamp has to be created each time
+  time: null, // more useful here, like in normal situations where event timestamp has to be created each time
   datacontenttype: 'application/json',
   dataschema: 'http://my-schema.localhost.localdomain/v1/',
   subject: 'subject',
   strict: false // same as default
 }
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
+const ceOptionsNoStrict = { strict: false } // same as default
+const ceOptionsStrict = { strict: true }
+const ceCommonOptionsStrict = { ...ceCommonOptions, ...ceOptionsStrict }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
-const ceCommonExtensions = { exampleextension: 'value' }
+const ceCommonExtensions = { exampleextension: 'value' } // example extension
+const ceReservedExtensions = { id: -1, data: 'data attribute in extension' } // example (bad) extension, use a standard property in extensions, not good for creation in strict mode
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
 const ceCommonData = { hello: 'world', year: 2020, enabled: true }
@@ -67,6 +70,8 @@ const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item
 
 module.exports = {
   commonEventTime,
+  ceOptionsNoStrict,
+  ceOptionsStrict,
   ceCommonOptions,
   ceCommonOptionsStrict,
   ceCommonOptionsWithSomeOptionalsNull,
@@ -78,6 +83,7 @@ module.exports = {
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
+  ceReservedExtensions,
   ceNamespace,
   ceServerUrl,
   ceCommonData,
