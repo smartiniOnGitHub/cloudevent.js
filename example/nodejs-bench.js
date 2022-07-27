@@ -44,36 +44,69 @@ const {
 // a function to validate the returned object
 function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResult = null, validateResult = null) {
   console.log(`Benchmark: '${name}', repeat ${repeat} times; start execution ...`)
-  const start = performance.now()
+  const startBenchmark = performance.now()
   // later check if wrap in a try/catch block ...
   let result
+
+  const startMainFunction = performance.now()
   for (let i = 0; i < repeat; i++) {
     result = functionToRun()
   }
-  const end = performance.now()
+  const endMainFunction = performance.now()
+
+  // validate last returned object
+  const startValidation = performance.now()
+  if (validateResult !== null) {
+    let isValid
+    for (let i = 0; i < repeat; i++) {
+      isValid = validateResult(name, result)
+    }
+    console.log(`Validation results (show only after last run): is valid: ${isValid}, validation details:\n\t${CloudEvent.validateEvent(result)}`)
+  }
+  const endValidation = performance.now()
+
+  const endBenchmark = performance.now()
+
   // test last returned object and dump it
-  // but not part of local performance count
+  // but not part of current performance count
   if (dumpResult !== null) {
     dumpResult(name, result)
   }
-  // validate last returned object
-  // but not part of local performance count
-  if (validateResult !== null) {
-    validateResult(name, result)
+
+  // print results
+  console.log(`Benchmark partial results:`)
+  if (functionToRun !== null) {
+    console.log(`\tMain function execution took:       ${formatNumber(endMainFunction - startMainFunction, 5)} msec`)
   }
-  console.log(`Benchmark: '${name}'; end execution (took ${end - start} msec) \n`)
+  if (validateResult !== null) {
+    console.log(`\tValidation function execution took: ${formatNumber(endValidation - startValidation, 5)} msec`)
+  }
+  console.log(`Benchmark: '${name}'; end. Execution took: ${formatNumber(endBenchmark - startBenchmark)} msec\n`)
+}
+
+// utility function to format numbers with the desired length and precision
+// note that rounding could be applied
+function formatNumber (num = 0, minIntDigits = 1) {
+  let formatted = new Intl.NumberFormat([], {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3, // <- implicit rounding!
+    minimumIntegerDigits: minIntDigits,
+    // style: 'unit',
+    // unit: 'millisecond'
+  }).format(num)
+  return formatted
 }
 
 // generic function to dump created CloudEvent object
 function dumpCE (name = '', ce) {
   assert(ce !== null)
-  console.log(`Generated ce object (in the last run): is strict: ${CloudEvent.isStrictEvent(ce)}, dump:\n${T.dumpObject(ce, 'ce')}`)
+  console.log(`Generated ce object (in the last run): is strict: ${CloudEvent.isStrictEvent(ce)}, dump:\n\t${T.dumpObject(ce, 'ce')}`)
 }
 
 // generic function to validate the given CloudEvent object and print info/results
 function validateCE (name = '', ce) {
-  assert(ce !== null)
-  console.log(`Validate generated ce object (in the last run): is valid: ${CloudEvent.isValidEvent(ce)}, validation details:\n${CloudEvent.validateEvent(ce)}`)
+  // assert(ce !== null)
+  return CloudEvent.isValidEvent(ce)
 }
 
 // definition of test functions
@@ -89,7 +122,7 @@ function createMinimalMandatoryUndefinedNoStrict () {
 }
 
 // number of times to repeat each test
-const numRun = 1_000_000
+const numRun = 1_000
 
 const startTime = performance.now()
 
@@ -114,7 +147,7 @@ benchmarkRunner('ce minimal (not good for validation)', numRun, createMinimalMan
 console.log('\nSample script: end execution.')
 
 const endTime = performance.now()
-console.log(`Total execution time: ${(endTime - startTime) / 1_000} sec`)
+console.log(`Total execution time: ${formatNumber((endTime - startTime) / 1_000)} sec`)
 console.log('----')
 assert(true) // all good here
 // end of script
