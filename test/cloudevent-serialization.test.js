@@ -2004,7 +2004,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       ceNamespace,
       ceServerUrl,
       null, // data
-      { ...ceOptionsWithDataInBase64, strict: true },
+      { ...ceOptionsWithDataInBase64, ...ceOptionsNoStrict },
       ceCommonExtensions
     )
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)

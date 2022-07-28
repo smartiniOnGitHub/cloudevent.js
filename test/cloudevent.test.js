@@ -292,7 +292,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   {
     // create an instance with a mandatory argument undefined (but no strict mode): expected success ...
     // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-    const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, valOptionsNoStrict)
+    const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsNoStrict)
     assert(ceMinimalMandatoryUndefinedNoStrict !== null)
     t.ok(ceMinimalMandatoryUndefinedNoStrict)
     t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict)) // using default strict mode in the event
