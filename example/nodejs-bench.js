@@ -34,6 +34,12 @@ assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
 // get factory for instances to test, in its own source
 const ceFactory = require('./common-example-factory')
 
+// get some common example/utility data
+const {
+  valOptionsNoStrict,
+  valOptionsStrict
+} = require('./common-example-data')
+
 // number of times to repeat each test
 const numRun = 1_000
 const numIntDigits = 3 // to align benchmark results: 2 or 3 is good for 1_000 iterations, 5 for 1_000_000
@@ -142,6 +148,7 @@ benchmarkRunner(`${benchNum++} - ce minimal (good)`, numRun, ceFactory.createMin
 benchmarkRunner(`${benchNum++} - ce minimal and strict (good)`, numRun, ceFactory.createMinimalStrict, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete (good)`, numRun, ceFactory.createFull, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete and strict (good)`, numRun, ceFactory.createFullStrict, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete and strict but validate in no stric tmode (good)`, numRun, ceFactory.createFullStrict, dumpCE, validateCEInNoStrictMode)
 benchmarkRunner(`${benchNum++} - ce complete with standard property in extensions (not good and not created)`, numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with text data (good)`, numRun, ceFactory.createFullTextData, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with binary data ecoded in base64 (good)`, numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)

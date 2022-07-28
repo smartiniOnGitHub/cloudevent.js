@@ -74,7 +74,6 @@ const valOptionsStrict = { strict: true }
 
 module.exports = {
   commonEventTime,
-  ceOptionsNoStrictOverride,
   ceOptionsNoStrict,
   ceOptionsStrict,
   ceCommonOptions,
