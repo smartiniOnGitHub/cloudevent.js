@@ -36,13 +36,15 @@ const ceCommonOptionsWithSomeOptionalsNull = {
   subject: null,
   strict: false
 }
+const ceOptionsNoStrict = { strict: false } // same as default in ce
+const ceOptionsStrict = { strict: true }
 const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 /** create some common options with strict flag enabled, for better reuse in tests */
-const ceCommonOptionsStrict = { ...ceCommonOptions, strict: true }
-const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
-const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, strict: true }
-const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, strict: true }
+const ceCommonOptionsStrict = { ...ceCommonOptions, ...ceOptionsStrict }
+const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, ...ceOptionsStrict }
+const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, ...ceOptionsStrict }
+const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, ...ceOptionsStrict }
 /** create some common extensions, for better reuse in tests */
 const ceCommonExtensions = { exampleextension: 'value' }
 const ceCommonExtensionsWithNullValue = { exampleextension: null }
@@ -61,9 +63,14 @@ ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 /** create some common data from an array, for better reuse in tests */
 const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item as null
+const valOptionsNoOverride = { strict: null } // same as default in validator
+const valOptionsNoStrict = { strict: false }
+const valOptionsStrict = { strict: true }
 
 module.exports = {
   commonEventTime,
+  ceOptionsNoStrict,
+  ceOptionsStrict,
   ceCommonOptions,
   ceCommonOptionsStrict,
   ceCommonOptionsWithSomeOptionalsNull,
@@ -79,5 +86,8 @@ module.exports = {
   ceServerUrl,
   ceCommonData,
   ceMapData,
-  ceArrayData
+  ceArrayData,
+  valOptionsNoOverride,
+  valOptionsNoStrict,
+  valOptionsStrict
 }

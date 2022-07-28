@@ -109,14 +109,19 @@ function dumpCE (name = '', ce) {
   }
 }
 
-// generic function to validate the given CloudEvent object
+// generic function to validate the given CloudEvent object using validation defaults
 function validateCE (name = '', ce) {
   return CloudEvent.isValidEvent(ce)
 }
 
+// generic function to validate the given CloudEvent object but with no strict mode enabled
+function validateCEInNoStrictMode (name = '', ce) {
+  return CloudEvent.isValidEvent(ce, valOptionsNoStrict)
+}
+
 // generic function to validate the given CloudEvent object but with strict mode enabled
 function validateCEInStrictMode (name = '', ce) {
-  return CloudEvent.isValidEvent(ce, { strict: true })
+  return CloudEvent.isValidEvent(ce, valOptionsStrict)
 }
 
 // start timer for the execution
@@ -127,19 +132,20 @@ console.log(`Repeat each test: ${numRun} times`)
 console.log(`Script file: ${__filename}`)
 
 // call benchmark functions, repeated n times each one
-benchmarkRunner('1 - ce empty (not good for validation)', numRun, ceFactory.createEmpty, dumpCE, validateCE)
-benchmarkRunner('2 - ce empty (not good for validation, forced strict validation here)', numRun, ceFactory.createEmpty, dumpCE, validateCEInStrictMode)
-benchmarkRunner('3 - ce minimal (not good for validation)', numRun, ceFactory.createMinimalMandatoryUndefinedNoStrict, dumpCE, validateCE)
-benchmarkRunner('4 - ce minimal (good but not for strict validation)', numRun, ceFactory.createMinimalBadSource, dumpCE, validateCE)
-benchmarkRunner('5 - ce minimal (good but not for strict validation, used/forced here)', numRun, ceFactory.createMinimalBadSource, dumpCE, validateCEInStrictMode)
-benchmarkRunner('6 - ce minimal (good)', numRun, ceFactory.createMinimal, dumpCE, validateCE)
-benchmarkRunner('7 - ce minimal and strict (good)', numRun, ceFactory.createMinimalStrict, dumpCE, validateCE)
-benchmarkRunner('8 - ce complete (good)', numRun, ceFactory.createFull, dumpCE, validateCE)
-benchmarkRunner('9 - ce complete and strict (good)', numRun, ceFactory.createFullStrict, dumpCE, validateCE)
-benchmarkRunner('10 - ce complete with standard property in extensions (not good and not created)', numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
-benchmarkRunner('11 - ce complete with text data (good)', numRun, ceFactory.createFullTextData, dumpCE, validateCE)
-benchmarkRunner('12 - ce complete with binary data ecoded in base64 (good)', numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)
-benchmarkRunner('13 - ce complete with JSON data (good)', numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCE)
+let benchNum = 1
+benchmarkRunner(`${benchNum++} - ce empty (not good for validation)`, numRun, ceFactory.createEmpty, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce empty (not good for validation, forced strict validation here)`, numRun, ceFactory.createEmpty, dumpCE, validateCEInStrictMode)
+benchmarkRunner(`${benchNum++} - ce minimal (not good for validation)`, numRun, ceFactory.createMinimalMandatoryUndefinedNoStrict, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce minimal (good but not for strict validation)`, numRun, ceFactory.createMinimalBadSource, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce minimal (good but not for strict validation, used/forced here)`, numRun, ceFactory.createMinimalBadSource, dumpCE, validateCEInStrictMode)
+benchmarkRunner(`${benchNum++} - ce minimal (good)`, numRun, ceFactory.createMinimal, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce minimal and strict (good)`, numRun, ceFactory.createMinimalStrict, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete (good)`, numRun, ceFactory.createFull, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete and strict (good)`, numRun, ceFactory.createFullStrict, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete with standard property in extensions (not good and not created)`, numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete with text data (good)`, numRun, ceFactory.createFullTextData, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete with binary data ecoded in base64 (good)`, numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete with JSON data (good)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCE)
 // TODO: check for a last test, on a ce instance with a long string as data ... wip
 
 console.log('\nSample script: end execution.')

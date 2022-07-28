@@ -31,7 +31,7 @@ const ceCommonOptions = {
   subject: 'subject',
   strict: false // same as default
 }
-const ceOptionsNoStrict = { strict: false } // same as default
+const ceOptionsNoStrict = { strict: false } // same as default in ce
 const ceOptionsStrict = { strict: true }
 const ceCommonOptionsStrict = { ...ceCommonOptions, ...ceOptionsStrict }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
@@ -54,9 +54,9 @@ const ceCommonOptionsWithSomeOptionalsNull = {
   strict: false
 }
 const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
-const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, strict: true }
-const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, strict: true }
-const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, strict: true }
+const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, ...ceOptionsStrict }
+const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, ...ceOptionsStrict }
+const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, ...ceOptionsStrict }
 
 const ceCommonExtensionsWithNullValue = { exampleextension: null }
 
@@ -68,8 +68,13 @@ ceMapData.set('key-2', 'value 2')
 
 const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item as null
 
+const valOptionsNoOverride = { strict: null } // same as default in validator
+const valOptionsNoStrict = { strict: false }
+const valOptionsStrict = { strict: true }
+
 module.exports = {
   commonEventTime,
+  ceOptionsNoStrictOverride,
   ceOptionsNoStrict,
   ceOptionsStrict,
   ceCommonOptions,
@@ -91,5 +96,8 @@ module.exports = {
   ceDataAsString,
   ceDataAsStringEncoded,
   ceMapData,
-  ceArrayData
+  ceArrayData,
+  valOptionsNoOverride,
+  valOptionsNoStrict,
+  valOptionsStrict
 }

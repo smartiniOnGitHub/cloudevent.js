@@ -364,13 +364,13 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @param {object} [options={}] containing:
-   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
   static validateEvent (event, {
-    strict = false,
+    strict = null,
     dataschemavalidator = null,
     timezoneOffset = 0
   } = {}) {
@@ -403,7 +403,7 @@ class CloudEvent {
     }
 
     // additional validation if strict mode enabled, or if enabled in the event ...
-    if (strict === true || CloudEvent.isStrictEvent(event) === true) {
+    if (strict === true || (strict === null && CloudEvent.isStrictEvent(event) === true)) {
       ve.push(V.ensureIsVersion(event.specversion, 'specversion'))
       if (V.isDefinedAndNotNull(event.data)) {
         if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
@@ -463,13 +463,13 @@ class CloudEvent {
    * @static
    * @param {!object} event the CloudEvent to validate
    * @param {object} [options={}] containing:
-   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, {
-    strict = false,
+    strict = null,
     dataschemavalidator = null,
     timezoneOffset = 0
   } = {}) {
@@ -796,11 +796,11 @@ class CloudEvent {
    * See {@link CloudEvent.validateEvent}.
    *
    * @param {object} [options={}] containing:
-   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    * @return {object[]} an array of (non null) validation errors, or at least an empty array
    */
-  validate ({ strict = false, dataschemavalidator = null } = {}) {
+  validate ({ strict = null, dataschemavalidator = null } = {}) {
     return this.constructor.validateEvent(this, { strict, dataschemavalidator })
   }
 
@@ -810,12 +810,12 @@ class CloudEvent {
    * See {@link CloudEvent.isValidEvent}.
    *
    * @param {object} [options={}] containing:
-   *        - strict (boolean, default false) to validate it in a more strict way,
+   *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
-  isValid ({ strict = false, dataschemavalidator = null, timezoneOffset = 0 } = {}) {
+  isValid ({ strict = null, dataschemavalidator = null, timezoneOffset = 0 } = {}) {
     return this.constructor.isValidEvent(this, { strict, dataschemavalidator, timezoneOffset })
   }
 
