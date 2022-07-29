@@ -46,7 +46,8 @@ const {
   ceOptionsNoStrict,
   ceOptionsStrict,
   ceReservedExtensions,
-  ceServerUrl
+  ceServerUrl,
+  getRandomString
 } = require('./common-example-data')
 
 // define factory functions
@@ -146,16 +147,31 @@ function createFullStrictJSONTextData () {
   )
 }
 
+// create a sample string big (more than 64 KB)
+const bigStringLength = 100_000
+const bigString = getRandomString(bigStringLength) // a random string with n chars
+
+function createFullBigStringData () {
+  return new CloudEvent('11/full-no-strict-text-big-string-data',
+    ceNamespace,
+    ceServerUrl,
+    { random: bigString }, // data
+    ceCommonOptions,
+    ceCommonExtensions
+  )
+}
+
 module.exports = {
   createEmpty,
-  createMinimalMandatoryUndefinedNoStrict,
-  createMinimalBadSource,
-  createMinimal,
-  createMinimalStrict,
   createFull,
+  createFullBigStringData,
+  createFullBinaryData,
   createFullStrict,
   createFullStrictBadExtension,
+  createFullStrictJSONTextData,
   createFullTextData,
-  createFullBinaryData,
-  createFullStrictJSONTextData
+  createMinimal,
+  createMinimalBadSource,
+  createMinimalMandatoryUndefinedNoStrict,
+  createMinimalStrict
 }

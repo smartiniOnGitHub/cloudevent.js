@@ -28,6 +28,7 @@ const {
   // ceOptionsNoStrict,
   // ceOptionsStrict,
   ceServerUrl,
+  getRandomString,
   valOnlyValidInstance,
   // valOptionsNoOverride,
   valOptionsNoStrict,
@@ -35,17 +36,8 @@ const {
 } = require('./common-test-data')
 
 /** create a sample string big (more than 64 KB) */
-const ceBigStringLength = 100000
-const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
-
-// sample function to calculate a random string, given the length, to use in tests here
-function getRandomString (length) {
-  let str = Math.random().toString(36).substring(2)
-  while (str.length < length) {
-    str += Math.random().toString(36).substring(2)
-  }
-  return str.substring(0, length)
-}
+const bigStringLength = 100000
+const bigString = getRandomString(bigStringLength) // a random string with n chars
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
@@ -246,7 +238,7 @@ test('ensure serialization functions works in the right way', (t) => {
     ceNamespace,
     ceServerUrl,
     // ceCommonData, // data
-    { random: ceBigString }, // data
+    { random: bigString }, // data
     ceCommonOptions,
     ceCommonExtensions
   )
