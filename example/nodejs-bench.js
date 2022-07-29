@@ -48,11 +48,17 @@ const numIntDigits = 3 // to align benchmark results: 2 or 3 is good for 1_000 i
 // arguments: benchmark name, number of repetitions,
 // the function to run (that should return a value),
 // a function to dump returned object (from the last benchmark run),
-// a function to validate the returned object
-function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResult = null, validateResult = null) {
+// a function to validate the returned object,
+// a function to serialize the returned object,
+// a function to deserialize the returned object
+// in future consider to use an array (or a map) of functions to generalize its signature (at least for optional functions)
+function benchmarkRunner (name = '', repeat = 1, functionToRun = null, 
+  dumpResult = null, validateResult = null,
+  serializeResult = null, deserializeResult = null
+) {
   console.log(`Benchmark: '${name}', repeat ${repeat} times; start execution ...`)
   const startBenchmark = performance.now()
-  // later check if wrap in a try/catch block ...
+
   let result
 
   const startMainFunction = performance.now()
@@ -60,8 +66,8 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
     result = functionToRun()
   }
   const endMainFunction = performance.now()
+  // now process only last returned object
 
-  // validate last returned object
   const startValidation = performance.now()
   if (validateResult !== null) {
     let isValid
@@ -72,6 +78,28 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
     console.log(`Validation results (show only after last run): is valid: ${isValid} (${validationResults.length} errors), validation details:\n\t${validationResults}`)
   }
   const endValidation = performance.now()
+
+  // serialize last returned object
+  const startSerialization = performance.now()
+  let ser // must be visible even to next phase
+  if (serializeResult !== null) {
+    for (let i = 0; i < repeat; i++) {
+      ser = serializeResult(name, result)
+    }
+    console.log(`Serialization results (show only after last run): dump: <omitted>`)
+  }
+  const endSerialization = performance.now()
+
+  // deserialize last returned object
+  const startDeserialization = performance.now()
+  if (deserializeResult !== null) {
+    let deser
+    for (let i = 0; i < repeat; i++) {
+      deser = deserializeResult(name, ser)
+    }
+    console.log(`Deserialization results (show only after last run): dump: <omitted>`)
+  }
+  const endDeserialization = performance.now()
 
   const endBenchmark = performance.now()
 
@@ -84,10 +112,16 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null, dumpResul
   // print results
   console.log('Benchmark partial results:')
   if (functionToRun !== null) {
-    console.log(`\tMain function execution took:       ${formatNumber(endMainFunction - startMainFunction, numIntDigits)} msec`)
+    console.log(`\tMain function execution took:            ${formatNumber(endMainFunction - startMainFunction, numIntDigits)} msec`)
   }
   if (validateResult !== null) {
-    console.log(`\tValidation function execution took: ${formatNumber(endValidation - startValidation, numIntDigits)} msec`)
+    console.log(`\tValidation function execution took:      ${formatNumber(endValidation - startValidation, numIntDigits)} msec`)
+  }
+  if (serializeResult !== null) {
+    console.log(`\tSerialization function execution took:   ${formatNumber(endSerialization - startSerialization, numIntDigits)} msec`)
+  }
+  if (deserializeResult !== null) {
+    console.log(`\tDeserialization function execution took: ${formatNumber(endDeserialization - startDeserialization, numIntDigits)} msec`)
   }
   console.log(`Benchmark: '${name}'; end. Execution took: ${formatNumber(endBenchmark - startBenchmark)} msec\n`)
 }
@@ -141,6 +175,17 @@ function validateCEInStrictMode (name = '', ce) {
   return CloudEvent.isValidEvent(ce, valOptionsStrict)
 }
 
+// generic function to serialize the given CloudEvent object
+function serializeCE (name = '', ce) {
+  return CloudEvent.serializeEvent(ce)
+}
+
+// generic function to deserialize the given CloudEvent object
+function deserializeCE (name = '', ce) {
+  return CloudEvent.deserializeEvent(ce)
+}
+
+// ----
 // start timer for the execution
 const startTime = performance.now()
 
@@ -157,18 +202,17 @@ benchmarkRunner(`${benchNum++} - ce minimal (good but not for strict validation)
 benchmarkRunner(`${benchNum++} - ce minimal (good but not for strict validation, used/forced here)`, numRun, ceFactory.createMinimalBadSource, dumpCE, validateCEInStrictMode)
 benchmarkRunner(`${benchNum++} - ce minimal (good)`, numRun, ceFactory.createMinimal, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce minimal and strict (good)`, numRun, ceFactory.createMinimalStrict, dumpCE, validateCE)
-benchmarkRunner(`${benchNum++} - ce complete (good, validated using default mode, so no strict here)`, numRun, ceFactory.createFull, dumpCE, validateCE)
-benchmarkRunner(`${benchNum++} - ce complete (good, validated in strict mode)`, numRun, ceFactory.createFull, dumpCE, validateCEInStrictMode)
-benchmarkRunner(`${benchNum++} - ce complete and strict (good)`, numRun, ceFactory.createFullStrict, dumpCE, validateCE)
-benchmarkRunner(`${benchNum++} - ce complete and strict (good, validated in no strict mode)`, numRun, ceFactory.createFullStrict, dumpCE, validateCEInNoStrictMode)
+benchmarkRunner(`${benchNum++} - ce complete (good, validated using default mode so no strict here, serialized, deserialized)`, numRun, ceFactory.createFull, dumpCE, validateCE, serializeCE, deserializeCE)
+benchmarkRunner(`${benchNum++} - ce complete (good, but validated in strict mode, serialized, deserialized)`, numRun, ceFactory.createFull, dumpCE, validateCEInStrictMode, serializeCE, deserializeCE)
+benchmarkRunner(`${benchNum++} - ce complete and strict (good, validated using default mode so strict here, serialized, deserialized)`, numRun, ceFactory.createFullStrict, dumpCE, validateCE, serializeCE, deserializeCE)
+benchmarkRunner(`${benchNum++} - ce complete and strict (good, but validated in no strict mode, serialized, deserialized)`, numRun, ceFactory.createFullStrict, dumpCE, validateCEInNoStrictMode, serializeCE, deserializeCE)
 benchmarkRunner(`${benchNum++} - ce complete with standard property in extensions (not good and not created)`, numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with text data (good)`, numRun, ceFactory.createFullTextData, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with binary data ecoded in base64 (good)`, numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)
-benchmarkRunner(`${benchNum++} - ce complete and strict with JSON data (good, but validated in no strict mode)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCEInNoStrictMode)
-benchmarkRunner(`${benchNum++} - ce complete and strict with JSON data (good)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCE)
-benchmarkRunner(`${benchNum++} - ce complete with a big text as data (good)`, numRun, ceFactory.createFullBigStringData, dumpSummaryOfCE, validateCE) // to not clutter the log, do a summary dump here
-benchmarkRunner(`${benchNum++} - ce complete with a big text as data (good, validated in strict mode)`, numRun, ceFactory.createFullBigStringData, dumpSummaryOfCE, validateCEInStrictMode) // to not clutter the log, do a summary dump here
-// TODO: check for a last test, on a ce instance with a long string as data ... wip
+benchmarkRunner(`${benchNum++} - ce complete and strict with JSON data (good, but validated in no strict mode, serialized, deserialized)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCEInNoStrictMode, serializeCE, deserializeCE)
+benchmarkRunner(`${benchNum++} - ce complete and strict with JSON data (good, validated using default mode so strict here, serialized, deserialized)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCE, serializeCE, deserializeCE)
+benchmarkRunner(`${benchNum++} - ce complete with a big text as data (good, validated using default mode so no strict here, serialized, deserialized)`, numRun, ceFactory.createFullBigStringData, dumpSummaryOfCE, validateCE, serializeCE, deserializeCE) // to not clutter the log, do a summary dump here
+benchmarkRunner(`${benchNum++} - ce complete with a big text as data (good, validated in strict mode, serialized, deserialized)`, numRun, ceFactory.createFullBigStringData, dumpSummaryOfCE, validateCEInStrictMode, serializeCE, deserializeCE) // to not clutter the log, do a summary dump here
 
 console.log('\nSample script: end execution.')
 
