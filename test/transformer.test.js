@@ -18,6 +18,13 @@
 const assert = require('node:assert').strict
 const test = require('tap').test
 
+// import some common test data
+const {
+  // valOptionsNoOverride,
+  // valOptionsNoStrict,
+  valOptionsStrict
+} = require('./common-test-data')
+
 /** @test {Transformer} */
 test('ensure the Transformer class (direct reference to it) works good', (t) => {
   // t.plan(4)
@@ -577,25 +584,25 @@ test('ensure uri/url are stripped by query arguments in the right way', (t) => {
 
   // the same but woth strict mode enabled
   t.throws(function () {
-    const url = T.uriStripArguments('', { strict: true })
+    const url = T.uriStripArguments('', valOptionsStrict)
     assert(url === null) // never executed
   }, Error, 'Expected exception when transforming a bad URI/URL to a stripped one (string)')
   t.throws(function () {
-    const url = T.uriStripArguments('sample string', { strict: true })
+    const url = T.uriStripArguments('sample string', valOptionsStrict)
     assert(url === null) // never executed
   }, Error, 'Expected exception when transforming a bad URI/URL to a stripped one (string)')
   {
-    const url = T.uriStripArguments('http://localhost:3000/path/nested', { strict: true })
+    const url = T.uriStripArguments('http://localhost:3000/path/nested', valOptionsStrict)
     t.ok(V.isString(url))
     t.strictSame(url, 'http://localhost:3000/path/nested')
   }
   {
-    const url = T.uriStripArguments('http://localhost:3000/path/nested?param1=value1&param2=&param3=Test', { strict: true })
+    const url = T.uriStripArguments('http://localhost:3000/path/nested?param1=value1&param2=&param3=Test', valOptionsStrict)
     t.ok(V.isString(url))
     t.strictSame(url, 'http://localhost:3000/path/nested')
   }
   {
-    const url = T.uriStripArguments('/path/nested?param1=value1&param2=&param3=Test', { strict: true })
+    const url = T.uriStripArguments('/path/nested?param1=value1&param2=&param3=Test', valOptionsStrict)
     t.ok(V.isString(url))
     t.strictSame(url, '/path/nested')
   }

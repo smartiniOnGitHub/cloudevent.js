@@ -124,7 +124,7 @@ test('ensure isValid and validate works good on undefined and null arguments, an
     t.notOk(JSONBatch.isValidBatch())
     t.strictSame(JSONBatch.validateBatch(), [new Error('JSONBatch undefined or null')])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
   {
     // null
@@ -133,39 +133,39 @@ test('ensure isValid and validate works good on undefined and null arguments, an
     t.notOk(JSONBatch.isValidBatch(arg))
     t.strictSame(JSONBatch.validateBatch(arg), [new Error('JSONBatch undefined or null')])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
   {
     // empty array
     const arg = []
     t.strictSame(JSONBatch.validateBatch(arg), [])
     t.strictSame(JSONBatch.validateBatch(arg).length, 0)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 0)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 0)
   }
   {
     // empty object (not a CloudEvent/subclass instance)
     const arg = {}
     t.strictSame(JSONBatch.validateBatch(arg), [new TypeError("The argument 'batch' must be an array or a CloudEvent instance (or a subclass), instead got a 'object'")])
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
   {
     // bad object type
     const arg = 'Sample string'
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
   {
     // bad object type
     const arg = 1234567890
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
   {
     // bad object type
     const arg = new Date()
     t.strictSame(JSONBatch.validateBatch(arg).length, 1)
-    t.strictSame(JSONBatch.validateBatch(arg, { strict: true }).length, 1)
+    t.strictSame(JSONBatch.validateBatch(arg, valOptionsStrict).length, 1)
   }
 
   t.end()
@@ -261,17 +261,17 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsNoStrict).length, 8) // expected validation errors
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsStrict).length, 14) // expected validation errors
-  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length}`)
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 4) // no filtering
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: true }).length, 4) // strict true with onlyValid false makes no filtering
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: false }).length, 4) // only valid
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, strict: true }).length, 2) // only valid in strict mode
+  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).length}`)
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).length, 4) // no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsStrict }).length, 4) // strict true with onlyValid false makes no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsNoStrict }).length, 4) // only valid
+  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsStrict }).length, 2) // only valid in strict mode
 
   // additional test, ensure that all instances returned (only valid), are CloudEvent instances
-  const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, strict: false })
+  const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsNoStrict })
   t.ok(eventsGot.every((i) => CloudEvent.isCloudEvent(i)))
   // test with other instances returned (filtered in a different way)
-  t.ok(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).every((i) => CloudEvent.isCloudEvent(i)))
+  t.ok(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).every((i) => CloudEvent.isCloudEvent(i)))
 
   t.end()
 })
@@ -307,7 +307,7 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.ok(V.isClass(V.ensureIsClass(ceFull, NotCESubclass, 'ceFull'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFull).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFull, { strict: true }).length, 2)
+  t.strictSame(JSONBatch.validateBatch(ceFull, valOptionsStrict).length, 2)
   t.notOk(JSONBatch.isJSONBatch(ceFull))
 
   const ceFullSubclass = new CESubclass('1/full/subclass',
@@ -330,13 +330,13 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   t.ok(V.isClass(V.ensureIsClass(ceFullSubclass, NotCESubclass, 'ceFullSubclass'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.strictSame(JSONBatch.validateBatch(ceFullSubclass).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, { strict: true }).length, 2)
+  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, valOptionsStrict).length, 2)
   t.notOk(JSONBatch.isJSONBatch(ceFullSubclass))
 
   // try even with a plain object
   const plainObject = { id: '1/plainObject', data: 'sample data' }
   t.strictSame(JSONBatch.validateBatch(plainObject).length, 1)
-  t.strictSame(JSONBatch.validateBatch(plainObject, { strict: true }).length, 1)
+  t.strictSame(JSONBatch.validateBatch(plainObject, valOptionsStrict).length, 1)
   t.notOk(JSONBatch.isJSONBatch(plainObject))
   t.throws(function () {
     const ce = [] // CloudEvent instances
