@@ -15,17 +15,22 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const test = require('tap').test
 
 // import some common test data
 const {
+  ceCommonData,
+  ceCommonExtensions,
   ceCommonOptions,
   ceCommonOptionsStrict,
-  ceCommonExtensions,
   ceNamespace,
+  // ceOptionsNoStrict,
+  // ceOptionsStrict,
   ceServerUrl,
-  ceCommonData
+  // valOptionsNoOverride,
+  valOptionsNoStrict,
+  valOptionsStrict
 } = require('./common-test-data')
 
 /** create a sample string big (more than 64 KB) */
@@ -289,7 +294,7 @@ test('ensure serialization functions works in the right way', (t) => {
 
   const events = JSONBatch.getEvents(arr, {
     onlyValid: true,
-    strict: false
+    ...valOptionsNoStrict
   })
   // console.log(`DEBUG: events JSONBatch length = ${events.length}, summary: ${events}`)
   // console.log(`DEBUG: events JSONBatch length = ${events.length}, details: ${JSON.stringify(events)}`)
@@ -337,7 +342,7 @@ test('ensure serialization functions works in the right way', (t) => {
   const deserStrict = JSONBatch.deserializeEvents(serEventsEvenBad, {
     onlyValid: true, // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true, // to force throw here ...
-    strict: true // to force strict validation ...
+    ...valOptionsStrict // to force strict validation ...
   })
   assert(deserStrict !== null)
   t.ok(deserStrict)
@@ -349,7 +354,7 @@ test('ensure serialization functions works in the right way', (t) => {
       throwError: true,
       onlyValid: true, // sample, to filter out not valid serialized instances ...
       // onlyIfLessThan64KB: true, // to force throw here ...
-      strict: true // to force strict validation ...
+      ...valOptionsStrict // to force strict validation ...
     }, dumpCallback)
     assert(deserStrictRaiseError === null) // never executed
   }, Error, 'No deserialization here due to selected flags (and errors in deserialization content) ...')

@@ -24,16 +24,16 @@ const assert = require('node:assert').strict
 // import some common example data
 const {
   // commonEventTime,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  ceCommonOptionsForTextData,
-  ceCommonExtensions,
-  ceNamespace,
-  ceServerUrl,
   ceCommonData,
+  ceCommonExtensions,
+  ceCommonOptions,
+  ceCommonOptionsForTextData,
+  ceCommonOptionsStrict,
   ceDataAsJSONString,
   ceDataAsString,
-  ceDataAsStringEncoded
+  ceDataAsStringEncoded,
+  ceNamespace,
+  ceServerUrl
 } = require('./common-example-data')
 
 console.log('Sample script: start execution ...\n')

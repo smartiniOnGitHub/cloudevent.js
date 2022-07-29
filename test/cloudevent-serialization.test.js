@@ -15,7 +15,7 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const test = require('tap').test
 
 /** @test {CloudEvent} */
@@ -53,45 +53,37 @@ test('ensure serialization functions exists (check only the static method here)'
 
 // import some common test data
 const {
-  commonEventTime,
-  ceOptionsNoStrictOverride,
-  ceOptionsNoStrict,
-  ceOptionsStrict,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  // ceCommonOptionsWithSomeOptionalsNull,
-  ceCommonOptionsWithSomeOptionalsNullStrict,
-  // ceCommonOptionsWithAllOptionalsNull,
-  ceCommonOptionsWithAllOptionalsNullStrict,
-  // ceCommonOptionsForTextData,
-  ceCommonOptionsForTextDataStrict,
+  ceArrayData,
+  ceCommonData,
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
+  ceCommonOptions,
+  // ceCommonOptionsForTextData,
+  ceCommonOptionsForTextDataStrict,
+  ceCommonOptionsStrict,
+  // ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
+  // ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
   ceNamespace,
+  ceOptionsNoStrict,
+  // ceOptionsStrict,
   ceServerUrl,
-  ceCommonData,
-  ceArrayData,
-  // valOptionsNoOverride,
+  commonEventTime,
+  getRandomString,
+  valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
 } = require('./common-test-data')
 
 /** sample data as an xml string */
-const ceDataAsXmlString = '<data "hello"="world" "year"="2020" />'
+const ceExampleDataXmlAsString = '<data "hello"="world" "year"="2020" />'
 /** sample data as a json string */
-const ceDataAsJSONString = JSON.stringify(ceCommonData)
-/** create a sample string big (more than 64 KB) */
-const ceBigStringLength = 100000
-const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
+const ceExampleDataAsJSONString = JSON.stringify(ceCommonData)
 
-// sample function to calculate a random string, given the length, to use in tests here
-function getRandomString (length) {
-  let str = Math.random().toString(36).substring(2)
-  while (str.length < length) {
-    str += Math.random().toString(36).substring(2)
-  }
-  return str.substring(0, length)
-}
+/** create a sample string big (more than 64 KB) */
+const ceBigStringLength = 100_000
+const ceBigString = getRandomString(ceBigStringLength) // a random string with n chars
 
 /** @test {CloudEvent} */
 test('serialize some CloudEvent instances to JSON, and ensure they are right', (t) => {
@@ -370,13 +362,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       t.ok(ceFullOtherContentTypeBad)
       t.ok(!ceFullOtherContentTypeBad.isValid())
       const ceFullBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
-        encodedData: ceDataAsXmlString,
+        encodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
-          encodedData: ceDataAsXmlString,
+          encodedData: ceExampleDataXmlAsString,
           onlyValid: true
         })
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
@@ -479,13 +471,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       ceFullOtherContentTypeStrictBad.id = null // remove some mandatory attribute now, to let serialization fail
       t.ok(!ceFullOtherContentTypeStrictBad.isValid())
       const ceFullStrictBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
-        encodedData: ceDataAsXmlString,
+        encodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       t.ok(ceFullStrictBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullStrictBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
-          encodedData: ceDataAsXmlString,
+          encodedData: ceExampleDataXmlAsString,
           onlyValid: true
         })
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
@@ -535,7 +527,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const ceFullOtherContentTypeSerialized2 = ceFullOtherContentType.serialize({
-      encodedData: ceDataAsXmlString
+      encodedData: ceExampleDataXmlAsString
     })
     t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
@@ -590,7 +582,7 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     t.ok(ceFullOtherContentTypeStrictSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const ceFullOtherContentTypeStrictSerialized2 = ceFullOtherContentTypeStrict.serialize({
-      encodedData: ceDataAsXmlString
+      encodedData: ceExampleDataXmlAsString
     })
     t.ok(ceFullOtherContentTypeStrictSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
@@ -712,7 +704,7 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
     const ceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSON.serialize({
-      encodedData: ceDataAsJSONString
+      encodedData: ceExampleDataAsJSONString
     })
     t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
@@ -818,7 +810,7 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     t.ok(ceFullOtherContentTypeSerialized1)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
     const ceFullOtherContentTypeSerialized2 = ceFullOtherContentTypeJSONStrict.serialize({
-      encodedData: ceDataAsJSONString
+      encodedData: ceExampleDataAsJSONString
     })
     t.ok(ceFullOtherContentTypeSerialized2)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
@@ -1215,28 +1207,28 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
@@ -1271,28 +1263,28 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: false
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
-        decodedData: ceDataAsXmlString,
+        decodedData: ceExampleDataXmlAsString,
         onlyValid: true
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
@@ -1743,9 +1735,9 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     assert(ceFullOtherContentTypeBadStrict !== null)
     t.ok(ceFullOtherContentTypeBadStrict)
     t.notOk(ceFullOtherContentTypeBadStrict.isValid()) // no validation strict mode override
-    t.notOk(ceFullOtherContentTypeBadStrict.isValid(ceOptionsNoStrictOverride)) // same of previous
-    t.ok(ceFullOtherContentTypeBadStrict.isValid(ceOptionsNoStrict)) // override validation to use no strict mode
-    t.notOk(ceFullOtherContentTypeBadStrict.isValid(ceOptionsStrict)) // override validation to use strict mode
+    t.notOk(ceFullOtherContentTypeBadStrict.isValid(valOptionsNoOverride)) // same of previous
+    t.ok(ceFullOtherContentTypeBadStrict.isValid(valOptionsNoStrict)) // override validation to use no strict mode
+    t.notOk(ceFullOtherContentTypeBadStrict.isValid(valOptionsStrict)) // override validation to use strict mode
 
     const ceFullOtherContentTypeStrict = new CloudEvent('1/non-default-contenttype/sample-data/strict',
       ceNamespace,

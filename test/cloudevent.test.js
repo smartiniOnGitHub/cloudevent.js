@@ -15,30 +15,30 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const test = require('tap').test
 
 // import some common test data
 const {
-  // commonEventTime,
-  ceOptionsNoStrict,
-  ceOptionsStrict,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  ceCommonOptionsWithSomeOptionalsNull,
-  ceCommonOptionsWithSomeOptionalsNullStrict,
-  ceCommonOptionsWithAllOptionalsNull,
-  ceCommonOptionsWithAllOptionalsNullStrict,
-  ceCommonOptionsForTextData,
-  ceCommonOptionsForTextDataStrict,
+  ceArrayData,
+  ceCommonData,
   ceCommonExtensions,
   ceCommonExtensionsWithNullValue,
+  ceCommonOptions,
+  ceCommonOptionsForTextData,
+  ceCommonOptionsForTextDataStrict,
+  ceCommonOptionsStrict,
+  ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
+  ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
   ceExtensionStrict,
-  ceNamespace,
-  ceServerUrl,
-  ceCommonData,
   ceMapData,
-  ceArrayData,
+  ceNamespace,
+  ceOptionsNoStrict,
+  ceOptionsStrict,
+  ceServerUrl,
+  // commonEventTime,
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict

@@ -20,6 +20,15 @@
  * Utility module to export some test data.
  */
 
+// strict-related options for ce creation
+const ceOptionsNoStrict = { strict: false } // same as default in ce
+const ceOptionsStrict = { strict: true }
+
+// strict-related options for ce validation
+const valOptionsNoOverride = { strict: null } // same as default in validator
+const valOptionsNoStrict = { strict: false }
+const valOptionsStrict = { strict: true }
+
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
@@ -36,8 +45,6 @@ const ceCommonOptionsWithSomeOptionalsNull = {
   subject: null,
   strict: false
 }
-const ceOptionsNoStrict = { strict: false } // same as default in ce
-const ceOptionsStrict = { strict: true }
 const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 /** create some common options with strict flag enabled, for better reuse in tests */
@@ -63,9 +70,15 @@ ceMapData.set('key-1', 'value 1')
 ceMapData.set('key-2', 'value 2')
 /** create some common data from an array, for better reuse in tests */
 const ceArrayData = [null, 'value 1', 'value 2', 'value 3'] // set even one item as null
-const valOptionsNoOverride = { strict: null } // same as default in validator
-const valOptionsNoStrict = { strict: false }
-const valOptionsStrict = { strict: true }
+
+// sample function to calculate a random string (given the length), to use in tests here
+function getRandomString (length) {
+  let str = Math.random().toString(36).substring(2)
+  while (str.length < length) {
+    str += Math.random().toString(36).substring(2)
+  }
+  return str.substring(0, length)
+}
 
 module.exports = {
   commonEventTime,
@@ -89,5 +102,6 @@ module.exports = {
   ceArrayData,
   valOptionsNoOverride,
   valOptionsNoStrict,
-  valOptionsStrict
+  valOptionsStrict,
+  getRandomString
 }

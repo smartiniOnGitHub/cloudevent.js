@@ -34,19 +34,19 @@ assert(CloudEvent !== null && V !== null && T !== null && JSONBatch !== null)
 // import some common example data
 const {
   // commonEventTime,
-  ceOptionsNoStrict,
-  ceOptionsStrict,
-  ceCommonOptions,
-  ceCommonOptionsStrict,
-  ceCommonOptionsForTextData,
-  ceCommonExtensions,
-  ceReservedExtensions,
-  ceNamespace,
-  ceServerUrl,
   ceCommonData,
+  ceCommonExtensions,
+  ceCommonOptions,
+  ceCommonOptionsForTextData,
+  ceCommonOptionsStrict,
   ceDataAsJSONString,
   ceDataAsString,
-  ceDataAsStringEncoded
+  ceDataAsStringEncoded,
+  ceNamespace,
+  ceOptionsNoStrict,
+  ceOptionsStrict,
+  ceReservedExtensions,
+  ceServerUrl
 } = require('./common-example-data')
 
 // define factory functions

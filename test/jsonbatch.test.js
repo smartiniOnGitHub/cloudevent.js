@@ -15,17 +15,22 @@
  */
 'use strict'
 
-const assert = require('assert').strict
+const assert = require('node:assert').strict
 const test = require('tap').test
 
 // import some common test data
 const {
+  ceCommonData,
+  ceCommonExtensions,
   ceCommonOptions,
   ceCommonOptionsStrict,
-  ceCommonExtensions,
   ceNamespace,
+  // ceOptionsNoStrict,
+  ceOptionsStrict,
   ceServerUrl,
-  ceCommonData
+  // valOptionsNoOverride,
+  valOptionsNoStrict,
+  valOptionsStrict
 } = require('./common-test-data')
 
 /** @test {CloudEvent} */
@@ -85,7 +90,7 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
       ceNamespace, // type
       '/', // source
       null, // data // optional, but useful the same in this sample usage
-      { strict: true }
+      ceOptionsStrict
     )
     t.ok(ceMinimalStrict)
     t.ok(CloudEvent.isStrictEvent(ceMinimalStrict))
@@ -177,12 +182,12 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(empty)
   t.ok(JSONBatch.isJSONBatch(empty))
   t.ok(JSONBatch.isValidBatch(empty))
-  t.strictSame(JSONBatch.validateBatch(empty, { strict: false }).length, 0)
-  t.strictSame(JSONBatch.validateBatch(empty, { strict: true }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, strict: false }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, strict: false }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, strict: true }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, strict: true }).length, 0)
+  t.strictSame(JSONBatch.validateBatch(empty, valOptionsNoStrict).length, 0)
+  t.strictSame(JSONBatch.validateBatch(empty, valOptionsStrict).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, ...valOptionsNoStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, ...valOptionsNoStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, ...valOptionsStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, ...valOptionsStrict }).length, 0)
 
   const ceFull = new CloudEvent('1/full',
     ceNamespace,
@@ -195,8 +200,8 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   )
   t.ok(ceFull)
   t.ok(CloudEvent.isValidEvent(ceFull))
-  t.ok(CloudEvent.isValidEvent(ceFull, { strict: false }))
-  t.notOk(CloudEvent.isValidEvent(ceFull, { strict: true })) // expected errors here
+  t.ok(CloudEvent.isValidEvent(ceFull, valOptionsNoStrict))
+  t.notOk(CloudEvent.isValidEvent(ceFull, valOptionsStrict)) // expected errors here
   t.strictSame(CloudEvent.validateEvent(ceFull), [])
   t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
   t.notOk(JSONBatch.isJSONBatch(ceFull))
@@ -210,10 +215,10 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   )
   t.ok(ceFullStrict)
   t.ok(CloudEvent.isValidEvent(ceFull))
-  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: false }))
-  t.ok(CloudEvent.isValidEvent(ceFullStrict, { strict: true }))
-  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: false }).length, 0)
-  t.strictSame(CloudEvent.validateEvent(ceFullStrict, { strict: true }).length, 0)
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsNoStrict))
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsStrict))
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, valOptionsNoStrict).length, 0)
+  t.strictSame(CloudEvent.validateEvent(ceFullStrict, valOptionsStrict).length, 0)
   t.notOk(JSONBatch.isJSONBatch(ceFullStrict))
 
   // create a sample minimal instance good for normal validation but not for strict validation ...
@@ -254,8 +259,8 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
   t.ok(JSONBatch.isJSONBatch(arr))
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: false }).length, 8) // expected validation errors
-  t.strictSame(JSONBatch.validateBatch(arr, { strict: true }).length, 14) // expected validation errors
+  t.strictSame(JSONBatch.validateBatch(arr, valOptionsNoStrict).length, 8) // expected validation errors
+  t.strictSame(JSONBatch.validateBatch(arr, valOptionsStrict).length, 14) // expected validation errors
   // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length}`)
   t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: false }).length, 4) // no filtering
   t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, strict: true }).length, 4) // strict true with onlyValid false makes no filtering
