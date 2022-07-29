@@ -71,6 +71,8 @@ const {
   ceServerUrl,
   commonEventTime,
   getRandomString,
+  valOnlyValidAllInstance,
+  valOnlyValidInstance,
   valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
@@ -155,9 +157,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(!CloudEvent.isCloudEvent(ceFullDeserialized))
     t.ok(!ceFullDeserialized.isStrict) // ok here, but doesn't mattter because is not a real CloudEvent instance
 
-    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
+    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, valOnlyValidAllInstance)
     t.ok(ceFullSerializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, { onlyValid: true })
+    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, valOnlyValidInstance)
     t.ok(ceFullSerializedOnlyValidTrue)
 
     {
@@ -171,10 +173,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       assert(ceFullBad !== null)
       t.ok(ceFullBad)
       t.ok(!ceFullBad.isValid())
-      const ceFullBadSerializedOnlyValidFalse = ceSerialize(ceFullBad, { onlyValid: false })
+      const ceFullBadSerializedOnlyValidFalse = ceSerialize(ceFullBad, valOnlyValidAllInstance)
       t.ok(ceFullBadSerializedOnlyValidFalse)
       t.throws(function () {
-        const ceFullBadSerializedOnlyValidTrue = ceSerialize(ceFullBad, { onlyValid: true })
+        const ceFullBadSerializedOnlyValidTrue = ceSerialize(ceFullBad, valOnlyValidInstance)
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
@@ -249,9 +251,9 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.ok(!CloudEvent.isCloudEvent(ceFullStrictDeserialized))
     t.ok(!ceFullStrictDeserialized.isStrict) // wrong here, but doesn't mattter because is not a real CloudEvent instance
 
-    const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
+    const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, valOnlyValidAllInstance)
     t.ok(ceFullStrictSerializedOnlyValidFalse)
-    const ceFullStrictSerializedOnlyValidTrue = ceSerialize(ceFullStrict, { onlyValid: true })
+    const ceFullStrictSerializedOnlyValidTrue = ceSerialize(ceFullStrict, valOnlyValidInstance)
     t.ok(ceFullStrictSerializedOnlyValidTrue)
 
     {
@@ -266,10 +268,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
       t.ok(ceFullStrictBad)
       ceFullStrictBad.id = null // remove some mandatory attribute now, to let serialization fail
       t.ok(!ceFullStrictBad.isValid())
-      const ceFullStrictBadSerializedOnlyValidFalse = ceSerialize(ceFullStrictBad, { onlyValid: false })
+      const ceFullStrictBadSerializedOnlyValidFalse = ceSerialize(ceFullStrictBad, valOnlyValidAllInstance)
       t.ok(ceFullStrictBadSerializedOnlyValidFalse)
       t.throws(function () {
-        const ceFullStrictBadSerializedOnlyValidTrue = ceSerialize(ceFullStrictBad, { onlyValid: true })
+        const ceFullStrictBadSerializedOnlyValidTrue = ceSerialize(ceFullStrictBad, valOnlyValidInstance)
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
     }
@@ -363,13 +365,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       t.ok(!ceFullOtherContentTypeBad.isValid())
       const ceFullBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
         encodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       t.ok(ceFullBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeBad, {
           encodedData: ceExampleDataXmlAsString,
-          onlyValid: true
+          ...valOnlyValidInstance
         })
         assert(ceFullBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
@@ -406,14 +408,14 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
     t.throws(function () {
-      const ceFullOtherContentTypeStrictSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, { onlyValid: true })
+      const ceFullOtherContentTypeStrictSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, valOnlyValidInstance)
       assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeStrictSerialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
         encoder: null,
         encodedData: null,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       assert(ceFullOtherContentTypeStrictSerialized === null) // never executed
     }, Error, 'Expected exception when serializing the current CloudEvent instance')
@@ -472,13 +474,13 @@ test('serialize a CloudEvent instance with a non default contenttype and empty s
       t.ok(!ceFullOtherContentTypeStrictBad.isValid())
       const ceFullStrictBadSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
         encodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       t.ok(ceFullStrictBadSerializedOnlyValidFalse)
       t.throws(function () {
         const ceFullStrictBadSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrictBad, {
           encodedData: ceExampleDataXmlAsString,
-          onlyValid: true
+          ...valOnlyValidInstance
         })
         assert(ceFullStrictBadSerializedOnlyValidTrue === null) // never executed
       }, Error, 'Expected exception when serializing a bad CloudEvent instance')
@@ -544,14 +546,14 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
@@ -599,14 +601,14 @@ test('serialize a CloudEvent instance with a non default contenttype and right s
     const ceFullOtherContentTypeStrictSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeStrictSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const ceFullOtherContentTypeStrictSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderToXmlSample,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     // note that onlyValid here is a check on transformed data ...
     t.ok(ceFullOtherContentTypeStrictSerialized5)
@@ -721,14 +723,14 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
     const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSON, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSON))
@@ -827,14 +829,14 @@ test('serialize a CloudEvent instance with a non default contenttype (but in the
     const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
     const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeJSONStrict, {
       encoder: encoderToJSON,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeJSONStrict))
@@ -935,9 +937,9 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
     t.strictSame(ceFullSerializedFunction, ceFullSerialized)
 
-    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
+    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, valOnlyValidAllInstance)
     t.ok(ceFullSerializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, { onlyValid: true })
+    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, valOnlyValidInstance)
     t.ok(ceFullSerializedOnlyValidTrue)
 
     const ceFullSerializedComparison = ceNestedFullSerializedJson
@@ -996,9 +998,9 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerializedStatic)
     t.strictSame(ceFullStrictSerializedFunction, ceFullStrictSerialized)
 
-    const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
+    const ceFullStrictSerializedOnlyValidFalse = ceSerialize(ceFullStrict, valOnlyValidAllInstance)
     t.ok(ceFullStrictSerializedOnlyValidFalse)
-    const ceFullStrictSerializedOnlyValidTrue = ceSerialize(ceFullStrict, { onlyValid: true })
+    const ceFullStrictSerializedOnlyValidTrue = ceSerialize(ceFullStrict, valOnlyValidInstance)
     t.ok(ceFullStrictSerializedOnlyValidTrue)
 
     const ceFullStrictSerializedComparison = ceNestedFullStrictSerializedJson
@@ -1060,11 +1062,11 @@ test('deserialize generic strings (not JSON representation for an Object) into a
     assert(deserialized === null) // never executed
   }, Error, 'Expected exception when deserializing a string representing an array (in JSON)')
   t.throws(function () {
-    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', { onlyValid: false })
+    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', valOnlyValidAllInstance)
     assert(deserialized === null) // never executed
   }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
   t.throws(function () {
-    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', { onlyValid: true })
+    const deserialized = CloudEvent.deserializeEvent('{ sample string, not a valid json }', valOnlyValidInstance)
     assert(deserialized === null) // never executed
   }, Error, 'Expected exception when deserializing a string not representing an object (in JSON)')
 
@@ -1208,28 +1210,28 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeSerializedBadJson, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -1264,28 +1266,28 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(serialized, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // bad assertion
     }, Error, 'Expected exception due to a bad assertion')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: false
+        ...valOnlyValidAllInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
     t.throws(function () {
       const ceFullOtherContentTypeDeserialized = CloudEvent.deserializeEvent(ceFullOtherContentTypeStrictSerializedBadJson, {
         decodedData: ceExampleDataXmlAsString,
-        onlyValid: true
+        ...valOnlyValidInstance
       })
       assert(ceFullOtherContentTypeDeserialized === null) // never executed
     }, Error, 'Expected exception when deserializing the current CloudEvent instance')
@@ -1337,13 +1339,13 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
       decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeDeserialized4)
     const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
       decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeDeserialized5)
   }
@@ -1377,13 +1379,13 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
     const ceFullOtherContentTypeDeserialized4 = CloudEvent.deserializeEvent(serialized, {
       decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeDeserialized4)
     const ceFullOtherContentTypeDeserialized5 = CloudEvent.deserializeEvent(serialized, {
       decoder: decoderFromXmlSample,
       decodedData: fixedDecodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeDeserialized5)
   }
@@ -1431,11 +1433,11 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
     t.strictSame(ceFullSerializedStatic, ceFullSerialized)
 
     // set some flags
-    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFull, { onlyValid: false, onlyIfLessThan64KB: false })
+    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFull, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: false })
     t.ok(ceFullSerializedOnlyValidFalse)
     const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse)
     t.ok(ceFullDeserializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFull, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFull, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceFullSerializedOnlyValidTrue)
     const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue)
     t.ok(ceFullDeserializedOnlyValidTrue)
@@ -1443,20 +1445,20 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
 
     // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
     t.throws(function () {
-      const serialized = CloudEvent.serializeEvent(ceFull, { onlyValid: false, onlyIfLessThan64KB: true })
+      const serialized = CloudEvent.serializeEvent(ceFull, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
-      const serialized = CloudEvent.serializeEvent(ceFull, { onlyValid: true, onlyIfLessThan64KB: true })
+      const serialized = CloudEvent.serializeEvent(ceFull, { ...valOnlyValidInstance, onlyIfLessThan64KB: true })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     // deserialize instances just serialized, but now with the flag enabled, so expect errors here
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { onlyValid: false, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { onlyValid: true, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { ...valOnlyValidInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
@@ -1471,13 +1473,13 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
     )
     assert(ceFullBadBig !== null)
     t.ok(ceFullBadBig)
-    const serialized = CloudEvent.serializeEvent(ceFullBadBig, { onlyValid: false, onlyIfLessThan64KB: false })
+    const serialized = CloudEvent.serializeEvent(ceFullBadBig, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: false })
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: true })
+      const deserialized = CloudEvent.deserializeEvent(serialized, valOnlyValidInstance)
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(serialized, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
   }
@@ -1515,11 +1517,11 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
     t.strictSame(ceFullSerializedStatic, ceFullSerialized)
 
     // set some flags
-    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: false, onlyIfLessThan64KB: false })
+    const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullStrict, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: false })
     t.ok(ceFullSerializedOnlyValidFalse)
     const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse)
     t.ok(ceFullDeserializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullStrict, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceFullSerializedOnlyValidTrue)
     const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue)
     t.ok(ceFullDeserializedOnlyValidTrue)
@@ -1527,20 +1529,20 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
 
     // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
     t.throws(function () {
-      const serialized = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: false, onlyIfLessThan64KB: true })
+      const serialized = CloudEvent.serializeEvent(ceFullStrict, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
-      const serialized = CloudEvent.serializeEvent(ceFullStrict, { onlyValid: true, onlyIfLessThan64KB: true })
+      const serialized = CloudEvent.serializeEvent(ceFullStrict, { ...valOnlyValidInstance, onlyIfLessThan64KB: true })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     // deserialize instances just serialized, but now with the flag enabled, so expect errors here
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { onlyValid: false, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { onlyValid: true, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, { ...valOnlyValidInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
@@ -1556,14 +1558,14 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
     )
     assert(ceFullBadBigStrict !== null)
     t.ok(ceFullBadBigStrict)
-    const serialized = CloudEvent.serializeEvent(ceFullBadBigStrict, { onlyValid: false, onlyIfLessThan64KB: false })
+    const serialized = CloudEvent.serializeEvent(ceFullBadBigStrict, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: false })
     ceFullBadBigStrict.id = null // remove some mandatory attribute now, to let deserialization fail
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: true })
+      const deserialized = CloudEvent.deserializeEvent(serialized, valOnlyValidInstance)
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
     t.throws(function () {
-      const deserialized = CloudEvent.deserializeEvent(serialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      const deserialized = CloudEvent.deserializeEvent(serialized, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
   }
@@ -1627,21 +1629,21 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
     const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentType, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentType))
 
     // set some flags
     const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentType, {
-      encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: false
     })
     t.ok(ceFullSerializedOnlyValidFalse)
     const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, {
@@ -1649,7 +1651,7 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     })
     t.ok(ceFullDeserializedOnlyValidFalse)
     const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentType, {
-      encoder: encoderBigSample, onlyValid: true, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: false
     })
     t.ok(ceFullSerializedOnlyValidTrue)
     const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, {
@@ -1661,26 +1663,26 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
     t.throws(function () {
       const serialized = CloudEvent.serializeEvent(ceFullOtherContentType, {
-        encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
       const serialized = CloudEvent.serializeEvent(ceFullOtherContentType, {
-        encoder: encoderBigSample, onlyValid: true, onlyIfLessThan64KB: true
+        encoder: encoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: true
       })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     // deserialize instances just serialized, but now with the flag enabled, so expect errors here
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, {
-        decoder: decoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, {
-        decoder: decoderBigSample, onlyValid: true, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
@@ -1702,17 +1704,17 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     t.ok(ceFullBadBig)
     t.ok(!ceFullBadBig.isValid())
     const serialized = CloudEvent.serializeEvent(ceFullBadBig, {
-      encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: false
     })
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: decoderBigSample, onlyValid: true
+        decoder: decoderBigSample, ...valOnlyValidInstance
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: decoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
@@ -1774,21 +1776,21 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     const ceFullOtherContentTypeSerialized4 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
-      onlyValid: false
+      ...valOnlyValidAllInstance
     })
     t.ok(ceFullOtherContentTypeSerialized4)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
     const ceFullOtherContentTypeSerialized5 = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
       encoder: encoderBigSample,
       encodedData: fixedEncodedData,
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceFullOtherContentTypeSerialized5)
     t.ok(CloudEvent.isValidEvent(ceFullOtherContentTypeStrict))
 
     // set some flags
     const ceFullSerializedOnlyValidFalse = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-      encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: false
     })
     t.ok(ceFullSerializedOnlyValidFalse)
     const ceFullDeserializedOnlyValidFalse = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, {
@@ -1796,7 +1798,7 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     })
     t.ok(ceFullDeserializedOnlyValidFalse)
     const ceFullSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-      encoder: encoderBigSample, onlyValid: true, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: false
     })
     t.ok(ceFullSerializedOnlyValidTrue)
     const ceFullDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, {
@@ -1808,26 +1810,26 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     // enable the flag to return the serialized string only if it's less than 64 KB, expected errors here
     t.throws(function () {
       const serialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-        encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
       const serialized = CloudEvent.serializeEvent(ceFullOtherContentTypeStrict, {
-        encoder: encoderBigSample, onlyValid: true, onlyIfLessThan64KB: true
+        encoder: encoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: true
       })
       assert(serialized === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     // deserialize instances just serialized, but now with the flag enabled, so expect errors here
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidFalse, {
-        decoder: decoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(ceFullSerializedOnlyValidTrue, {
-        decoder: decoderBigSample, onlyValid: true, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
@@ -1847,18 +1849,18 @@ test('serialize and deserialize a big CloudEvent instance with a non default con
     assert(ceFullBadBigStrict !== null)
     t.ok(ceFullBadBigStrict)
     const serialized = CloudEvent.serializeEvent(ceFullBadBigStrict, {
-      encoder: encoderBigSample, onlyValid: false, onlyIfLessThan64KB: false
+      encoder: encoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: false
     })
     ceFullBadBigStrict.id = null // remove some mandatory attribute now, to let deserialization fail
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: decoderBigSample, onlyValid: true
+        decoder: decoderBigSample, ...valOnlyValidInstance
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
     t.throws(function () {
       const deserialized = CloudEvent.deserializeEvent(serialized, {
-        decoder: decoderBigSample, onlyValid: false, onlyIfLessThan64KB: true
+        decoder: decoderBigSample, ...valOnlyValidAllInstance, onlyIfLessThan64KB: true
       })
       assert(deserialized === null) // never executed
     }, Error, 'Expected exception when deserializing a not valid big Cloudevent, with related flag enabled')
@@ -1915,9 +1917,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceFullSerializedFunction)
     t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
     t.strictSame(ceFullSerializedFunction, ceFullSerialized)
-    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, { onlyValid: false })
+    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFull, valOnlyValidAllInstance)
     t.ok(ceFullSerializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, { onlyValid: true })
+    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFull, valOnlyValidInstance)
     t.ok(ceFullSerializedOnlyValidTrue)
 
     const ceDeserialized = CloudEvent.deserializeEvent(ceFullSerializedStatic)
@@ -2022,9 +2024,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceFullSerializedFunction)
     t.strictSame(ceFullSerializedFunction, ceFullSerializedStatic)
     t.strictSame(ceFullSerializedFunction, ceFullSerialized)
-    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFullStrict, { onlyValid: false })
+    const ceFullSerializedOnlyValidFalse = ceSerialize(ceFullStrict, valOnlyValidAllInstance)
     t.ok(ceFullSerializedOnlyValidFalse)
-    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFullStrict, { onlyValid: true })
+    const ceFullSerializedOnlyValidTrue = ceSerialize(ceFullStrict, valOnlyValidInstance)
     t.ok(ceFullSerializedOnlyValidTrue)
 
     const ceDeserialized = CloudEvent.deserializeEvent(ceFullSerializedStatic)
@@ -2146,13 +2148,13 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.ok(ceSerialized)
     t.ok(V.isString(ceSerialized))
     // force some options (big objects are already enabled anyway), expected success
-    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBig, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBig, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceBigSerializedWithGoodOptions)
     t.ok(V.isString(ceBigSerializedWithGoodOptions))
     t.strictSame(ceSerialized, ceBigSerializedWithGoodOptions)
     // force some options (disable big objects), expect error
     t.throws(function () {
-      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBig, { onlyValid: false, onlyIfLessThan64KB: true })
+      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBig, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(ceBigSerializedNoBigObjects === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
 
@@ -2187,7 +2189,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
     // force some options (big objects are already enabled anyway), expected success
-    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceBigDeserializedWithGoodOptions)
     t.ok(V.isClass(ceBigDeserializedWithGoodOptions, CloudEvent))
     t.ok(ceBigDeserializedWithGoodOptions.isValid())
@@ -2202,7 +2204,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(ceBigDeserializedWithGoodOptions.payload, ceBig.payload)
     // force some options (disable big objects), expect error
     t.throws(function () {
-      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(ceBigDeserializedNoBigObjects === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
@@ -2240,13 +2242,13 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.ok(ceSerialized)
     t.ok(V.isString(ceSerialized))
     // force some options (big objects are already enabled anyway), expected success
-    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBigStrict, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceBigSerializedWithGoodOptions = CloudEvent.serializeEvent(ceBigStrict, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceBigSerializedWithGoodOptions)
     t.ok(V.isString(ceBigSerializedWithGoodOptions))
     t.strictSame(ceSerialized, ceBigSerializedWithGoodOptions)
     // force some options (disable big objects), expect error
     t.throws(function () {
-      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBigStrict, { onlyValid: false, onlyIfLessThan64KB: true })
+      const ceBigSerializedNoBigObjects = CloudEvent.serializeEvent(ceBigStrict, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(ceBigSerializedNoBigObjects === null) // never executed
     }, Error, 'Expected exception when serializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
 
@@ -2281,7 +2283,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     // then ensure they are different object (references) ...
     // not needed here because is a string, and payload returns a copy of it, so comparison here will be equals ...
     // force some options (big objects are already enabled anyway), expected success
-    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: true, onlyIfLessThan64KB: false })
+    const ceBigDeserializedWithGoodOptions = CloudEvent.deserializeEvent(ceSerialized, { ...valOnlyValidInstance, onlyIfLessThan64KB: false })
     t.ok(ceBigDeserializedWithGoodOptions)
     t.ok(V.isClass(ceBigDeserializedWithGoodOptions, CloudEvent))
     t.ok(ceBigDeserializedWithGoodOptions.isValid())
@@ -2296,7 +2298,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(ceBigDeserializedWithGoodOptions.payload, ceBigStrict.payload)
     // force some options (disable big objects), expect error
     t.throws(function () {
-      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { onlyValid: false, onlyIfLessThan64KB: true })
+      const ceBigDeserializedNoBigObjects = CloudEvent.deserializeEvent(ceSerialized, { ...valOnlyValidAllInstance, onlyIfLessThan64KB: true })
       assert(ceBigDeserializedNoBigObjects === null) // never executed
     }, Error, 'Expected exception when deserializing a Cloudevent bigger than 64 KB (with the flag to forbid it enabled)')
   }
@@ -2362,7 +2364,7 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
@@ -2388,7 +2390,7 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
@@ -2418,7 +2420,7 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Text')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
@@ -2449,14 +2451,14 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
     t.strictSame(ceStrict.dataType, 'Text')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, {
       encodedData: JSON.stringify(ceArrayData), // with a non default data content type, I need to specify encoder or encodedData
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     // const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue) // ok but shouldn't work in this case
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue, { // sample, to show the right way
       decodedData: ceArrayData, // with a non default data content type, I need to specify encoder or encodedData
-      onlyValid: true
+      ...valOnlyValidInstance
     })
     t.ok(ceDeserializedOnlyValidTrue)
     // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
@@ -2492,7 +2494,7 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Text')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
@@ -2522,7 +2524,7 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Text')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
@@ -2545,7 +2547,7 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Text')
-    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, { onlyValid: true })
+    const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
     // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)

@@ -28,6 +28,7 @@ const {
   // ceOptionsNoStrict,
   // ceOptionsStrict,
   ceServerUrl,
+  valOnlyValidInstance,
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
@@ -286,14 +287,14 @@ test('ensure serialization functions works in the right way', (t) => {
       // prettyPrint: true,
       logError: true,
       throwError: true,
-      // onlyValid: true, // commented otherwise it will be filtered out by getEvents ...
+      // ...valOnlyValidInstance, // commented otherwise it will be filtered out by getEvents ...
       onlyIfLessThan64KB: true // to force throw here ...
     }, dumpCallback)
     assert(serNoBig === null) // never executed
   }, Error, 'No serialization here due to selected flags (and a big instance) ...')
 
   const events = JSONBatch.getEvents(arr, {
-    onlyValid: true,
+    ...valOnlyValidInstance,
     ...valOptionsNoStrict
   })
   // console.log(`DEBUG: events JSONBatch length = ${events.length}, summary: ${events}`)
@@ -305,7 +306,7 @@ test('ensure serialization functions works in the right way', (t) => {
   const deser = JSONBatch.deserializeEvents(ser, {
     logError: true,
     throwError: false,
-    onlyValid: true // sample, to filter out not valid serialized instances ...
+    ...valOnlyValidInstance // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true // to force throw here ...
   }, dumpCallback)
   // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
@@ -340,7 +341,7 @@ test('ensure serialization functions works in the right way', (t) => {
   const eventsEvenBad = JSONBatch.getEvents(arr, {})
   const serEventsEvenBad = JSONBatch.serializeEvents(eventsEvenBad, {})
   const deserStrict = JSONBatch.deserializeEvents(serEventsEvenBad, {
-    onlyValid: true, // sample, to filter out not valid serialized instances ...
+    ...valOnlyValidInstance, // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true, // to force throw here ...
     ...valOptionsStrict // to force strict validation ...
   })
@@ -352,7 +353,7 @@ test('ensure serialization functions works in the right way', (t) => {
     const deserStrictRaiseError = JSONBatch.deserializeEvents(serEventsEvenBad, {
       logError: true,
       throwError: true,
-      onlyValid: true, // sample, to filter out not valid serialized instances ...
+      ...valOnlyValidInstance, // sample, to filter out not valid serialized instances ...
       // onlyIfLessThan64KB: true, // to force throw here ...
       ...valOptionsStrict // to force strict validation ...
     }, dumpCallback)

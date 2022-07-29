@@ -29,6 +29,10 @@ const valOptionsNoOverride = { strict: null } // same as default in validator
 const valOptionsNoStrict = { strict: false }
 const valOptionsStrict = { strict: true }
 
+// other general ce validation (and others) related options
+const valOnlyValidAllInstance = { onlyValid: false } // all instances, valid and not, default
+const valOnlyValidInstance = { onlyValid: true } // only valid instances
+
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
 const ceCommonOptions = {
@@ -36,14 +40,14 @@ const ceCommonOptions = {
   datacontenttype: 'application/json',
   dataschema: 'http://my-schema.localhost.localdomain',
   subject: 'subject',
-  strict: false
+  ...ceOptionsNoStrict // same as default in ce
 }
 const ceCommonOptionsWithSomeOptionalsNull = {
   time: commonEventTime, // to simplify tests, keep it with a fixed value here
   datacontenttype: null,
   dataschema: null,
   subject: null,
-  strict: false
+  ...ceOptionsNoStrict
 }
 const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
@@ -100,8 +104,10 @@ module.exports = {
   ceCommonData,
   ceMapData,
   ceArrayData,
+  getRandomString,
+  valOnlyValidAllInstance,
+  valOnlyValidInstance,
   valOptionsNoOverride,
   valOptionsNoStrict,
-  valOptionsStrict,
-  getRandomString
+  valOptionsStrict
 }

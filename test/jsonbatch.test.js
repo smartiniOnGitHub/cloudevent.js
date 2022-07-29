@@ -28,6 +28,8 @@ const {
   // ceOptionsNoStrict,
   ceOptionsStrict,
   ceServerUrl,
+  valOnlyValidAllInstance,
+  valOnlyValidInstance,
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
@@ -184,10 +186,10 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.ok(JSONBatch.isValidBatch(empty))
   t.strictSame(JSONBatch.validateBatch(empty, valOptionsNoStrict).length, 0)
   t.strictSame(JSONBatch.validateBatch(empty, valOptionsStrict).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, ...valOptionsNoStrict }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, ...valOptionsNoStrict }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: true, ...valOptionsStrict }).length, 0)
-  t.strictSame(JSONBatch.getEvents(empty, { onlyValid: false, ...valOptionsStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidInstance, ...valOptionsNoStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidInstance, ...valOptionsStrict }).length, 0)
+  t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidAllInstance, ...valOptionsStrict }).length, 0)
 
   const ceFull = new CloudEvent('1/full',
     ceNamespace,
@@ -261,17 +263,17 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsNoStrict).length, 8) // expected validation errors
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsStrict).length, 14) // expected validation errors
-  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).length}`)
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).length, 4) // no filtering
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsStrict }).length, 4) // strict true with onlyValid false makes no filtering
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsNoStrict }).length, 4) // only valid
-  t.strictSame(JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsStrict }).length, 2) // only valid in strict mode
+  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length}`)
+  t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length, 4) // no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsStrict }).length, 4) // strict true with onlyValid false makes no filtering
+  t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidInstance, ...valOptionsNoStrict }).length, 4) // only valid
+  t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidInstance, ...valOptionsStrict }).length, 2) // only valid in strict mode
 
   // additional test, ensure that all instances returned (only valid), are CloudEvent instances
-  const eventsGot = JSONBatch.getEvents(arr, { onlyValid: true, ...valOptionsNoStrict })
+  const eventsGot = JSONBatch.getEvents(arr, { ...valOnlyValidInstance, ...valOptionsNoStrict })
   t.ok(eventsGot.every((i) => CloudEvent.isCloudEvent(i)))
   // test with other instances returned (filtered in a different way)
-  t.ok(JSONBatch.getEvents(arr, { onlyValid: false, ...valOptionsNoStrict }).every((i) => CloudEvent.isCloudEvent(i)))
+  t.ok(JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).every((i) => CloudEvent.isCloudEvent(i)))
 
   t.end()
 })
