@@ -52,7 +52,7 @@ const numIntDigits = 3 // to align benchmark results: 2 or 3 is good for 1_000 i
 // a function to serialize the returned object,
 // a function to deserialize the returned object
 // in future consider to use an array (or a map) of functions to generalize its signature (at least for optional functions)
-function benchmarkRunner (name = '', repeat = 1, functionToRun = null, 
+function benchmarkRunner (name = '', repeat = 1, functionToRun = null,
   dumpResult = null, validateResult = null,
   serializeResult = null, deserializeResult = null
 ) {
@@ -86,7 +86,8 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null,
     for (let i = 0; i < repeat; i++) {
       ser = serializeResult(name, result)
     }
-    console.log(`Serialization results (show only after last run): dump: <omitted>`)
+    assert(ser !== null)
+    console.log('Serialization results (show only after last run): dump: <omitted>')
   }
   const endSerialization = performance.now()
 
@@ -97,7 +98,8 @@ function benchmarkRunner (name = '', repeat = 1, functionToRun = null,
     for (let i = 0; i < repeat; i++) {
       deser = deserializeResult(name, ser)
     }
-    console.log(`Deserialization results (show only after last run): dump: <omitted>`)
+    assert(deser !== null)
+    console.log('Deserialization results (show only after last run): dump: <omitted>')
   }
   const endDeserialization = performance.now()
 
