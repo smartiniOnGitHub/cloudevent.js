@@ -97,10 +97,8 @@ class Validator {
    */
   static isString (arg) {
     // return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'string'))
-    // rewritten (inline same code here) for more performances
-    // return ((arg !== undefined && arg !== null) && (typeof arg === 'string'))
-    // rewritten using new ES features, but same behavior
-    return ((arg ?? false) && (typeof arg === 'string'))
+    // rewritten inline and using new ES features for more performances
+    return ((arg?.length >= 0) && (typeof arg === 'string'))
   }
 
   /**
@@ -114,10 +112,8 @@ class Validator {
    */
   static isStringNotEmpty (arg) {
     // return (Validator.isString(arg) && (arg.length > 0))
-    // rewritten (inline same code here) for more performances
-    // return ((arg !== undefined && arg !== null) && (typeof arg === 'string') && (arg.length > 0))
-    // rewritten using new ES features, but same behavior
-    return ((arg ?? false) && (typeof arg === 'string') && (arg.length > 0))
+    // rewritten inline and using new ES features for more performances
+    return ((arg?.length > 0) && (typeof arg === 'string'))
   }
 
   /**
