@@ -21,14 +21,14 @@
  */
 
 /**
- * Get a reference to cloudevent Validator class.
+ * Reference to cloudevent Validator class.
  * @private
  * @see Validator
  */
 const V = require('./validator') // get validator from here
 
 /**
- * Get a reference to cloudevent Transformer class.
+ * Reference to cloudevent Transformer class.
  * @private
  * @see Transformer
  */
@@ -777,6 +777,21 @@ class CloudEvent {
   }
 
   /**
+   * Getter method to return the list of standard property names, as an array of strings.
+   *
+   * @type {Array}
+   * @static
+   */
+  static get standardProps () {
+    return [
+      'specversion',
+      'id', 'type', 'source', 'data',
+      'time', 'data_base64', 'datacontenttype',
+      'dataschema', 'subject'
+    ]
+  }
+
+  /**
    * Serialize the current CloudEvent.
    *
    * See {@link CloudEvent.serializeEvent}.
@@ -963,19 +978,5 @@ class CloudEvent {
     return 'CloudEvent'
   }
 }
-
-/**
- * Utility variable that returns all standard property names, in an array.
- *
- * @readonly
- * @type {string[]}
- * @static
- */
-CloudEvent.standardProps = [
-  'specversion',
-  'id', 'type', 'source', 'data',
-  'time', 'data_base64', 'datacontenttype',
-  'dataschema', 'subject'
-]
 
 module.exports = CloudEvent
