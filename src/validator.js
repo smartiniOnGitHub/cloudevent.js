@@ -24,7 +24,7 @@
  * Get a reference to Node.js url module.
  * @private
  */
-const url = require('url')
+const url = require('node:url')
 
 /**
  * Generic Validator implementation.

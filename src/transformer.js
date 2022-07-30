@@ -31,13 +31,13 @@ const V = require('./validator') // get validator from here
  * Get the host name where this code is runninng.
  * @private
  */
-const hostname = require('os').hostname()
+const hostname = require('node:os').hostname()
 
 /**
  * Get the process id (pid) where this code is runninng.
  * @private
  */
-const pid = require('process').pid
+const pid = require('node:process').pid
 
 /**
  * Useful Transformations for CloudEvent objects.

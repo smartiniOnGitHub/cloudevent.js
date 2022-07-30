@@ -53,7 +53,7 @@ test('ensure the Transformer class (direct reference to it) works good', (t) => 
 
 /** @test {Transformer} */
 test('ensure the Transformer class is good and expose some functions to transform timestamps', (t) => {
-  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.equal(typeof CloudEvent, 'function')
   t.equal(typeof V.isClass, 'function')
   t.equal(typeof T.dumpObject, 'function')
@@ -75,7 +75,7 @@ const endOf2018TimestampAsNumber = 1546300799999 // Date.parse(endOf2018Timestam
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed to string in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
   t.ok(endOf2018TimestampAsString)
   t.ok(V.isString(endOf2018TimestampAsString))
@@ -125,7 +125,7 @@ test('ensure timestamps are transformed to string in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from string in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
 
   t.throws(function () {
@@ -193,7 +193,7 @@ test('ensure timestamps are transformed from string in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to string and back as date in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
 
   const timestampAsString = T.timestampToString(commonEventTime)
@@ -228,7 +228,7 @@ test('ensure the current timestamp is transformed to string and back as date in 
 
 /** @test {Transformer} */
 test('ensure timestamps are transformed from number in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
   t.ok(endOf2018TimestampAsNumber)
@@ -302,7 +302,7 @@ test('ensure timestamps are transformed from number in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure the current timestamp is transformed to number and back as date in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
 
   const nowAsNumber = T.timestampToNumber()
@@ -352,7 +352,7 @@ test('ensure the current timestamp is transformed to number and back as date in 
 
 /** @test {Transformer} */
 test('ensure errors are transformed into data attribute in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
 
   t.throws(function () {
@@ -497,7 +497,7 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
 
 /** @test {Transformer} */
 test('ensure dumpObject works in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
 
   t.ok(T.dumpObject())
@@ -517,7 +517,7 @@ test('ensure dumpObject works in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure process info are transformed into data attribute in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
   t.ok(V.isFunction(T.processInfoToData))
@@ -542,7 +542,7 @@ test('ensure process info are transformed into data attribute in the right way',
 
 /** @test {Transformer} */
 test('ensure uri/url are stripped by query arguments in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   // t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
   t.ok(V.isFunction(T.uriStripArguments))
@@ -612,7 +612,7 @@ test('ensure uri/url are stripped by query arguments in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure objects are merged in the right way', (t) => {
-  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(T))
   t.ok(V.isFunction(T.mergeObjects))
 
@@ -644,7 +644,7 @@ test('ensure objects are merged in the right way', (t) => {
 
 /** @test {Transformer} */
 test('ensure strings are encoded/decoded in th right way in base64', (t) => {
-  const { CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEventTransformer: T } = require('../src/')
 
   t.strictSame(T.stringToBase64(), '')
   t.strictSame(T.stringToBase64(undefined), '')

@@ -44,7 +44,7 @@ test('ensure objects exported by index script, exists and are of the right type'
 
   {
     const { CloudEvent: CEClass, JSONBatch: JSONBClass, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
-    // const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+    // const { CloudEvent, JSONBatch, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
     t.equal(typeof CEClass, 'function')
     t.equal(typeof V.isClass, 'function')
     t.equal(typeof T.dumpObject, 'function')
@@ -54,7 +54,7 @@ test('ensure objects exported by index script, exists and are of the right type'
     t.ok(V.isFunction(T.dumpObject))
     t.ok(V.isFunction(JSONBClass))
 
-    const { CloudEvent, JSONBatch } = require('../src/') // get references via destructuring
+    const { CloudEvent, JSONBatch } = require('../src/')
     t.ok(CloudEvent)
     t.equal(typeof CloudEvent, 'function')
     t.ok(JSONBatch)

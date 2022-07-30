@@ -1133,7 +1133,7 @@ test('create CloudEvent instances with a number as data attribute, and ensure th
 
 /** @test {CloudEvent} */
 test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, but not other objects', (t) => {
-  const { CloudEvent, CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V } = require('../src/')
   t.ok(CloudEvent)
   t.ok(V)
 
@@ -1215,7 +1215,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and objects are merged in the right way', (t) => {
-  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
   t.ok(V.isFunction(CloudEvent))
   t.ok(V.isFunction(V))
   t.ok(V.isFunction(T))
@@ -1252,7 +1252,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent with data encoded in base64 are managed in the right way', (t) => {
-  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/') // get references via destructuring
+  const { CloudEvent, CloudEventValidator: V, CloudEventTransformer: T } = require('../src/')
 
   const ceDataAsString = 'Hello World, 2020'
   const ceDataEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='

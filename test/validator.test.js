@@ -43,7 +43,7 @@ test('ensure the Validator class (direct reference to it) works good', (t) => {
 /** @test {CloudEvent} */
 test('create CloudEvent instances with different class hierarchy, and ensure the validation is right', (t) => {
   /** create some classes, for better reuse in following tests */
-  const { CloudEvent: CEClass } = require('../src/') // get references via destructuring
+  const { CloudEvent: CEClass } = require('../src/')
   class NotCESubclass {
   }
   class CESubclass extends CEClass {
@@ -103,13 +103,13 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
   }
 
   {
-    const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+    const { CloudEventValidator: V } = require('../src/')
     t.equal(typeof V, 'function')
     t.equal(typeof V.isClass, 'function')
     t.ok(V.isFunction(V))
     t.ok(V.isFunction(V.isClass))
 
-    const { CloudEvent, CloudEventValidator } = require('../src/') // get references via destructuring
+    const { CloudEvent, CloudEventValidator } = require('../src/')
     t.equal(typeof CloudEvent, 'function')
     t.equal(typeof CloudEventValidator, 'function')
     t.ok(V.isFunction(CloudEvent))
@@ -121,7 +121,7 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
 
 /** @test {Validator} */
 test('ensure some (edge cases for) validation functions are right', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   {
@@ -167,7 +167,7 @@ test('ensure some (edge cases for) validation functions are right', (t) => {
 
 /** @test {Validator} */
 test('ensure some (less used) validation functions are right', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   {
@@ -461,7 +461,7 @@ test('ensure some (less used) validation functions are right', (t) => {
 
 /** @test {Validator} */
 test('ensure some (utility) functions are right', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   {
@@ -509,7 +509,7 @@ test('ensure some (utility) functions are right', (t) => {
 
 /** @test {Validator} */
 test('ensure validation functions on object properties are right', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   t.ok(!V.doesObjectContainsProperty())
@@ -537,7 +537,7 @@ test('ensure validation functions on object properties are right', (t) => {
 
 /** @test {Validator} */
 test('ensure validation functions on standard properties are right', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   // sample function that tell if the given property name is standard
@@ -573,7 +573,7 @@ test('ensure validation functions on standard properties are right', (t) => {
 
 /** @test {Validator} */
 test('ensure validation functions to filter bad object instances raise exceptions', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   // sample function that tell if the given property name is standard
@@ -595,7 +595,7 @@ test('ensure validation functions to filter bad object instances raise exception
 
 /** @test {Validator} */
 test('ensure validation functions to throw exceptions, works good', (t) => {
-  const { CloudEventValidator: V } = require('../src/') // get references via destructuring
+  const { CloudEventValidator: V } = require('../src/')
   t.ok(V)
 
   t.notOk(V.throwOnError()) // no error returned
