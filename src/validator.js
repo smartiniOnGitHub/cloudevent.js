@@ -96,7 +96,11 @@ class Validator {
    * @return {boolean} true if it's a string, false otherwise
    */
   static isString (arg) {
-    return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'string'))
+    // return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'string'))
+    // rewritten (inline same code here) for more performances
+    // return ((arg !== undefined && arg !== null) && (typeof arg === 'string'))
+    // rewritten using new ES features, but same behavior
+    return ((arg ?? false) && (typeof arg === 'string'))
   }
 
   /**
@@ -109,7 +113,11 @@ class Validator {
    * @return {boolean} true if it's a not empty string, false otherwise
    */
   static isStringNotEmpty (arg) {
-    return (Validator.isString(arg) && (arg.length > 0))
+    // return (Validator.isString(arg) && (arg.length > 0))
+    // rewritten (inline same code here) for more performances
+    // return ((arg !== undefined && arg !== null) && (typeof arg === 'string') && (arg.length > 0))
+    // rewritten using new ES features, but same behavior
+    return ((arg ?? false) && (typeof arg === 'string') && (arg.length > 0))
   }
 
   /**
@@ -240,7 +248,11 @@ class Validator {
    * @return {boolean} true if it's a function, false otherwise
    */
   static isFunction (arg) {
-    return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'function'))
+    // return (Validator.isDefinedAndNotNull(arg) && (typeof arg === 'function'))
+    // rewritten (inline same code here) for more performances
+    // return ((arg !== undefined && arg !== null) && (typeof arg === 'function'))
+    // rewritten using new ES features, but same behavior
+    return ((arg ?? false) && (typeof arg === 'function'))
   }
 
   /**

@@ -16,8 +16,9 @@ private/
 tmp/
 temp/
 
-coverage/
 .nyc_output
+coverage/
+*.0x/
 
 scripts/
 src/
