@@ -87,5 +87,5 @@ function createFromObject (obj = {}, { strict = null, onlyValid = false, enableD
 }
 
 module.exports = {
-  createFromObject: createFromObject
+  createFromObject
 }

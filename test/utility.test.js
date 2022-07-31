@@ -22,9 +22,9 @@ const test = require('tap').test
 const {
   // ceArrayData,
   // ceCommonData,
-  // ceCommonExtensions,
+  ceCommonExtensions,
   // ceCommonExtensionsWithNullValue,
-  // ceCommonOptions,
+  ceCommonOptions,
   // ceCommonOptionsForTextData,
   // ceCommonOptionsForTextDataStrict,
   // ceCommonOptionsStrict,
@@ -37,8 +37,10 @@ const {
   ceNamespace,
   ceOptionsNoStrict,
   ceOptionsStrict,
-  // ceServerUrl,
+  ceServerUrl,
   // commonEventTime,
+  valDebugInfoDisable,
+  // valDebugInfoEnable,
   valOnlyValidAllInstance,
   valOnlyValidInstance,
   valOptionsNoOverride,
@@ -174,8 +176,7 @@ test('ensure utility function createFromObject exists and works in the right way
   const objMinimalBadSource = { id: '1/minimal-bad-source', type: ceNamespace, source: 'source (bad in strict mode)', data: null }
   {
     const obj = { ...objMinimalBadSource, ...ceOptionsNoStrict }
-    const ce = U.createFromObject(obj) // , { ...valOptionsStrict, ...valOnlyValidAllInstance })
-    // assert(ce !== null)
+    const ce = U.createFromObject(obj, valDebugInfoDisable) // show usage of debug info show, same value of its default used here
     t.ok(ce)
     t.ok(ce.isValid()) // ce is not strict
     t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
@@ -183,8 +184,7 @@ test('ensure utility function createFromObject exists and works in the right way
 
     // ce with strict mode and source bad but given, so ce creation expected
     const objStrict = { ...objMinimalBadSource, ...ceOptionsStrict }
-    const ceStrict = U.createFromObject(objStrict) // expected success because no validation requested
-    // assert(ceStrict !== null)
+    const ceStrict = U.createFromObject(objStrict, valDebugInfoDisable) // expected success because no validation requested
     t.ok(ceStrict)
     // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
     // console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ceStrict)}`)
@@ -200,7 +200,40 @@ test('ensure utility function createFromObject exists and works in the right way
     assert(ce !== null) // wrong assertion but never executed
   }, Error, 'Expected exception when ask to create a CloudEvent with not valid properties and validation requested')
 
-  // TODO: ... wip
+  const objFullBadDatatype = {
+    id: '1/full/string-data/no-strict',
+    type: ceNamespace,
+    source: ceServerUrl,
+    data: 'data as a string',
+    ...ceCommonOptions,
+    ...ceCommonExtensions
+  }
+  {
+    // create an instance with a string data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
+    // bad because of the default datacontenttype, but validation error only in strict mode
+    const obj = { ...objFullBadDatatype, ...ceOptionsNoStrict }
+    // const ce = U.createFromObject(obj, valDebugInfoEnable)
+    const ce = U.createFromObject(obj, valDebugInfoDisable)
+    t.ok(ce)
+    t.ok(ce.isValid()) // ce is not strict
+    t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
+    t.notOk(ce.isValid(valOptionsStrict)) // force validation strict
+
+    const objStrict = { ...objFullBadDatatype, ...ceOptionsStrict }
+    // const ceStrict = U.createFromObject(objStrict, valDebugInfoEnable) // expected success because no validation requested
+    const ceStrict = U.createFromObject(objStrict, valDebugInfoDisable) // expected success because no validation requested
+    t.ok(ceStrict)
+    t.notOk(ceStrict.isValid()) // ce is already strict
+    t.ok(ceStrict.isValid(valOptionsNoStrict)) // force validation no strict
+    t.notOk(ceStrict.isValid(valOptionsStrict)) // force validation strict
+  }
+  t.throws(function () {
+    const ce = U.createFromObject(objFullBadDatatype, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoDisable })
+    // const ce = U.createFromObject(objFullBadDatatype, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoEnable })
+    assert(ce !== null) // wrong assertion but never executed
+  }, Error, 'Expected exception when ask to create a CloudEvent with not valid properties and validation requested')
+
+  // more tests later ...
 
   t.end()
 })
