@@ -31,8 +31,10 @@ const valOptionsStrict = { strict: true }
 // other general ce validation (and others) related options
 const valOnlyValidAllInstance = { onlyValid: false } // all instances, valid and not, default
 const valOnlyValidInstance = { onlyValid: true } // only valid instances
-const valDebugInfoDisable = { enableDebugInfo: false }
-const valDebugInfoEnable = { enableDebugInfo: true }
+const valDebugInfoDisable = { printDebugInfo: false } // default
+const valDebugInfoEnable = { printDebugInfo: true }
+const valExcludeExtensionsDisable = { skipExtensions: false } // default
+const valExcludeExtensionsEnable = { skipExtensions: true }
 
 /** create some common options, for better reuse in tests */
 const commonEventTime = new Date()
@@ -108,6 +110,8 @@ module.exports = {
   getRandomString,
   valDebugInfoDisable,
   valDebugInfoEnable,
+  valExcludeExtensionsDisable,
+  valExcludeExtensionsEnable,
   valOnlyValidAllInstance,
   valOnlyValidInstance,
   valOptionsNoOverride,

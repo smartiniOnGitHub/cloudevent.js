@@ -44,19 +44,36 @@ const V = CloudEventValidator
  * @param {object} [options={}] optional serialization attributes:
  *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
  *        - onlyValid (boolean, default false) to return it only if it's a valid instance,
- *        - enableDebugInfo (boolean, default false) to print some debug info to the console,
+ *        - printDebugInfo (boolean, default false) to print some debug info to the console,
+ *        - skipExtensions (boolean, default false) to skip all extensions properties,
  * @return {object} the created CloudEvent instance
  * @throws {Error} if object is undefined or null, or an option is undefined/null/wrong, or is not possible to create a CloudEvent instance
  */
-function createFromObject (obj = {}, { strict = null, onlyValid = false, enableDebugInfo = false } = {}) {
+function createFromObject (obj = {}, {
+  strict = null,
+  onlyValid = false,
+  printDebugInfo = false,
+  skipExtensions = false
+} = {}) {
   if (!V.isObjectPlain(obj)) {
     throw new TypeError('The given argument is not an object instance')
   }
 
-  // check and process using given options
-
-  // TODO: act like in deserializeEvent: get extensions properties, etc ... wip
-  const extensions = null
+  // extensions properties
+  let extensions = null
+  if (skipExtensions === false) { // get and use extension properties from the given object
+    extensions = CloudEvent.getExtensionsOfEvent(obj)
+    // note that using that method, extensions always contains at least the strict property,
+    // even when not set (so set as false), but do not remove from here
+    // to avoid problems when using this factory function
+    if (printDebugInfo === true) { // print some debug info
+      console.log(`DEBUG - extensions found: ${JSON.stringify(extensions)}`)
+    }
+  } else {
+    if (printDebugInfo === true) {
+      console.log('DEBUG - skip extensions')
+    }
+  }
 
   // fill a new CludEvent instance with object data
   const ce = new CloudEvent(obj.id,
@@ -74,8 +91,7 @@ function createFromObject (obj = {}, { strict = null, onlyValid = false, enableD
     extensions
   )
 
-  // some debug info, enable only if/when needed
-  if (enableDebugInfo === true) {
+  if (printDebugInfo === true) {
     console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ce)}`)
     console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ce, { strict }, 'ce')}`)
   }

@@ -40,7 +40,9 @@ const {
   ceServerUrl,
   // commonEventTime,
   valDebugInfoDisable,
-  // valDebugInfoEnable,
+  valDebugInfoEnable,
+  valExcludeExtensionsDisable,
+  valExcludeExtensionsEnable,
   valOnlyValidAllInstance,
   valOnlyValidInstance,
   valOptionsNoOverride,
@@ -172,6 +174,12 @@ test('ensure utility function createFromObject exists and works in the right way
     t.ok(ce)
   }
 
+  // reference some imported variables, even when not used, mainly to avoid linting errors
+  assert(valDebugInfoDisable !== null)
+  assert(valDebugInfoEnable !== null)
+  assert(valExcludeExtensionsDisable !== null)
+  assert(valExcludeExtensionsEnable !== null)
+
   // test with other bad arguments (missing/wrong/duplicated ce mandatory arguments)
   const objMinimalBadSource = { id: '1/minimal-bad-source', type: ceNamespace, source: 'source (bad in strict mode)', data: null }
   {
@@ -212,21 +220,46 @@ test('ensure utility function createFromObject exists and works in the right way
     // create an instance with a string data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
     // bad because of the default datacontenttype, but validation error only in strict mode
     const obj = { ...objFullBadDatatype, ...ceOptionsNoStrict }
-    // const ce = U.createFromObject(obj, valDebugInfoEnable)
-    const ce = U.createFromObject(obj, valDebugInfoDisable)
+    const ce = U.createFromObject(obj, { ...valDebugInfoDisable, ...valExcludeExtensionsDisable }) // default options
     t.ok(ce)
     t.ok(ce.isValid()) // ce is not strict
     t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
     t.notOk(ce.isValid(valOptionsStrict)) // force validation strict
+    t.ok(ce.exampleextension) // ensure the given extension is present here
+  }
 
+  {
+    // exclude (do not use) extensions from the given object
+    const obj = { ...objFullBadDatatype, ...ceOptionsNoStrict }
+    const ce = U.createFromObject(obj, { ...valDebugInfoDisable, ...valExcludeExtensionsEnable })
+    t.ok(ce)
+    t.ok(ce.isValid()) // ce is not strict
+    t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
+    t.notOk(ce.isValid(valOptionsStrict)) // force validation strict
+    t.notOk(ce.exampleextension) // ensure the given extension is not present here
+  }
+
+  {
     const objStrict = { ...objFullBadDatatype, ...ceOptionsStrict }
-    // const ceStrict = U.createFromObject(objStrict, valDebugInfoEnable) // expected success because no validation requested
-    const ceStrict = U.createFromObject(objStrict, valDebugInfoDisable) // expected success because no validation requested
-    t.ok(ceStrict)
+    const ceStrict = U.createFromObject(objStrict, { ...valDebugInfoDisable, ...valExcludeExtensionsDisable }) // default options
+    t.ok(ceStrict) // expected success because no validation requested
     t.notOk(ceStrict.isValid()) // ce is already strict
     t.ok(ceStrict.isValid(valOptionsNoStrict)) // force validation no strict
     t.notOk(ceStrict.isValid(valOptionsStrict)) // force validation strict
+    t.ok(ceStrict.exampleextension) // ensure the given extension is present here
   }
+
+  {
+    // exclude (do not use) extensions from the given object
+    const objStrict = { ...objFullBadDatatype, ...ceOptionsStrict }
+    const ceStrict = U.createFromObject(objStrict, { ...valDebugInfoDisable, ...valExcludeExtensionsEnable })
+    t.ok(ceStrict) // expected success because no validation requested
+    t.notOk(ceStrict.isValid()) // ce is already strict
+    t.ok(ceStrict.isValid(valOptionsNoStrict)) // force validation no strict
+    t.notOk(ceStrict.isValid(valOptionsStrict)) // force validation strict
+    t.notOk(ceStrict.exampleextension) // ensure the given extension is not present here
+  }
+
   t.throws(function () {
     const ce = U.createFromObject(objFullBadDatatype, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoDisable })
     // const ce = U.createFromObject(objFullBadDatatype, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoEnable })
@@ -249,7 +282,7 @@ test('ensure utility function createFromObject exists and works in the right way
   }
   */
 
-  // test with some good arguments: ce in strict mode and only valid ce false/true
+  // test with some good arguments: ce in strict mode (even with good extensions) and only valid ce false/true
   // TODO: ... wip
 
   t.end()
