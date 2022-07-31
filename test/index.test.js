@@ -20,7 +20,7 @@ const test = require('tap').test
 
 /** @test {CloudEvent} */
 test('ensure objects exported by index script, exists and are of the right type', (t) => {
-  // t.plan(25)
+  // t.plan(27)
 
   {
     const CloudEventExports = require('../src/') // reference the library
@@ -37,6 +37,9 @@ test('ensure objects exported by index script, exists and are of the right type'
     const CloudEventTransformer = CloudEventExports.CloudEventTransformer // reference the transformer class
     t.ok(CloudEventTransformer)
     t.equal(typeof CloudEventTransformer, 'function')
+    const CloudEventUtilities = CloudEventExports.CloudEventUtilities // reference the utilities
+    t.ok(CloudEventUtilities)
+    t.equal(typeof CloudEventUtilities, 'object')
     const JSONBatchClass = CloudEventExports.JSONBatch // reference the implementation class
     t.ok(JSONBatchClass)
     t.equal(typeof JSONBatchClass, 'function')

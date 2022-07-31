@@ -49,6 +49,12 @@ const cloudEventValidator = require('./validator')
  */
 const cloudEventTransformer = require('./transformer')
 
+/**
+ * Get a reference to cloudevent utility source.
+ * @private
+ */
+const cloudEventUtilities = require('./utility')
+
 module.exports = {
   /** CloudEvent class definition. */
   CloudEvent: cloudEventDefinition,
@@ -60,5 +66,8 @@ module.exports = {
   CloudEventValidator: cloudEventValidator,
 
   /** CloudEvent class Transformer. */
-  CloudEventTransformer: cloudEventTransformer
+  CloudEventTransformer: cloudEventTransformer,
+
+  /** CloudEvent utility functions. */
+  CloudEventUtilities: cloudEventUtilities
 }

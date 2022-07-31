@@ -768,9 +768,9 @@ class CloudEvent {
     } else if (V.isNull(ce)) {
       return `${name}: null`
     } else if (CloudEvent.isCloudEvent(ce)) {
-      const opts = (options == null) ? {} : options
+      const opts = options ?? {}
       const ve = CloudEvent.validateEvent(ce, opts)
-      return `${name}: ${JSON.stringify(ve.map((i) => i.message))}`
+      return `${name}, validation with options (${JSON.stringify(options)}): ${JSON.stringify(ve.map((i) => i.message))}`
     } else {
       return `${name}: 'is not a CloudEvent, no validation possible'`
     }

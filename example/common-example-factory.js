@@ -17,7 +17,7 @@
 
 /**
  * Common-Example-Factory:
- * Utility module to export some factory functions to create instances to use in examples.
+ * Utility module to provide some factory functions to create instances to use in examples.
  */
 
 const assert = require('node:assert').strict
@@ -60,7 +60,7 @@ function createMinimalMandatoryUndefinedNoStrict () {
 }
 
 function createMinimalBadSource () {
-  return new CloudEvent('1/minimal-bad-source', ceNamespace, 'source (bad)', null)
+  return new CloudEvent('1/minimal-bad-source', ceNamespace, 'source (bad in strict mode)', null)
 }
 
 function createMinimal () {
