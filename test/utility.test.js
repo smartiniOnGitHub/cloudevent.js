@@ -20,11 +20,13 @@ const test = require('tap').test
 
 // import some common test data
 const {
+  ceCommonData,
   ceCommonExtensions,
   ceCommonOptionsWithFixedTime,
   ceNamespace,
   ceOptionsNoStrict,
   ceOptionsStrict,
+  ceOptionsWithDataInBase64,
   ceServerUrl,
   valDebugInfoDisable,
   valDebugInfoEnable,
@@ -267,15 +269,53 @@ test('ensure utility function createFromObject exists and works in the right way
 test('ensure utility function createFromObject exists and works in the right way: test with good arguments and attributes', (t) => {
   t.ok(U.createFromObject)
 
-  /*
   // test with some good arguments for ce and good attributes
-  {
-    // TODO: ... wip
+  // use directly strict ce for better/safer compliance
+  const objFullBinaryData = {
+    id: '1/full/binary-data/strict',
+    type: ceNamespace,
+    source: ceServerUrl,
+    data: null, // data must be null here
+    ...ceOptionsWithDataInBase64,
+    ...ceCommonExtensions
   }
-  */
+  t.notOk(objFullBinaryData.data)
+  {
+    const objStrict = { ...objFullBinaryData, ...ceOptionsStrict }
+    const ceStrict = U.createFromObject(objStrict) // omit options, as a sample (use its defaults)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict)) // omit options, as a sample (use its defaults)
+  }
+  {
+    const objStrict = { ...objFullBinaryData, ...ceOptionsStrict }
+    const ceStrict = U.createFromObject(objStrict, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoDisable }) // force strict validation, return only if valid, print debug info disabled
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict, { ...valDebugInfoDisable, ...valOptionsStrict })) // force defaults: validation strict (already strict), print debug info disable
+  }
 
-  // test with some good arguments: ce in strict mode (even with good extensions) and only valid ce false/true
-  // TODO: ... wip
+  const objFullData = {
+    id: '1/full/binary-data/strict',
+    type: ceNamespace,
+    source: ceServerUrl,
+    data: ceCommonData,
+    ...ceCommonOptionsWithFixedTime,
+    ...ceCommonExtensions
+  }
+  t.ok(objFullData.data)
+  {
+    const objStrict = { ...objFullData, ...ceOptionsStrict }
+    const ceStrict = U.createFromObject(objStrict) // omit options, as a sample (use its defaults)
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict)) // omit options, as a sample (use its defaults)
+  }
+  {
+    const objStrict = { ...objFullData, ...ceOptionsStrict }
+    const ceStrict = U.createFromObject(objStrict, { ...valOptionsStrict, ...valOnlyValidInstance, ...valDebugInfoDisable }) // force strict validation, return only if valid, print debug info disabled
+    t.ok(ceStrict)
+    t.ok(CloudEvent.isValidEvent(ceStrict, { ...valDebugInfoDisable, ...valOptionsStrict })) // force defaults: validation strict (already strict), print debug info disable
+  }
+
+  // more tests later ...
 
   t.end()
 })

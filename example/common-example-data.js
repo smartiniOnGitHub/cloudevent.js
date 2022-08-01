@@ -62,6 +62,7 @@ const ceCommonData = { hello: 'world', year: 2020, enabled: true }
 const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
 const ceDataAsString = 'Hello World, 2020'
 const ceDataAsStringEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
+const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataAsStringEncoded }
 
 // ----
 
@@ -97,10 +98,10 @@ function getRandomString (length) {
 }
 
 module.exports = {
-  commonEventTime,
-  ceOptionsNoStrict,
-  ceOptionsStrict,
+  ceArrayData,
+  ceCommonData,
   ceCommonExtensions,
+  ceCommonExtensionsWithNullValue,
   ceCommonOptions,
   ceCommonOptionsForTextData,
   ceCommonOptionsForTextDataStrict,
@@ -112,17 +113,18 @@ module.exports = {
   ceCommonOptionsWithFixedTimeStrict,
   ceCommonOptionsWithSomeOptionalsNull,
   ceCommonOptionsWithSomeOptionalsNullStrict,
-  ceCommonExtensionsWithNullValue,
-  ceExtensionStrict,
-  ceReservedExtensions,
-  ceNamespace,
-  ceServerUrl,
-  ceCommonData,
   ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
+  ceExtensionStrict,
   ceMapData,
-  ceArrayData,
+  ceNamespace,
+  ceOptionsNoStrict,
+  ceOptionsStrict,
+  ceOptionsWithDataInBase64,
+  ceReservedExtensions,
+  ceServerUrl,
+  commonEventTime,
   fixedEventTime,
   getRandomString,
   valDebugInfoDisable,

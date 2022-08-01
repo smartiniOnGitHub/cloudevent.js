@@ -465,16 +465,21 @@ class CloudEvent {
    * @param {object} [options={}] containing:
    *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
   static isValidEvent (event, {
     strict = null,
     dataschemavalidator = null,
+    printDebugInfo = false,
     timezoneOffset = 0
   } = {}) {
     const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator, timezoneOffset })
     const size = V.getSize(validationErrors)
+    if (printDebugInfo === true) { // print some debug info
+      console.log(`DEBUG - validation errors found: ${size}, details: ${JSON.stringify(validationErrors)}`)
+    }
     return (size === 0)
   }
 
@@ -827,11 +832,12 @@ class CloudEvent {
    * @param {object} [options={}] containing:
    *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
    *        - dataschemavalidator (function(data, dataschema) boolean, optional) a function to validate data of current CloudEvent instance with its dataschema
+   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {boolean} true if valid, otherwise false
    */
-  isValid ({ strict = null, dataschemavalidator = null, timezoneOffset = 0 } = {}) {
-    return this.constructor.isValidEvent(this, { strict, dataschemavalidator, timezoneOffset })
+  isValid ({ strict = null, dataschemavalidator = null, printDebugInfo = false, timezoneOffset = 0 } = {}) {
+    return this.constructor.isValidEvent(this, { strict, dataschemavalidator, printDebugInfo, timezoneOffset })
   }
 
   /**
