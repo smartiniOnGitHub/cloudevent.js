@@ -20,25 +20,12 @@ const test = require('tap').test
 
 // import some common test data
 const {
-  // ceArrayData,
-  // ceCommonData,
   ceCommonExtensions,
-  // ceCommonExtensionsWithNullValue,
-  ceCommonOptions,
-  // ceCommonOptionsForTextData,
-  // ceCommonOptionsForTextDataStrict,
-  // ceCommonOptionsStrict,
-  // ceCommonOptionsWithAllOptionalsNull,
-  // ceCommonOptionsWithAllOptionalsNullStrict,
-  // ceCommonOptionsWithSomeOptionalsNull,
-  // ceCommonOptionsWithSomeOptionalsNullStrict,
-  // ceExtensionStrict,
-  // ceMapData,
+  ceCommonOptionsWithFixedTime,
   ceNamespace,
   ceOptionsNoStrict,
   ceOptionsStrict,
   ceServerUrl,
-  // commonEventTime,
   valDebugInfoDisable,
   valDebugInfoEnable,
   valExcludeExtensionsDisable,
@@ -48,7 +35,7 @@ const {
   valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
-} = require('./common-test-data')
+} = require('../example/common-example-data')
 
 const { CloudEvent, CloudEventValidator: V, CloudEventUtilities: U } = require('../src/') // get references via destructuring
 assert(CloudEvent !== null)
@@ -181,7 +168,12 @@ test('ensure utility function createFromObject exists and works in the right way
   assert(valExcludeExtensionsEnable !== null)
 
   // test with other bad arguments (missing/wrong/duplicated ce mandatory arguments)
-  const objMinimalBadSource = { id: '1/minimal-bad-source', type: ceNamespace, source: 'source (bad in strict mode)', data: null }
+  const objMinimalBadSource = {
+    id: '1/minimal-bad-source',
+    type: ceNamespace,
+    source: 'source (bad in strict mode)',
+    data: null
+  }
   {
     const obj = { ...objMinimalBadSource, ...ceOptionsNoStrict }
     const ce = U.createFromObject(obj, valDebugInfoDisable) // show usage of debug info show, same value of its default used here
@@ -213,7 +205,7 @@ test('ensure utility function createFromObject exists and works in the right way
     type: ceNamespace,
     source: ceServerUrl,
     data: 'data as a string',
-    ...ceCommonOptions,
+    ...ceCommonOptionsWithFixedTime,
     ...ceCommonExtensions
   }
   {

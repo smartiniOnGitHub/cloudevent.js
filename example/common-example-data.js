@@ -32,9 +32,14 @@ const valOptionsStrict = { strict: true }
 // other general ce validation (and others) related options
 const valOnlyValidAllInstance = { onlyValid: false } // all instances, valid and not, default
 const valOnlyValidInstance = { onlyValid: true } // only valid instances
+const valDebugInfoDisable = { printDebugInfo: false } // default
+const valDebugInfoEnable = { printDebugInfo: true }
+const valExcludeExtensionsDisable = { skipExtensions: false } // default
+const valExcludeExtensionsEnable = { skipExtensions: true }
 
 // define some common attributes
 const commonEventTime = new Date()
+const fixedEventTime = { time: commonEventTime } // set a fixed value, to use mainly in tests
 const ceCommonOptions = {
   // time: new Date(), // same as default
   // time: commonEventTime, // to simplify tests, keep it with a fixed value here
@@ -46,6 +51,9 @@ const ceCommonOptions = {
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, ...ceOptionsStrict }
 const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
+const ceCommonOptionsWithFixedTime = { ...ceCommonOptions, ...fixedEventTime }
+const ceCommonOptionsWithFixedTimeStrict = { ...ceCommonOptionsStrict, ...fixedEventTime }
+const ceCommonOptionsForTextDataWithFixedTime = { ...ceCommonOptionsForTextData, ...fixedEventTime }
 const ceCommonExtensions = { exampleextension: 'value' } // example extension
 const ceReservedExtensions = { id: -1, data: 'data attribute in extension' } // example (bad) extension, use a standard property in extensions, not good for creation in strict mode
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
@@ -92,15 +100,18 @@ module.exports = {
   commonEventTime,
   ceOptionsNoStrict,
   ceOptionsStrict,
+  ceCommonExtensions,
   ceCommonOptions,
-  ceCommonOptionsStrict,
-  ceCommonOptionsWithSomeOptionalsNull,
-  ceCommonOptionsWithSomeOptionalsNullStrict,
-  ceCommonOptionsWithAllOptionalsNull,
-  ceCommonOptionsWithAllOptionalsNullStrict,
   ceCommonOptionsForTextData,
   ceCommonOptionsForTextDataStrict,
-  ceCommonExtensions,
+  ceCommonOptionsForTextDataWithFixedTime,
+  ceCommonOptionsStrict,
+  ceCommonOptionsWithAllOptionalsNull,
+  ceCommonOptionsWithAllOptionalsNullStrict,
+  ceCommonOptionsWithFixedTime,
+  ceCommonOptionsWithFixedTimeStrict,
+  ceCommonOptionsWithSomeOptionalsNull,
+  ceCommonOptionsWithSomeOptionalsNullStrict,
   ceCommonExtensionsWithNullValue,
   ceExtensionStrict,
   ceReservedExtensions,
@@ -112,7 +123,12 @@ module.exports = {
   ceDataAsStringEncoded,
   ceMapData,
   ceArrayData,
+  fixedEventTime,
   getRandomString,
+  valDebugInfoDisable,
+  valDebugInfoEnable,
+  valExcludeExtensionsDisable,
+  valExcludeExtensionsEnable,
   valOnlyValidAllInstance,
   valOnlyValidInstance,
   valOptionsNoOverride,

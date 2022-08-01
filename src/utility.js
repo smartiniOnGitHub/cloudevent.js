@@ -45,7 +45,7 @@ const V = CloudEventValidator
  *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
  *        - onlyValid (boolean, default false) to return it only if it's a valid instance,
  *        - printDebugInfo (boolean, default false) to print some debug info to the console,
- *        - skipExtensions (boolean, default false) to skip all extensions properties,
+ *        - skipExtensions (boolean, default false) to skip all non-standard (so extensions) properties,
  * @return {object} the created CloudEvent instance
  * @throws {Error} if object is undefined or null, or an option is undefined/null/wrong, or is not possible to create a CloudEvent instance
  */

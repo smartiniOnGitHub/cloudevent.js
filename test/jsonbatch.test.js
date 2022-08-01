@@ -33,7 +33,7 @@ const {
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
-} = require('./common-test-data')
+} = require('../example/common-example-data')
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent and JSONBatch class (and related Validator and Transformer classes) are exported by the library', (t) => {

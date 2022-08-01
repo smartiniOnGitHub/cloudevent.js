@@ -23,7 +23,7 @@ const {
   // valOptionsNoOverride,
   // valOptionsNoStrict,
   valOptionsStrict
-} = require('./common-test-data')
+} = require('../example/common-example-data')
 
 /** @test {Transformer} */
 test('ensure the Transformer class (direct reference to it) works good', (t) => {

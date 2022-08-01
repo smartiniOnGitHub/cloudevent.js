@@ -33,7 +33,7 @@ const {
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
-} = require('./common-test-data')
+} = require('../example/common-example-data')
 
 /** create a sample string big (more than 64 KB) */
 const bigStringLength = 100000

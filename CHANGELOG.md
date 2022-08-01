@@ -8,12 +8,13 @@ Summary Changelog:
   now defaults to null, so validation/check will override the value in the event (is any) 
   only when that flag has a value in arguments
 - Small improvements in Validator functions
+- Add some Utility functions, in its own source
 - Add an example (minimal) benchmark
 - Small improvements in performances (inline some small utility code block),
   as seen in flame graph on both examples; later check if do more
 - Rewritten some code to use new ES features and operators; 
   but not (yet) private functions/methods to avoid less code coverage 
-  (later check if it worth the effort)
+  (to not add a library to mock that code for testing it once private; later check if it worth the effort)
 
 ## [0.9.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.9.0) (2022-04-16)
 Summary Changelog:

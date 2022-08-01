@@ -30,6 +30,7 @@ const {
   ceCommonOptionsStrict,
   ceCommonOptionsWithAllOptionalsNull,
   ceCommonOptionsWithAllOptionalsNullStrict,
+  ceCommonOptionsWithFixedTime,
   ceCommonOptionsWithSomeOptionalsNull,
   ceCommonOptionsWithSomeOptionalsNullStrict,
   ceExtensionStrict,
@@ -42,7 +43,7 @@ const {
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
-} = require('./common-test-data')
+} = require('../example/common-example-data')
 
 /** @test {CloudEvent} */
 test('ensure CloudEvent class (and related Validator and Transformer classes) are exported by the library', (t) => {
@@ -456,7 +457,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptions,
+    ceCommonOptionsWithFixedTime,
     ceCommonExtensions
   )
   t.ok(ceFull1)
@@ -476,7 +477,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptions,
+    ceCommonOptionsWithFixedTime,
     ceCommonExtensions
   )
   t.ok(ceFull1Clone)
