@@ -41,11 +41,12 @@ const V = CloudEventValidator
  * Create and return a CloudEvent from the given object and options.
  *
  * @param {!object} obj the plain object instance to use (its properties will be used)
- * @param {object} [options={}] optional serialization attributes:
+ * @param {object} [options={}] optional attributes:
  *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
  *        - onlyValid (boolean, default false) to return it only if it's a valid instance,
  *        - printDebugInfo (boolean, default false) to print some debug info to the console,
  *        - skipExtensions (boolean, default false) to skip all non-standard (so extensions) properties,
+ * @throws {TypeError} if object is not a plain object instance
  * @return {object} the created CloudEvent instance
  * @throws {Error} if object is undefined or null, or an option is undefined/null/wrong, or is not possible to create a CloudEvent instance
  */
@@ -67,11 +68,11 @@ function createFromObject (obj = {}, {
     // even when not set (so set as false), but do not remove from here
     // to avoid problems when using this factory function
     if (printDebugInfo === true) { // print some debug info
-      console.log(`DEBUG - extensions found: ${JSON.stringify(extensions)}`)
+      console.log(`DEBUG | extensions found: ${JSON.stringify(extensions)}`)
     }
   } else {
     if (printDebugInfo === true) {
-      console.log('DEBUG - skip extensions')
+      console.log('DEBUG | skip extensions')
     }
   }
 
@@ -92,8 +93,8 @@ function createFromObject (obj = {}, {
   )
 
   if (printDebugInfo === true) {
-    console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ce)}`)
-    console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ce, { strict }, 'ce')}`)
+    console.log(`DEBUG | cloudEvent details: ${JSON.stringify(ce)}`)
+    console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ce, { strict }, 'ce')}`)
   }
 
   // return ce, depending on its validation option
@@ -102,6 +103,60 @@ function createFromObject (obj = {}, {
   } else throw new Error('Unable to return a not valid CloudEvent.')
 }
 
+/**
+ * Clone the given CloudEvent in a plain object.
+ * Note that depending on the clone method chosen, a shallow clone could be done
+ * (usually it is, even for performance reasons),
+ * so pay attention using the skipExtensions option in that case.
+ *
+ * @static
+ * @param {!object} event the CloudEvent to clone
+ * @param {object} [options={}] optional attributes:
+ *        - strict (boolean, default null so no override) to validate it in a more strict way (if null it will be used strict mode in the given event),
+ *        - onlyValid (boolean, default false) to return it only if it's a valid instance,
+ *        - printDebugInfo (boolean, default false) to print some debug info to the console,
+ *        - skipExtensions (boolean, default false) to skip all non-standard (so extensions) properties,
+ * @return {object} the event, as a plain object
+ * @throws {TypeError} if event is not a CloudEvent instance or subclass
+ * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
+ */
+function cloneToObject (event = {}, {
+  strict = null,
+  onlyValid = false,
+  printDebugInfo = false,
+  skipExtensions = false
+} = {}) {
+  if (!CloudEvent.isCloudEvent(event)) {
+    throw new TypeError(`The argument must be a CloudEvent (or a subclass), instead got a '${typeof event}'`)
+  }
+
+  let obj = null
+  if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event, { strict, printDebugInfo }) === true)) {
+    // implement the clone via destructuring, but at the moment it's a shallow copy (like Object.assign())
+    // TODO: check if support more ways, with a dedicated option (to comment in docs) ... wip
+    obj = { ...event }
+  } else throw new Error('Unable to clone a not valid CloudEvent.')
+
+  if (skipExtensions === true) { // delete extension properties from the cloned object
+    const extensions = CloudEvent.getExtensionsOfEvent(obj)
+    let count = 0
+    for (const [key] of Object.entries(extensions)) { // removed value from items because not used
+      delete obj[key]
+      count++
+    }
+    if (printDebugInfo === true) {
+      console.log(`DEBUG | filtered ${count} extensions`)
+    }
+  }
+
+  if (printDebugInfo === true) {
+    console.log(`DEBUG | cloned object: ${JSON.stringify(obj)}`)
+  }
+
+  return obj
+}
+
 module.exports = {
-  createFromObject
+  createFromObject,
+  cloneToObject
 }

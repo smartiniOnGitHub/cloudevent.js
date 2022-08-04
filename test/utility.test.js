@@ -18,6 +18,9 @@
 const assert = require('node:assert').strict
 const test = require('tap').test
 
+// get factory for instances to test, in its own source
+const ceFactory = require('../example/common-example-factory')
+
 // import some common test data
 const {
   ceCommonData,
@@ -73,7 +76,6 @@ test('ensure utility module exists and has the right type', (t) => {
 
 /** @test {CloudEventUtilities} */
 test('ensure utility function createFromObject exists and works in the right way: initial tests', (t) => {
-  t.ok(U)
   t.ok(U.createFromObject)
   t.equal(typeof U.createFromObject, 'function')
 
@@ -188,17 +190,17 @@ test('ensure utility function createFromObject exists and works in the right way
     const objStrict = { ...objMinimalBadSource, ...ceOptionsStrict }
     const ceStrict = U.createFromObject(objStrict, valDebugInfoDisable) // expected success because no validation requested
     t.ok(ceStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
-    // console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ceStrict)}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${JSON.stringify(ceStrict)}`)
     t.notOk(ceStrict.isValid()) // ce is already strict
     t.ok(ceStrict.isValid(valOptionsNoStrict)) // force validation no strict
     t.notOk(ceStrict.isValid(valOptionsStrict)) // force validation strict
   }
   t.throws(function () {
     const ce = U.createFromObject(objMinimalBadSource, { ...valOptionsStrict, ...valOnlyValidInstance })
-    // console.log(`DEBUG - cloudEvent details: ${JSON.stringify(ce)}`)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ce, null, 'ce')}`)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ce, { ...valOptionsStrict }, 'ce')}`)
+    // console.log(`DEBUG | cloudEvent details: ${JSON.stringify(ce)}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ce, null, 'ce')}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ce, { ...valOptionsStrict }, 'ce')}`)
     assert(ce !== null) // wrong assertion but never executed
   }, Error, 'Expected exception when ask to create a CloudEvent with not valid properties and validation requested')
 
@@ -294,7 +296,7 @@ test('ensure utility function createFromObject exists and works in the right way
   }
 
   const objFullData = {
-    id: '1/full/binary-data/strict',
+    id: '1/full/normal-data/strict',
     type: ceNamespace,
     source: ceServerUrl,
     data: ceCommonData,
@@ -319,3 +321,124 @@ test('ensure utility function createFromObject exists and works in the right way
 
   t.end()
 })
+
+/** @test {CloudEventUtilities} */
+test('ensure utility function cloneToObject exists and works in the right way', (t) => {
+  t.ok(U.cloneToObject)
+
+  // test with some good arguments but ce mandatory arguments missing
+  // (but with no strict mode in ce) or no validation requested (expected success)
+  t.throws(function () {
+    const obj = U.cloneToObject({})
+    assert(obj !== null) // wrong assertion but never executed
+  }, Error, 'Expected exception when ask to clone a bad CloudEvent')
+
+  // reference some imported variables, even when not used, mainly to avoid linting errors
+  assert(valDebugInfoDisable !== null)
+  assert(valDebugInfoEnable !== null)
+  assert(valExcludeExtensionsDisable !== null)
+  assert(valExcludeExtensionsEnable !== null)
+
+  // test with other bad arguments (missing/wrong/duplicated ce mandatory arguments)
+  {
+    // create an instance with a string data attribute (and default datacontenttype), but with strict flag disabled: expected success ...
+    // bad because of the default datacontenttype, but validation error only in strict mode
+    const ce = ceFactory.createMinimalBadSource()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is not strict
+    t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
+    t.notOk(ce.isValid(valOptionsStrict)) // force validation strict
+
+    const obj = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsNoStrict }) // force defaults: validation no strict (already set), print debug info disable
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+
+    t.throws(function () {
+      // expected failure because this ce is not valid in strict mode
+      const objOnlyIfValid = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsStrict, ...valOnlyValidInstance }) // override some options: validation strict, return obj only if ce is valid
+      assert(objOnlyIfValid !== null) // wrong assertion but never executed
+    }, Error, 'Expected exception when ask to clone a not valid CloudEvent (depending on validation options)')
+  }
+
+  {
+    // create an instance with a string data attribute, with strict flag disabled: expected success ...
+    // TODO: update it to be good but not in strict mode ... wip
+    const ce = ceFactory.createFullTextData()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is not strict
+    t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
+    t.ok(ce.isValid(valOptionsStrict)) // force validation strict
+
+    // const obj = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsNoStrict }) // force defaults: validation no strict (already set), print debug info disable
+    // TODO: ... wip
+  }
+
+  // more tests later ...
+
+  t.end()
+})
+
+/** @test {CloudEventUtilities} */
+test('ensure utility function cloneToObject exists and works in the right way: test with good arguments and attributes', (t) => {
+  t.ok(U.cloneToObject)
+
+  // test with some good arguments for ce and good attributes
+  // use directly strict ce instances in some cases for better/safer compliance
+  {
+    // create an instance with a string data attribute, with strict flag disabled: expected success ...
+    // good even in strict mode
+    const ce = ceFactory.createFullTextData()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is not strict
+    t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
+    t.ok(ce.isValid(valOptionsStrict)) // force validation strict
+
+    const obj = U.cloneToObject(ce, {
+      ...valDebugInfoDisable, // default
+      ...valOptionsStrict, // doverride to strict
+      ...valOnlyValidInstance, // override
+      ...valExcludeExtensionsDisable // default
+    })
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+    t.ok(obj.exampleextension) // ensure a specific extension property has not been filtered out in obj
+    t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
+
+    // the same but filtering out extensions, as a sample
+    const objNoExtensions = U.cloneToObject(ce, {
+      ...valDebugInfoDisable, // default
+      ...valOptionsStrict, // override to strict
+      ...valOnlyValidInstance, // override
+      ...valExcludeExtensionsEnable // override
+    })
+    t.ok(objNoExtensions)
+    t.notOk(CloudEvent.isCloudEvent(objNoExtensions)) // objNoExtensions is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in objNoExtensions
+    // ensure extension proprties does not exist in objNoExtensions, but still exist in ce
+    t.notOk(objNoExtensions.exampleextension)
+    t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
+  }
+
+  /*
+  // TODO: ... wip
+  const ce = ceFactory.createFullStrictJSONTextData()
+  // ...
+
+  const ce = ceFactory.createFullStrict()
+  // ...
+
+  // TODO: test even with nested data ... wip
+  // ...
+  */
+
+  // more tests later ...
+
+  t.end()
+})
+
+// TODO: refactor test objects here ... wip
