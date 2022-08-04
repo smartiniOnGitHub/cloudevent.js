@@ -382,7 +382,7 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
 
   {
     const error = {}
-    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    // console.log(`DEBUG | error details: ${T.dumpObject(error, 'error')}`)
     t.ok(!V.isError(error))
     t.ok(!V.ensureIsObjectOrCollection(error, 'error')) // no error returned
     t.ok(V.ensureIsError(error, 'error')) // expected error returned
@@ -392,10 +392,10 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
 
   {
     const error = new Error()
-    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    // console.log(`DEBUG | error details: ${T.dumpObject(error, 'error')}`)
     t.ok(V.isError(error))
     const data = T.errorToData(error)
-    // console.log(`DEBUG - data details: ${T.dumpObject(data, 'data')}`)
+    // console.log(`DEBUG | data details: ${T.dumpObject(data, 'data')}`)
     t.ok(data)
     t.ok(V.isObject(data))
     t.strictSame(data, { name: 'Error', message: '', stack: null, status: 'error' })
@@ -403,10 +403,10 @@ test('ensure errors are transformed into data attribute in the right way', (t) =
 
   {
     const error = new TypeError()
-    // console.log(`DEBUG - error details: ${T.dumpObject(error, 'error')}`)
+    // console.log(`DEBUG | error details: ${T.dumpObject(error, 'error')}`)
     t.ok(V.isError(error))
     const data = T.errorToData(error)
-    // console.log(`DEBUG - data details: ${T.dumpObject(data, 'data')}`)
+    // console.log(`DEBUG | data details: ${T.dumpObject(data, 'data')}`)
     t.ok(data)
     t.ok(V.isObject(data))
     t.strictSame(data, { name: 'TypeError', message: '', stack: null, status: 'error' })
@@ -527,7 +527,7 @@ test('ensure process info are transformed into data attribute in the right way',
 
   {
     const data = T.processInfoToData()
-    // console.log(`DEBUG - data: ${T.dumpObject(data, 'data')}`)
+    // console.log(`DEBUG | data: ${T.dumpObject(data, 'data')}`)
     t.ok(V.isObject(data))
     t.ok(!V.ensureIsObjectOrCollection(data, 'data')) // no error returned
     t.strictSame(V.ensureIsObjectOrCollection(data, 'data'), undefined) // no error returned
@@ -634,7 +634,7 @@ test('ensure objects are merged in the right way', (t) => {
   {
     const base = { bVal: 1, bName: 'Base' }
     const obj = T.mergeObjects(base, { ext1Val: 10, ext1Name: 'Extension1' }, { ext2Val: 20, ext2Name: 'Extension2' })
-    // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'merged')}`)
+    // console.log(`DEBUG | merged details: ${T.dumpObject(obj, 'merged')}`)
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
   }

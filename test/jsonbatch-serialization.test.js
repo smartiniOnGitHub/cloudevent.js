@@ -270,7 +270,7 @@ test('ensure serialization functions works in the right way', (t) => {
     prettyPrint: true,
     logError: true
   }, null) // callback set to null here to avoid a lot of stuff in console
-  // console.log(`DEBUG: serialized JSONBatch (prettyPrint enabled) = ${ser}`)
+  // console.log(`DEBUG | serialized JSONBatch (prettyPrint enabled) = ${ser}`)
   assert(ser !== null)
   t.ok(ser)
 
@@ -289,8 +289,8 @@ test('ensure serialization functions works in the right way', (t) => {
     ...valOnlyValidInstance,
     ...valOptionsNoStrict
   })
-  // console.log(`DEBUG: events JSONBatch length = ${events.length}, summary: ${events}`)
-  // console.log(`DEBUG: events JSONBatch length = ${events.length}, details: ${JSON.stringify(events)}`)
+  // console.log(`DEBUG | events JSONBatch length = ${events.length}, summary: ${events}`)
+  // console.log(`DEBUG | events JSONBatch length = ${events.length}, details: ${JSON.stringify(events)}`)
   assert(events !== null)
   t.ok(events)
   t.strictSame(events.length, 2)
@@ -301,8 +301,8 @@ test('ensure serialization functions works in the right way', (t) => {
     ...valOnlyValidInstance // sample, to filter out not valid serialized instances ...
     // onlyIfLessThan64KB: true // to force throw here ...
   }, dumpCallback)
-  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
-  // console.log(`DEBUG: deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
+  // console.log(`DEBUG | deserialized JSONBatch length = ${deser.length}, summary: ${deser}`)
+  // console.log(`DEBUG | deserialized JSONBatch length = ${deser.length}, details: ${JSON.stringify(deser)}`)
   assert(deser !== null)
   t.ok(deser)
   t.strictSame(deser.length, 2)

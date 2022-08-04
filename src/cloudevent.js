@@ -328,7 +328,7 @@ class CloudEvent {
   }
 
   /**
-   * Get all extensions from the given object.
+   * Get all extensions (non standard) properties from the given object.
    * Should not be used outside CloudEvent.
    *
    * @private
@@ -478,7 +478,7 @@ class CloudEvent {
     const validationErrors = CloudEvent.validateEvent(event, { strict, dataschemavalidator, timezoneOffset })
     const size = V.getSize(validationErrors)
     if (printDebugInfo === true) { // print some debug info
-      console.log(`DEBUG - validation errors found: ${size}, details: ${JSON.stringify(validationErrors)}`)
+      console.log(`DEBUG | validation errors found: ${size}, details: ${JSON.stringify(validationErrors)}`)
     }
     return (size === 0)
   }

@@ -78,8 +78,8 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.equal(typeof ceMinimal, 'object')
@@ -263,7 +263,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.notOk(JSONBatch.isValidBatch(arr)) // it has some validation error (on its content)
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsNoStrict).length, 8) // expected validation errors
   t.strictSame(JSONBatch.validateBatch(arr, valOptionsStrict).length, 14) // expected validation errors
-  // console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length}`)
+  // console.log(`DEBUG | JSONBatch.getEvents, num: ${JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length}`)
   t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsNoStrict }).length, 4) // no filtering
   t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidAllInstance, ...valOptionsStrict }).length, 4) // strict true with onlyValid false makes no filtering
   t.strictSame(JSONBatch.getEvents(arr, { ...valOnlyValidInstance, ...valOptionsNoStrict }).length, 4) // only valid

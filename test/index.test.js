@@ -70,8 +70,8 @@ test('ensure objects exported by index script, exists and are of the right type'
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimal, CloudEvent))

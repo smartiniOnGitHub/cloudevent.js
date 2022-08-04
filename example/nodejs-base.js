@@ -190,9 +190,9 @@ console.log(`ce dump: ${T.dumpObject(ceFullStrictBinaryData, 'ceFullStrictBinary
 // then, to validate objects, use class static methods like 'isValidEvent' and 'ValidateEvent', or instance methods like 'isValid', 'validate', etc ...
 assert(!ceEmpty.isValid())
 assert(!ceMinimalMandatoryUndefinedNoStrict.isValid())
-// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceMinimalBadSource, null, 'ceMinimalBadSource')}`)
+// console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceMinimalBadSource, null, 'ceMinimalBadSource')}`)
 assert(ceMinimalBadSource.isValid())
-// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceMinimalBadSource, valOptionsStrict, 'ceMinimalBadSource')}`)
+// console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceMinimalBadSource, valOptionsStrict, 'ceMinimalBadSource')}`)
 assert(!ceMinimalBadSource.isValid(valOptionsStrict))
 assert(ceMinimal.isValid())
 assert(ceMinimal.isValid(valOptionsStrict))
@@ -216,9 +216,9 @@ assert(CloudEvent.isValidEvent(ceFullStrictOtherContentType))
 assert(CloudEvent.isValidEvent(ceFullTextData))
 assert(CloudEvent.isValidEvent(ceFullTextData, valOptionsStrict))
 assert(CloudEvent.isValidEvent(ceFullStrictBinaryData))
-// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, null, 'ceEmpty')}`)
+// console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceEmpty, null, 'ceEmpty')}`)
 assert(CloudEvent.validateEvent(ceEmpty).length === 3)
-// console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceEmpty, valOptionsStrict, 'ceEmpty')}`)
+// console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceEmpty, valOptionsStrict, 'ceEmpty')}`)
 assert(CloudEvent.validateEvent(ceEmpty, valOptionsStrict).length === 4)
 assert(CloudEvent.validateEvent(ceMinimalMandatoryUndefinedNoStrict).length > 0)
 assert(CloudEvent.validateEvent(ceMinimal).length === 0)
@@ -359,7 +359,7 @@ console.log(`JSONBatch validation errors in strict mode, details:\n${JSONBatch.v
 assert(JSONBatch.validateBatch(batch, valOptionsNoStrict).length === 8) // expected validation errors
 assert(JSONBatch.validateBatch(batch, valOptionsStrict).length === 13) // expected validation errors
 // sample filtering of events
-// console.log(`DEBUG - JSONBatch.getEvents, num: ${JSONBatch.getEvents(batch, { ...valOnlyValidInstance, strict: true }).length}`)
+// console.log(`DEBUG | JSONBatch.getEvents, num: ${JSONBatch.getEvents(batch, { ...valOnlyValidInstance, strict: true }).length}`)
 assert(JSONBatch.getEvents(batch, { ...valOnlyValidAllInstance, strict: false }).length === 8) // no filtering
 assert(JSONBatch.getEvents(batch, { ...valOnlyValidAllInstance, strict: true }).length === 8) // no filtering (neither in strict mode)
 assert(JSONBatch.getEvents(batch, { ...valOnlyValidInstance, strict: false }).length === 8) // only valid

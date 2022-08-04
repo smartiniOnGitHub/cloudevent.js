@@ -119,10 +119,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.equal(ceFull.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFull))
     const ceFullAsString = ceFull.toString()
-    // console.log(`DEBUG - ceFullAsString: ${ceFullAsString}`)
+    // console.log(`DEBUG | ceFullAsString: ${ceFullAsString}`)
     t.ok(V.isString(ceFullAsString))
     const ceFullPayloadDumped = T.dumpObject(ceFull.payload, 'payload')
-    // console.log(`DEBUG - ceFullPayloadDumped: ${ceFullPayloadDumped}`)
+    // console.log(`DEBUG | ceFullPayloadDumped: ${ceFullPayloadDumped}`)
     t.ok(V.isString(ceFullPayloadDumped))
     t.ok(ceFullPayloadDumped.length < 1024)
 
@@ -213,10 +213,10 @@ test('serialize some CloudEvent instances to JSON, and ensure they are right', (
     t.equal(ceFullStrict.datacontenttype, CloudEvent.datacontenttypeDefault())
     t.ok(CloudEvent.isDatacontenttypeJSONEvent(ceFullStrict))
     const ceFullStrictAsString = ceFullStrict.toString()
-    // console.log(`DEBUG - ceFullStrictAsString: ${ceFullStrictAsString}`)
+    // console.log(`DEBUG | ceFullStrictAsString: ${ceFullStrictAsString}`)
     t.ok(V.isString(ceFullStrictAsString))
     const ceFullStrictPayloadDumped = T.dumpObject(ceFullStrict.payload, 'payload')
-    // console.log(`DEBUG - ceFullStrictPayloadDumped: ${ceFullStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceFullStrictPayloadDumped: ${ceFullStrictPayloadDumped}`)
     t.ok(V.isString(ceFullStrictPayloadDumped))
     t.ok(ceFullStrictPayloadDumped.length < 1024)
 
@@ -1081,17 +1081,17 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
 
   {
     const serialized = ceNestedFullSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
     const ceDeserialized = CloudEvent.deserializeEvent(serialized)
     assert(ceDeserialized !== null)
-    // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
-    // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent type: ${typeof ceDeserialized}`)
+    // console.log(`DEBUG | cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -1115,8 +1115,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.strictSame(ceDeserializedTimeTransformed.getTime(), commonEventTime.getTime())
     t.not(ceDeserializedTimeTransformed, commonEventTime)
     t.not(ceDeserialized.time, commonEventTime)
-    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
-    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    // console.log(`DEBUG | cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG | cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data)
     t.ok(V.isObject(ceDeserialized.data))
     t.ok(ceDeserialized.payload)
@@ -1132,17 +1132,17 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
   {
     // the same but with strict mode enabled ...
     const serialized = ceNestedFullStrictSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
     const ceDeserialized = CloudEvent.deserializeEvent(serialized)
     assert(ceDeserialized !== null)
-    // console.log(`DEBUG - cloudEvent type: ${typeof ceDeserialized}`)
-    // console.log(`DEBUG - cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent type: ${typeof ceDeserialized}`)
+    // console.log(`DEBUG | cloudEvent details: ceDeserialized = ${JSON.stringify(ceDeserialized)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -1166,8 +1166,8 @@ test('deserialize some CloudEvent instances from JSON, and ensure built instance
     t.strictSame(ceDeserializedTimeTransformed.getTime(), commonEventTime.getTime())
     t.not(ceDeserializedTimeTransformed, commonEventTime)
     t.not(ceDeserialized.time, commonEventTime)
-    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
-    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    // console.log(`DEBUG | cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG | cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data)
     t.ok(V.isObject(ceDeserialized.data))
     t.ok(ceDeserialized.payload)
@@ -1189,7 +1189,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
 
   {
     const serialized = ceFullOtherContentTypeSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -1242,7 +1242,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and empty
   {
     // the same but with strict mode enabled ...
     const serialized = ceFullOtherContentTypeStrictSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -1315,7 +1315,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
 
   {
     const serialized = ceFullOtherContentTypeSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -1355,7 +1355,7 @@ test('deserialize a CloudEvent instance with a non default contenttype and right
   {
     // the same but with strict mode enabled ...
     const serialized = ceFullOtherContentTypeStrictSerializedJson
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -1899,7 +1899,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       },
       ceCommonExtensions
     )
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFull, 'ceFull')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceFull, 'ceFull')}`)
     t.ok(ceFull)
     t.ok(CloudEvent.isValidEvent(ceFull, valOptionsNoStrict))
     t.ok(CloudEvent.isValidEvent(ceFull, valOptionsStrict))
@@ -1911,7 +1911,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
 
     const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFull)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
     t.ok(ceFullSerializedStatic)
     const ceFullSerialized = ceFull.serialize()
     t.ok(ceFullSerialized)
@@ -1928,9 +1928,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceFullSerializedOnlyValidTrue)
 
     const ceDeserialized = CloudEvent.deserializeEvent(ceFullSerializedStatic)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -1954,9 +1954,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.strictSame(ceDeserializedTimeTransformed.getTime(), commonEventTime.getTime())
     t.not(ceDeserializedTimeTransformed, commonEventTime)
     t.not(ceDeserialized.time, commonEventTime)
-    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
-    // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
-    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    // console.log(`DEBUG | cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG | cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
+    // console.log(`DEBUG | cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data_base64)
     t.ok(V.isString(ceDeserialized.data_base64))
     t.ok(ceDeserialized.payload)
@@ -1972,14 +1972,14 @@ test('create and deserialize some CloudEvent instances with data encoded in base
 
     {
       const serialized = ceFullSerializedStatic
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+      // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
       t.ok(serialized)
       t.ok(V.isString(serialized))
       // some checks on serialized instance
       const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
       // ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      // console.log(`DEBUG - original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
-      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
+      // console.log(`DEBUG | original cloudEvent: data = '${ceFull.data}', data_base64 = '${ceFull.data_base64}'`)
+      // console.log(`DEBUG | deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
       t.strictNotSame(ceFullDeserializedJSON, ceFull)
       t.strictSame(ceFullDeserializedJSON.data, ceFull.data)
@@ -1988,7 +1988,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     {
       // test with not supported data (not a string representation)
       const serialized = ceFullSerializedStatic.replace(ceDataEncoded, '{}')
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+      // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
       // some checks on serialized instance, but using deserialization methods
       t.throws(function () {
         const ceDeserialized = CloudEvent.deserializeEvent(serialized)
@@ -2010,7 +2010,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
       },
       ceCommonExtensions
     )
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceFullStrict, 'ceFullStrict')}`)
     t.ok(ceFullStrict)
     t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsNoStrict))
     t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsStrict))
@@ -2022,7 +2022,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
 
     const ceFullSerializedStatic = CloudEvent.serializeEvent(ceFullStrict)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceFullSerializedStatic, 'ceFullSerializedStatic')}`)
     t.ok(ceFullSerializedStatic)
     const ceFullSerialized = ceFullStrict.serialize()
     t.ok(ceFullSerialized)
@@ -2039,9 +2039,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.ok(ceFullSerializedOnlyValidTrue)
 
     const ceDeserialized = CloudEvent.deserializeEvent(ceFullSerializedStatic)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -2065,9 +2065,9 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     t.strictSame(ceDeserializedTimeTransformed.getTime(), commonEventTime.getTime())
     t.not(ceDeserializedTimeTransformed, commonEventTime)
     t.not(ceDeserialized.time, commonEventTime)
-    // console.log(`DEBUG - cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
-    // console.log(`DEBUG - cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
-    // console.log(`DEBUG - cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
+    // console.log(`DEBUG | cloudEvent data: ${T.dumpObject(ceDeserialized.data, 'ceDeserialized.data')}`)
+    // console.log(`DEBUG | cloudEvent data_base64: ${T.dumpObject(ceDeserialized.data_base64, 'ceDeserialized.data_base64')}`)
+    // console.log(`DEBUG | cloudEvent payload: ${T.dumpObject(ceDeserialized.payload, 'ceDeserialized.payload')}`)
     t.ok(ceDeserialized.data_base64)
     t.ok(V.isString(ceDeserialized.data_base64))
     t.ok(ceDeserialized.payload)
@@ -2083,14 +2083,14 @@ test('create and deserialize some CloudEvent instances with data encoded in base
 
     {
       const serialized = ceFullSerializedStatic
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+      // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
       t.ok(serialized)
       t.ok(V.isString(serialized))
       // some checks on serialized instance
       const ceFullDeserializedJSON = JSON.parse(ceFullSerializedStatic) // note that some fields (like dates) will be different when deserialized in this way ...
       // ceFullDeserializedJSON.time = commonEventTime // quick fix for the Date/timestamp attribute in the deserialized object
-      // console.log(`DEBUG - original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
-      // console.log(`DEBUG - deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
+      // console.log(`DEBUG | original cloudEvent: data = '${ceFullStrict.data}', data_base64 = '${ceFullStrict.data_base64}'`)
+      // console.log(`DEBUG | deserialized cloudEvent: data = '${ceFullDeserializedJSON.data}', data_base64 = '${ceFullDeserializedJSON.data_base64}'`)
       // next tests are so because here deserialization is done with standard JSON, and not with ce specific method ...
       t.strictNotSame(ceFullDeserializedJSON, ceFullStrict)
       t.strictSame(ceFullDeserializedJSON.data, ceFullStrict.data)
@@ -2099,7 +2099,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
     {
       // test with not supported data (not a string representation)
       const serialized = ceFullSerializedStatic.replace(ceDataEncoded, '{}')
-      // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+      // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
       // some checks on serialized instance, but using deserialization methods
       t.throws(function () {
         const ceDeserialized = CloudEvent.deserializeEvent(serialized)
@@ -2134,7 +2134,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
       ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceBig, 'ceBig')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceBig, 'ceBig')}`)
     t.ok(ceBig)
     t.ok(CloudEvent.isValidEvent(ceBig, valOptionsNoStrict))
     t.ok(CloudEvent.isValidEvent(ceBig, valOptionsStrict))
@@ -2145,15 +2145,15 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
     const ceBigAsString = ceBig.toString()
-    // console.log(`DEBUG - ceBigAsString: ${ceBigAsString}`)
+    // console.log(`DEBUG | ceBigAsString: ${ceBigAsString}`)
     t.ok(V.isString(ceBigAsString))
     const ceBigPayloadDumped = T.dumpObject(ceBig.payload, 'payload')
-    // console.log(`DEBUG - ceBigPayloadDumped: ${ceBigPayloadDumped}`)
+    // console.log(`DEBUG | ceBigPayloadDumped: ${ceBigPayloadDumped}`)
     t.ok(V.isString(ceBigPayloadDumped))
     t.ok(ceBigPayloadDumped.length >= 1024)
     // use default serialization options, expected success
     const ceSerialized = CloudEvent.serializeEvent(ceBig)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
     t.ok(ceSerialized)
     t.ok(V.isString(ceSerialized))
     // force some options (big objects are already enabled anyway), expected success
@@ -2169,9 +2169,9 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
 
     // use default deserialization options, expected success
     const ceDeserialized = CloudEvent.deserializeEvent(ceSerialized)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -2227,7 +2227,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
       ceOptionsWithDataInBase64,
       ceCommonExtensions
     )
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceBigStrict, 'ceBigStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceBigStrict, 'ceBigStrict')}`)
     t.ok(ceBigStrict)
     t.ok(CloudEvent.isValidEvent(ceBigStrict, valOptionsNoStrict))
     t.ok(CloudEvent.isValidEvent(ceBigStrict, valOptionsStrict))
@@ -2238,16 +2238,16 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
     t.strictSame(T.stringToBase64(ceDataAsString), ceDataEncoded)
     t.strictSame(T.stringFromBase64(T.stringToBase64(ceDataAsString)), ceDataAsString)
     const ceBigStrictAsString = ceBigStrict.toString()
-    // console.log(`DEBUG - ceBigStrictAsString: ${ceBigStrictAsString}`)
+    // console.log(`DEBUG | ceBigStrictAsString: ${ceBigStrictAsString}`)
     t.ok(V.isString(ceBigStrictAsString))
     const ceBigStrictPayloadDumped = T.dumpObject(ceBigStrict.payload, 'payload')
-    // console.log(`DEBUG - ceBigStrictPayloadDumped: ${ceBigStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceBigStrictPayloadDumped: ${ceBigStrictPayloadDumped}`)
     t.ok(V.isString(ceBigStrictPayloadDumped))
     t.ok(ceBigStrictPayloadDumped.length >= 1024)
 
     // use default serialization options, expected success
     const ceSerialized = CloudEvent.serializeEvent(ceBigStrict)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceSerialized, 'ceSerialized')}`)
     t.ok(ceSerialized)
     t.ok(V.isString(ceSerialized))
     // force some options (big objects are already enabled anyway), expected success
@@ -2263,9 +2263,9 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
 
     // use default deserialization options, expected success
     const ceDeserialized = CloudEvent.deserializeEvent(ceSerialized)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
-    // console.log(`DEBUG - cloudEvent validation: ${ceDeserialized.validate()}`)
-    // console.log(`DEBUG - cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserialized, 'ceDeserialized')}`)
+    // console.log(`DEBUG | cloudEvent validation: ${ceDeserialized.validate()}`)
+    // console.log(`DEBUG | cloudEvent validation (strict): ${ceDeserialized.validate(valOptionsStrict)}`)
     t.ok(ceDeserialized)
     t.ok(V.isClass(ceDeserialized, CloudEvent))
     t.ok(ceDeserialized.isValid())
@@ -2325,7 +2325,7 @@ test('deserialize some CloudEvent instances (but a previous specversion) from JS
 
   {
     const serialized = ceFullSerializedJson03
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -2338,7 +2338,7 @@ test('deserialize some CloudEvent instances (but a previous specversion) from JS
   {
     // the same but with strict mode enabled ...
     const serialized = ceFullStrictSerializedJson03
-    // console.log(`DEBUG - serialized cloudEvent details: serialized = '${serialized}'`)
+    // console.log(`DEBUG | serialized cloudEvent details: serialized = '${serialized}'`)
     t.ok(serialized)
     t.ok(V.isString(serialized))
 
@@ -2367,18 +2367,18 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     )
     assert(ceStrict !== null)
     t.ok(ceStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 
   {
@@ -2393,18 +2393,18 @@ test('serialize and deserialize some CloudEvent instances with some optional att
     )
     assert(ceStrict !== null)
     t.ok(ceStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.ok(ceStrict.isValid())
     t.strictSame(ceStrict.payload, ceStrict.data)
     t.strictSame(ceStrict.dataType, 'Unknown')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 
   t.end()
@@ -2431,15 +2431,15 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
     t.strictSame(ceStrict.dataType, 'Text')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
     const ceStrictAsString = ceStrict.toString()
-    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    // console.log(`DEBUG | ceStrictAsString: ${ceStrictAsString}`)
     t.ok(V.isString(ceStrictAsString))
     const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
-    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
   }
@@ -2463,19 +2463,19 @@ test('serialize and deserialize some CloudEvent instances with data as array, an
       ...valOnlyValidInstance
     })
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     // const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue) // ok but shouldn't work in this case
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue, { // sample, to show the right way
       decodedData: ceArrayData, // with a non default data content type, I need to specify encoder or encodedData
       ...valOnlyValidInstance
     })
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
     const ceStrictAsString = ceStrict.toString()
-    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    // console.log(`DEBUG | ceStrictAsString: ${ceStrictAsString}`)
     t.ok(V.isString(ceStrictAsString))
     const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
-    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
   }
@@ -2505,15 +2505,15 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.strictSame(ceStrict.dataType, 'Text')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
     const ceStrictAsString = ceStrict.toString()
-    // console.log(`DEBUG - ceStrictAsString: ${ceStrictAsString}`)
+    // console.log(`DEBUG | ceStrictAsString: ${ceStrictAsString}`)
     t.ok(V.isString(ceStrictAsString))
     const ceStrictPayloadDumped = T.dumpObject(ceStrict.payload, 'payload')
-    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
   }
@@ -2535,10 +2535,10 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.strictSame(ceStrict.dataType, 'Text')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 
   {
@@ -2558,10 +2558,10 @@ test('serialize and deserialize some CloudEvent instances with data as value (st
     t.strictSame(ceStrict.dataType, 'Text')
     const ceSerializedOnlyValidTrue = CloudEvent.serializeEvent(ceStrict, valOnlyValidInstance)
     t.ok(ceSerializedOnlyValidTrue)
-    // console.log(`DEBUG - ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
+    // console.log(`DEBUG | ceStrict serialized:\n${ceSerializedOnlyValidTrue}`)
     const ceDeserializedOnlyValidTrue = CloudEvent.deserializeEvent(ceSerializedOnlyValidTrue)
     t.ok(ceDeserializedOnlyValidTrue)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceDeserializedOnlyValidTrue, 'ceDeserializedOnlyValidTrue')}`)
   }
 
   t.end()

@@ -75,9 +75,9 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
-    // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
+    // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG | cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
 
     // check that created instances belongs to the right base class
     t.equal(typeof ceMinimal, 'object')
@@ -108,17 +108,17 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
     t.ok(CloudEvent.isValidEvent(ceMinimalStrict))
 
     const ceStrictAsString = ceMinimalStrict.toString()
-    // console.log(`DEBUG - ceStrictAsString: ${ceMinimalStrict}`)
+    // console.log(`DEBUG | ceStrictAsString: ${ceMinimalStrict}`)
     t.ok(V.isString(ceStrictAsString))
     const ceStrictPayloadDumped = T.dumpObject(ceMinimalStrict.payload, 'payload')
-    // console.log(`DEBUG - ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
+    // console.log(`DEBUG | ceStrictPayloadDumped: ${ceStrictPayloadDumped}`)
     t.ok(V.isString(ceStrictPayloadDumped))
     t.ok(ceStrictPayloadDumped.length < 1024)
 
     // ensure getter for time as Date works in the right way
     const ceStrictTimeAsString = ceMinimalStrict.time
     const ceStrictTimeAsDate = ceMinimalStrict.timeAsDate
-    // console.log(`DEBUG - ceStrictTimeAsString: ${ceStrictTimeAsString}, ceStrictTimeAsDate: ${ceStrictTimeAsDate}`)
+    // console.log(`DEBUG | ceStrictTimeAsString: ${ceStrictTimeAsString}, ceStrictTimeAsDate: ${ceStrictTimeAsDate}`)
     t.ok(ceStrictTimeAsString)
     t.ok(V.isStringNotEmpty(ceStrictTimeAsString))
     t.ok(ceStrictTimeAsDate)
@@ -157,35 +157,35 @@ test('ensure dumpValidationResults works good on undefined, null, and wrong obje
   {
     // undefined
     const ceDumpValidationResults = CloudEvent.dumpValidationResults(undefined, valOptionsStrict)
-    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
 
   {
     // null
     const ceDumpValidationResults = CloudEvent.dumpValidationResults(null, valOptionsStrict)
-    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
 
   {
     // object, not in strict mode
     const ceDumpValidationResults = CloudEvent.dumpValidationResults({})
-    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
 
   {
     // object, with null options
     const ceDumpValidationResults = CloudEvent.dumpValidationResults({}, null)
-    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
 
   {
     // object
     const ceDumpValidationResults = CloudEvent.dumpValidationResults({}, valOptionsStrict)
-    // console.log(`DEBUG - dump validation errors: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
   }
 
@@ -212,7 +212,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.strictSame(ceEmpty.validate().length, 3) // simplify comparison of results, check only the  number of expected errors ...
     t.ok(!ceEmpty.isStrict)
     const ceDumpValidationResults = CloudEvent.dumpValidationResults(ceEmpty, valOptionsStrict, 'ceStrict')
-    // console.log(`DEBUG - dump validation errors for ceEmpty: ${ceDumpValidationResults}`)
+    // console.log(`DEBUG | dump validation errors for ceEmpty: ${ceDumpValidationResults}`)
     t.ok(ceDumpValidationResults.length > 0) // expected validation errors
     t.strictSame(ceEmpty.validate(valOptionsStrict).length, 4) // simplify comparison of results, check only the  number of expected errors ...
   }
@@ -256,9 +256,9 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
-    // console.log(`DEBUG - cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
+    // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG | cloudEvent details: ${ceMinimal}`) // implicit call of its toString method ...
     t.ok(CloudEvent.isValidEvent(ceMinimal))
     t.strictSame(CloudEvent.validateEvent(ceMinimal), [])
     // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
@@ -1238,7 +1238,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
     t.ok(base.isValid(valOptionsNoStrict)) // strict false here because base is missing some attribute, for the test
     t.ok(!base.isStrict)
     const obj = T.mergeObjects(base, { data: ceCommonData }, ceCommonOptions, ceExtensionStrict)
-    // console.log(`DEBUG - merged details: ${T.dumpObject(obj, 'obj')}`)
+    // console.log(`DEBUG | merged details: ${T.dumpObject(obj, 'obj')}`)
     // after the merge now I have to transform time from Date to the right string representation (like in the constructor)
     obj.time = T.timestampToString(obj.time)
     t.ok(obj)
@@ -1513,8 +1513,8 @@ test('ensure null values in some optional attributes are managed in the right wa
     )
     assert(ceStrict !== null)
     t.ok(ceStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.ok(CloudEvent.isValidEvent(ceStrict, valOptionsStrict))
     t.strictSame(CloudEvent.validateEvent(ceStrict), [])
@@ -1563,8 +1563,8 @@ test('ensure null values in some optional attributes are managed in the right wa
     )
     assert(ceStrict !== null)
     t.ok(ceStrict)
-    // console.log(`DEBUG - ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
+    // console.log(`DEBUG | ${CloudEvent.dumpValidationResults(ceStrict, null, 'ceStrict')}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceStrict, 'ceStrict')}`)
     t.ok(CloudEvent.isValidEvent(ceStrict))
     t.ok(CloudEvent.isValidEvent(ceStrict, valOptionsStrict))
     t.strictSame(CloudEvent.validateEvent(ceStrict), [])

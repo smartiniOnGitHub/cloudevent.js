@@ -66,8 +66,8 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimal)
-    // console.log(`DEBUG - cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
+    // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimal, CloudEvent))
@@ -88,8 +88,8 @@ test('create CloudEvent instances with different class hierarchy, and ensure the
       {} // data (empty) // optional, but useful the same in this sample usage
     )
     t.ok(ceMinimalSubclass)
-    // console.log(`DEBUG - cloudEvent details: ceMinimalSubclass = ${JSON.stringify(ceMinimalSubclass)}`)
-    // console.log(`DEBUG - cloudEvent details: ${T.dumpObject(ceMinimalSubclass, 'ceMinimalSubclass')}`)
+    // console.log(`DEBUG | cloudEvent details: ceMinimalSubclass = ${JSON.stringify(ceMinimalSubclass)}`)
+    // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimalSubclass, 'ceMinimalSubclass')}`)
 
     // check that created instances belongs to the right base class
     t.ok(V.isClass(ceMinimalSubclass, CloudEvent))
