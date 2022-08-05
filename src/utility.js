@@ -133,7 +133,7 @@ function cloneToObject (event = {}, {
   let obj = null
   if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event, { strict, printDebugInfo }) === true)) {
     // implement the clone via destructuring, but at the moment it's a shallow copy (like Object.assign())
-    // TODO: check if support more ways, with a dedicated option (to comment in docs) ... wip
+    // later check if support more ways, with a dedicated option (to comment in docs)
     obj = { ...event }
   } else throw new Error('Unable to clone a not valid CloudEvent.')
 

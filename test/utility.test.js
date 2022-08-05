@@ -364,16 +364,24 @@ test('ensure utility function cloneToObject exists and works in the right way', 
 
   {
     // create an instance with a string data attribute, with strict flag disabled: expected success ...
-    // TODO: update it to be good but not in strict mode ... wip
-    const ce = ceFactory.createFullTextData()
+    // bad because of the default datacontenttype, but validation error only in strict mode
+    const ce = ceFactory.createFullTextDataBadContentType()
     t.ok(ce)
     t.ok(CloudEvent.isCloudEvent(ce))
     t.ok(ce.isValid()) // ce is not strict
     t.ok(ce.isValid(valOptionsNoStrict)) // force validation no strict
-    t.ok(ce.isValid(valOptionsStrict)) // force validation strict
+    t.notOk(ce.isValid(valOptionsStrict)) // force validation strict
 
-    // const obj = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsNoStrict }) // force defaults: validation no strict (already set), print debug info disable
-    // TODO: ... wip
+    const obj = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsNoStrict }) // force defaults: validation no strict (already set), print debug info disable
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+
+    t.throws(function () {
+      // expected failure because this ce is not valid in strict mode
+      const objOnlyIfValid = U.cloneToObject(ce, { ...valDebugInfoDisable, ...valOptionsStrict, ...valOnlyValidInstance }) // override some options: validation strict, return obj only if ce is valid
+      assert(objOnlyIfValid !== null) // wrong assertion but never executed
+    }, Error, 'Expected exception when ask to clone a not valid CloudEvent (depending on validation options)')
   }
 
   // more tests later ...
@@ -399,7 +407,7 @@ test('ensure utility function cloneToObject exists and works in the right way: t
 
     const obj = U.cloneToObject(ce, {
       ...valDebugInfoDisable, // default
-      ...valOptionsStrict, // doverride to strict
+      ...valOptionsStrict, // override to strict
       ...valOnlyValidInstance, // override
       ...valExcludeExtensionsDisable // default
     })
@@ -424,17 +432,96 @@ test('ensure utility function cloneToObject exists and works in the right way: t
     t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
   }
 
-  /*
-  // TODO: ... wip
-  const ce = ceFactory.createFullStrictJSONTextData()
-  // ...
+  {
+    const ce = ceFactory.createFullStrictJSONTextData()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is strict
 
-  const ce = ceFactory.createFullStrict()
-  // ...
+    const obj = U.cloneToObject(ce, {
+      ...valDebugInfoDisable, // default
+      ...valOptionsStrict, // override to strict
+      ...valOnlyValidInstance, // override
+      ...valExcludeExtensionsDisable // default
+    })
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+    t.ok(obj.exampleextension) // ensure a specific extension property has not been filtered out in obj
+    t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
+    // ensure changes to the cloned obj does not impact ce instance
+    // but this depnds on ce content (if nested or not) and then clone method used (by default shallow, or full/structured)
+    delete obj.exampleextension // its value is a string here
+    t.notOk(obj.exampleextension) // ensure that property doesn't exist anymore
+    t.ok(ce.exampleextension) // ensure that property is still present in the ce
+    delete obj.data // its value is a string here
+    t.notOk(obj.data) // ensure that property doesn't exist anymore
+    t.ok(ce.data) // ensure that property is still present in the ce
+  }
 
-  // TODO: test even with nested data ... wip
-  // ...
-  */
+  {
+    const ce = ceFactory.createFullStrict()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is strict
+
+    const obj = U.cloneToObject(ce, {
+      ...valDebugInfoDisable, // default
+      ...valOptionsStrict, // override to strict
+      ...valOnlyValidInstance, // override
+      ...valExcludeExtensionsDisable // default
+    })
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+    t.ok(obj.exampleextension) // ensure a specific extension property has not been filtered out in obj
+    t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
+    // ensure changes to the cloned obj does not impact ce instance
+    // but this depnds on ce content (if nested or not) and then clone method used (by default shallow, or full/structured)
+    delete obj.exampleextension // its value is a string here
+    t.notOk(obj.exampleextension) // ensure that property doesn't exist anymore
+    t.ok(ce.exampleextension) // ensure that property is still present in the ce
+    delete obj.data // its value is a string here
+    t.notOk(obj.data) // ensure that property doesn't exist anymore
+    t.ok(ce.data) // ensure that property is still present in the ce
+  }
+
+  {
+    const ce = ceFactory.createFullNestedDataStrict()
+    t.ok(ce)
+    t.ok(CloudEvent.isCloudEvent(ce))
+    t.ok(ce.isValid()) // ce is strict
+
+    const obj = U.cloneToObject(ce, {
+      ...valDebugInfoDisable, // default
+      ...valOptionsStrict, // override to strict
+      ...valOnlyValidInstance, // override
+      ...valExcludeExtensionsDisable // default
+    })
+    t.ok(obj)
+    t.notOk(CloudEvent.isCloudEvent(obj)) // obj is not a CloudEvent instance
+    t.notOk(obj.isValid) // ensure that method/function does not exist in obj
+    t.ok(obj.exampleextension) // ensure a specific extension property has not been filtered out in obj
+    t.ok(ce.exampleextension) // ensure a specific extension property is still present in the ce
+    // ensure changes to the cloned obj does not impact ce instance
+    // but this depnds on ce content (if nested or not) and then clone method used (by default shallow, or full/structured)
+    delete obj.exampleextension // its value is a string here
+    t.notOk(obj.exampleextension) // ensure that property doesn't exist anymore
+    t.ok(ce.exampleextension) // ensure that property is still present in the ce
+    // change data nested attribute, as a sample
+    t.ok(obj.data.nested1.nested2)
+    // console.log(`DEBUG | obj.data: ${JSON.stringify(obj.data)}`)
+    delete obj.data.nested1.nested2
+    t.notOk(obj.data.nested1.nested2) // ensure that attribute has been deleted
+    // t.ok(ce.data.nested1.nested2) // true when cloned in a full/structured way
+    t.notOk(ce.data.nested1.nested2) // that attribute has been deleted even here, because of the shallow clone; pay attention
+    // console.log(`DEBUG | obj.data: ${JSON.stringify(obj.data)}`)
+    // console.log(`DEBUG | ce.data:  ${JSON.stringify(ce.data)}`)
+
+    delete obj.data // its value is a string here
+    t.notOk(obj.data) // ensure that property doesn't exist anymore
+    t.ok(ce.data) // ensure that property is still present in the ce
+  }
 
   // more tests later ...
 

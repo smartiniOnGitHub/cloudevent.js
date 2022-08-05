@@ -42,6 +42,7 @@ const {
   ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
+  ceDataNested,
   ceNamespace,
   ceOptionsNoStrict,
   ceOptionsStrict,
@@ -116,12 +117,31 @@ function createFullStrictBadExtension () {
   return ce
 }
 
+function createFullNestedDataStrict () {
+  return new CloudEvent('3/full-strict-nested-data',
+    ceNamespace,
+    ceServerUrl,
+    ceDataNested,
+    ceCommonOptionsStrict,
+    ceCommonExtensions
+  )
+}
+
+function createFullTextDataBadContentType () {
+  return new CloudEvent('5/no-strict-text-data-bad-content-type',
+    ceNamespace,
+    ceServerUrl,
+    ceDataAsString, // data
+    ceCommonOptions, // ok but not in strict validation
+    ceCommonExtensions
+  )
+}
+
 function createFullTextData () {
   return new CloudEvent('5/no-strict-text-data',
     ceNamespace,
     ceServerUrl,
     ceDataAsString, // data
-    // ceCommonOptions, // ok but not in strict validation
     ceCommonOptionsForTextData, // ok even in strict validation
     ceCommonExtensions
   )
@@ -166,10 +186,12 @@ module.exports = {
   createFull,
   createFullBigStringData,
   createFullBinaryData,
+  createFullNestedDataStrict,
   createFullStrict,
   createFullStrictBadExtension,
   createFullStrictJSONTextData,
   createFullTextData,
+  createFullTextDataBadContentType,
   createMinimal,
   createMinimalBadSource,
   createMinimalMandatoryUndefinedNoStrict,
