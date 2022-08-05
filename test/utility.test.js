@@ -527,5 +527,3 @@ test('ensure utility function cloneToObject exists and works in the right way: t
 
   t.end()
 })
-
-// TODO: refactor test objects here ... wip

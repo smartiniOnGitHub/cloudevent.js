@@ -18,7 +18,11 @@
 const assert = require('node:assert').strict
 const test = require('tap').test
 
+// get factory for instances to test
+const ceFactory = require('../example/common-example-factory')
+
 // import some common test data
+// const ed = require('../example/common-example-data')
 const {
   ceArrayData,
   ceCommonData,
@@ -69,11 +73,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CloudEvent('1', // id
-      ceNamespace, // type
-      '/', // source
-      {} // data (empty) // optional, but useful the same in this sample usage
-    )
+    const ceMinimal = ceFactory.createMinimal()
     t.ok(ceMinimal)
     // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
     // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
@@ -86,12 +86,7 @@ test('ensure CloudEvent class (and related Validator and Transformer classes) ar
 
   {
     // create an instance with only mandatory arguments but null data (and strict mode): expected success ...
-    const ceMinimalStrict = new CloudEvent('1-strict', // id
-      ceNamespace, // type
-      '/', // source
-      null, // data // optional, but useful the same in this sample usage
-      ceOptionsStrict
-    )
+    const ceMinimalStrict = ceFactory.createMinimalStrict()
     t.ok(ceMinimalStrict)
     t.ok(CloudEvent.isStrictEvent(ceMinimalStrict))
     t.ok(ceMinimalStrict.isStrict)
@@ -250,11 +245,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CloudEvent('1', // id
-      ceNamespace, // type
-      '/', // source
-      {} // data (empty) // optional, but useful the same in this sample usage
-    )
+    const ceMinimal = ceFactory.createMinimal()
     t.ok(ceMinimal)
     // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
     // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
@@ -410,7 +401,7 @@ test('ensure extensions are managed in the right way', (t) => {
   }, TypeError, 'Expected exception when getting bad extensions')
 
   // ensure no instance will be created if extensions contains standard properties, but only in strict mode
-  const ceFull = new CloudEvent('1/full',
+  const ceFull = new CloudEvent('1/full-bad-extensions-with-standard-names',
     ceNamespace,
     ceServerUrl,
     ceCommonData,
@@ -423,7 +414,7 @@ test('ensure extensions are managed in the right way', (t) => {
   t.strictSame(CloudEvent.validateEvent(ceFull), [])
   t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
   t.throws(function () {
-    const ceFullStrict = new CloudEvent('1/full-strict',
+    const ceFullStrict = new CloudEvent('1/full-strict-bad-extensions-with-standard-names',
       ceNamespace,
       ceServerUrl,
       ceCommonData,
@@ -434,7 +425,7 @@ test('ensure extensions are managed in the right way', (t) => {
   }, Error, 'Expected exception when creating a CloudEvent with extensions containing standard prioperties, in strict mode')
   // ensure no instance will be created if extensions are defined but empty (not valid in strict mode)
   t.throws(function () {
-    const ceFullStrictEmptyExtensions = new CloudEvent('1/full-strict',
+    const ceFullStrictEmptyExtensions = new CloudEvent('1/full-strict-empty-extensions',
       ceNamespace,
       ceServerUrl,
       ceCommonData,
@@ -453,7 +444,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   t.ok(CloudEvent)
 
   // create an instance with some common options, but with strict flag disabled: expected success ...
-  const ceFull1 = new CloudEvent('1/full',
+  const ceFull1 = new CloudEvent('1/full-with-fixed-time',
     ceNamespace,
     ceServerUrl,
     ceCommonData,
@@ -473,7 +464,7 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   t.strictSame(ceFull1.payload, ceCommonData)
 
   // create another instance with all fields equals: expected success ...
-  const ceFull1Clone = new CloudEvent('1/full', // should be '2/full/no-strict' ...
+  const ceFull1Clone = new CloudEvent('1/full-with-fixed-time', // otherwise should be '2/full-with-fixed-time/no-strict' here ...
     ceNamespace,
     ceServerUrl,
     ceCommonData,

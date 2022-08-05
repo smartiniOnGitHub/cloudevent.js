@@ -68,7 +68,7 @@ function createMinimal () {
   return new CloudEvent('1/minimal', // id
     ceNamespace, // type
     '/', // source
-    {} // data (empty) // optional, but useful the same in this sample usage
+    {} // data (empty object) // optional, but useful the same in this sample usage
   )
 }
 
@@ -76,7 +76,7 @@ function createMinimalStrict () {
   return new CloudEvent('1/minimal-strict', // id
     ceNamespace, // type
     '/', // source
-    {}, // data (empty) // optional, but useful the same in this sample usage
+    null, // data // optional, but useful the same in this sample usage
     ceOptionsStrict
   )
 }
