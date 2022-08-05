@@ -464,29 +464,29 @@ test('create two CloudEvent instances with all arguments (mandatory and optional
   t.strictSame(ceFull1.payload, ceCommonData)
 
   // create another instance with all fields equals: expected success ...
-  const ceFull1Clone = new CloudEvent('1/full-with-fixed-time', // otherwise should be '2/full-with-fixed-time/no-strict' here ...
+  const ceFull1SameAttributes = new CloudEvent('1/full-with-fixed-time', // otherwise should be '2/full-with-fixed-time/no-strict' here ...
     ceNamespace,
     ceServerUrl,
     ceCommonData,
     ceCommonOptionsWithFixedTime,
     ceCommonExtensions
   )
-  t.ok(ceFull1Clone)
-  t.ok(CloudEvent.isValidEvent(ceFull1Clone))
-  t.ok(CloudEvent.isValidEvent(ceFull1Clone, valOptionsNoStrict))
-  t.strictSame(CloudEvent.validateEvent(ceFull1Clone), [])
-  t.strictSame(CloudEvent.validateEvent(ceFull1Clone).length, 0)
+  t.ok(ceFull1SameAttributes)
+  t.ok(CloudEvent.isValidEvent(ceFull1SameAttributes))
+  t.ok(CloudEvent.isValidEvent(ceFull1SameAttributes, valOptionsNoStrict))
+  t.strictSame(CloudEvent.validateEvent(ceFull1SameAttributes), [])
+  t.strictSame(CloudEvent.validateEvent(ceFull1SameAttributes).length, 0)
   // the same but using normal instance methods, to ensure they works good ...
-  t.ok(ceFull1Clone.isValid())
-  t.ok(ceFull1Clone.isValid(valOptionsNoStrict))
-  t.strictSame(ceFull1Clone.validate(), [])
-  t.strictSame(ceFull1Clone.validate().length, 0)
-  t.strictSame(ceFull1Clone.payload, ceCommonData)
+  t.ok(ceFull1SameAttributes.isValid())
+  t.ok(ceFull1SameAttributes.isValid(valOptionsNoStrict))
+  t.strictSame(ceFull1SameAttributes.validate(), [])
+  t.strictSame(ceFull1SameAttributes.validate().length, 0)
+  t.strictSame(ceFull1SameAttributes.payload, ceCommonData)
 
   // then ensure they are different objects ...
-  assert(ceFull1 !== ceFull1Clone) // they must be different object references
-  t.same(ceFull1, ceFull1Clone)
-  t.strictSame(ceFull1, ceFull1Clone)
+  assert(ceFull1 !== ceFull1SameAttributes) // they must be different object references
+  t.same(ceFull1, ceFull1SameAttributes)
+  t.strictSame(ceFull1, ceFull1SameAttributes)
 
   t.end()
 })

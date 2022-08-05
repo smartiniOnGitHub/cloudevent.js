@@ -50,18 +50,26 @@ const ceCommonOptions = {
   ...ceOptionsNoStrict // same as default in ce
 }
 const ceCommonOptionsStrict = { ...ceCommonOptions, ...ceOptionsStrict }
-const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
 const ceCommonOptionsWithFixedTime = { ...ceCommonOptions, ...fixedEventTime }
 const ceCommonOptionsWithFixedTimeStrict = { ...ceCommonOptionsStrict, ...fixedEventTime }
+
+const ceCommonOptionsForTextData = { ...ceCommonOptions, datacontenttype: 'text/plain' }
+const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, ...ceOptionsStrict }
 const ceCommonOptionsForTextDataWithFixedTime = { ...ceCommonOptionsForTextData, ...fixedEventTime }
+const ceCommonOptionsForXMLData = { ...ceCommonOptions, datacontenttype: 'application/xml' }
+const ceCommonOptionsForXMLDataStrict = { ...ceCommonOptionsForXMLData, ...ceOptionsStrict }
+const ceCommonOptionsForXMLWithFixedTime = { ...ceCommonOptionsForXMLData, ...fixedEventTime }
+
 const ceCommonExtensions = { exampleextension: 'value' } // example extension
 const ceReservedExtensions = { id: -1, data: 'data attribute in extension' } // example (bad) extension, use a standard property in extensions, not good for creation in strict mode
 const ceNamespace = 'com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0'
 const ceServerUrl = '/test'
+
 const ceCommonData = { hello: 'world', year: 2020, enabled: true }
-const ceDataAsJSONString = '{ "hello": "world", "year": 2020, "enabled": true }'
+const ceDataAsJSONString = JSON.stringify(ceCommonData) // same as = '{ "hello": "world", "year": 2020, "enabled": true }'
 const ceDataAsString = 'Hello World, 2020'
 const ceDataAsStringEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
+const ceDataXMLAsString = '<data "hello"="world" "year"="2020" />'
 const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataAsStringEncoded }
 
 const ceDataNested = {
@@ -89,7 +97,6 @@ const ceCommonOptionsWithSomeOptionalsNull = {
 const ceCommonOptionsWithAllOptionalsNull = { ...ceCommonOptionsWithSomeOptionalsNull, time: null }
 const ceCommonOptionsWithSomeOptionalsNullStrict = { ...ceCommonOptionsWithSomeOptionalsNull, ...ceOptionsStrict }
 const ceCommonOptionsWithAllOptionalsNullStrict = { ...ceCommonOptionsWithAllOptionalsNull, ...ceOptionsStrict }
-const ceCommonOptionsForTextDataStrict = { ...ceCommonOptionsForTextData, ...ceOptionsStrict }
 
 const ceCommonExtensionsWithNullValue = { exampleextension: null }
 
@@ -119,6 +126,9 @@ module.exports = {
   ceCommonOptionsForTextData,
   ceCommonOptionsForTextDataStrict,
   ceCommonOptionsForTextDataWithFixedTime,
+  ceCommonOptionsForXMLData,
+  ceCommonOptionsForXMLDataStrict,
+  ceCommonOptionsForXMLWithFixedTime,
   ceCommonOptionsStrict,
   ceCommonOptionsWithAllOptionalsNull,
   ceCommonOptionsWithAllOptionalsNullStrict,
@@ -130,6 +140,7 @@ module.exports = {
   ceDataAsString,
   ceDataAsStringEncoded,
   ceDataNested,
+  ceDataXMLAsString,
   ceExtensionStrict,
   ceMapData,
   ceNamespace,

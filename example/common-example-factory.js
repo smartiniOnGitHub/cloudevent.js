@@ -38,11 +38,14 @@ const {
   ceCommonExtensions,
   ceCommonOptions,
   ceCommonOptionsForTextData,
+  ceCommonOptionsForXMLData,
+  ceCommonOptionsForXMLDataStrict,
   ceCommonOptionsStrict,
   ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
   ceDataNested,
+  ceDataXMLAsString,
   ceNamespace,
   ceOptionsNoStrict,
   ceOptionsStrict,
@@ -81,22 +84,22 @@ function createMinimalStrict () {
   )
 }
 
-function createFull () {
+function createFull (overrideOptions = {}) {
   return new CloudEvent('2/full',
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptions,
+    { ...ceCommonOptions, ...overrideOptions },
     ceCommonExtensions
   )
 }
 
-function createFullStrict () {
+function createFullStrict (overrideOptions = {}) {
   return new CloudEvent('2/full-strict',
     ceNamespace,
     ceServerUrl,
     ceCommonData,
-    ceCommonOptionsStrict,
+    { ...ceCommonOptionsStrict, ...overrideOptions },
     ceCommonExtensions
   )
 }
@@ -117,18 +120,28 @@ function createFullStrictBadExtension () {
   return ce
 }
 
-function createFullNestedDataStrict () {
+function createFullNestedData (overrideOptions = {}) {
+  return new CloudEvent('3/full-no-strict-nested-data',
+    ceNamespace,
+    ceServerUrl,
+    ceDataNested,
+    { ...ceCommonOptions, ...overrideOptions },
+    ceCommonExtensions
+  )
+}
+
+function createFullNestedDataStrict (overrideOptions = {}) {
   return new CloudEvent('3/full-strict-nested-data',
     ceNamespace,
     ceServerUrl,
     ceDataNested,
-    ceCommonOptionsStrict,
+    { ...ceCommonOptionsStrict, ...overrideOptions },
     ceCommonExtensions
   )
 }
 
 function createFullTextDataBadContentType () {
-  return new CloudEvent('5/no-strict-text-data-bad-content-type',
+  return new CloudEvent('4/no-strict-text-data-bad-content-type',
     ceNamespace,
     ceServerUrl,
     ceDataAsString, // data
@@ -137,32 +150,98 @@ function createFullTextDataBadContentType () {
   )
 }
 
-function createFullTextData () {
-  return new CloudEvent('5/no-strict-text-data',
+function createFullTextData (overrideOptions = {}) {
+  return new CloudEvent('4/no-strict-text-data',
     ceNamespace,
     ceServerUrl,
     ceDataAsString, // data
-    ceCommonOptionsForTextData, // ok even in strict validation
+    { ...ceCommonOptionsForTextData, ...overrideOptions },
     ceCommonExtensions
   )
 }
 
-function createFullBinaryData () {
-  return new CloudEvent('6/full-strict-binary-data',
+function createFullBinaryData (overrideOptions = {}) {
+  return new CloudEvent('5/full-no-strict-binary-data',
     ceNamespace,
     ceServerUrl,
-    null, // data
-    { ...ceCommonOptionsStrict, datainbase64: ceDataAsStringEncoded }, // use common strict options, and set binary data in base64
+    null, // null data
+    { ...ceCommonOptions, datainbase64: ceDataAsStringEncoded, ...overrideOptions }, // use common options, and set binary data in base64
     ceCommonExtensions
   )
 }
 
 function createFullStrictJSONTextData () {
-  return new CloudEvent('7/full-strict-json-string-data',
+  return new CloudEvent('6/full-strict-json-string-data',
     ceNamespace,
     ceServerUrl,
-    ceDataAsJSONString, // data
+    ceDataAsJSONString, // JSON string for data
     ceCommonOptionsStrict, // use strict options
+    ceCommonExtensions
+  )
+}
+
+function createFullXMLData () {
+  return new CloudEvent('7/full-no-strict-xml-string-data',
+    ceNamespace,
+    ceServerUrl,
+    ceDataXMLAsString, // XML string for data
+    ceCommonOptionsForXMLData, // specify XML type
+    ceCommonExtensions
+  )
+}
+
+function createFullXMLDataStrict () {
+  return new CloudEvent('7/full-strict-xml-string-data',
+    ceNamespace,
+    ceServerUrl,
+    ceDataXMLAsString, // XML string fordata
+    ceCommonOptionsForXMLDataStrict, // specify XML type, strict
+    ceCommonExtensions
+  )
+}
+
+function createFullDataAsXMLType () {
+  return new CloudEvent('8/full-no-strict-data-as-xml-type',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData, // object for data
+    ceCommonOptionsForXMLData, // specify XML type
+    ceCommonExtensions
+  )
+}
+
+function createFullDataAsXMLTypeStrict () {
+  return new CloudEvent('8/full-strict-data-as-xml-type',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData, // object for data
+    ceCommonOptionsForXMLDataStrict, // specify XML type, strict
+    ceCommonExtensions
+  )
+}
+
+function createFullDataAsJSONNonDefaultType () {
+  return new CloudEvent('9/full-no-strict-data-as-json-non-default-type',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData, // object for data
+    {
+      ...ceCommonOptions,
+      datacontenttype: 'text/json' // set a non default JSON type
+    },
+    ceCommonExtensions
+  )
+}
+
+function createFullDataAsJSONNonDefaultTypeStrict () {
+  return new CloudEvent('9/full-strict-data-as-json-non-default-type',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData, // object for data
+    {
+      ...ceCommonOptionsStrict,
+      datacontenttype: 'text/json' // set a non default JSON type
+    },
     ceCommonExtensions
   )
 }
@@ -171,12 +250,22 @@ function createFullStrictJSONTextData () {
 const bigStringLength = 100_000
 const bigString = getRandomString(bigStringLength) // a random string with n chars
 
-function createFullBigStringData () {
+function createFullBigStringData (overrideOptions = {}) {
   return new CloudEvent('11/full-no-strict-text-big-string-data',
     ceNamespace,
     ceServerUrl,
     { random: bigString }, // data
-    ceCommonOptions,
+    { ...ceCommonOptions, ...overrideOptions },
+    ceCommonExtensions
+  )
+}
+
+function createFullBigBinaryData (base64Data = '', overrideOptions = {}) {
+  return new CloudEvent('12/full-no-strict-binary-big-base64-data',
+    ceNamespace,
+    ceServerUrl,
+    null, // null data
+    { ...ceCommonOptions, datainbase64: base64Data, ...overrideOptions }, // use common options, and set binary data in base64
     ceCommonExtensions
   )
 }
@@ -184,14 +273,22 @@ function createFullBigStringData () {
 module.exports = {
   createEmpty,
   createFull,
+  createFullBigBinaryData,
   createFullBigStringData,
   createFullBinaryData,
+  createFullDataAsJSONNonDefaultType,
+  createFullDataAsJSONNonDefaultTypeStrict,
+  createFullDataAsXMLType,
+  createFullDataAsXMLTypeStrict,
+  createFullNestedData,
   createFullNestedDataStrict,
   createFullStrict,
   createFullStrictBadExtension,
   createFullStrictJSONTextData,
   createFullTextData,
   createFullTextDataBadContentType,
+  createFullXMLData,
+  createFullXMLDataStrict,
   createMinimal,
   createMinimalBadSource,
   createMinimalMandatoryUndefinedNoStrict,
