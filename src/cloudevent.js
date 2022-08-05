@@ -510,6 +510,7 @@ class CloudEvent {
    *        - encodedData (string, no default) already encoded data (but consistency with the datacontenttype is not checked),
    *        - onlyValid (boolean, default false) to serialize only if it's a valid instance,
    *        - onlyIfLessThan64KB (boolean, default false) to return the serialized string only if it's less than 64 KB,
+   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {string} the serialized event, as a string
    * @throws {Error} if event is undefined or null, or an option is undefined/null/wrong
@@ -517,9 +518,13 @@ class CloudEvent {
   static serializeEvent (event, {
     encoder, encodedData,
     onlyValid = false, onlyIfLessThan64KB = false,
+    printDebugInfo = false,
     timezoneOffset = 0
   } = {}) {
     if (V.isUndefinedOrNull(event)) throw new Error('CloudEvent undefined or null')
+    if (printDebugInfo === true) {
+      console.log(`DEBUG | trying to serialize ce: ${JSON.stringify(event)}`)
+    }
     if (event.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(event, { timezoneOffset }) === true)) {
         const ser = JSON.stringify(event, function replacer (key, value) {
@@ -531,6 +536,9 @@ class CloudEvent {
               return value
           }
         })
+        if (printDebugInfo === true) {
+          console.log(`DEBUG | ce successfully serialized as: ${ser}`)
+        }
         if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
         else throw new Error('Unable to return a serialized CloudEvent bigger than 64 KB.')
       } else throw new Error('Unable to serialize a not valid CloudEvent.')
@@ -551,6 +559,9 @@ class CloudEvent {
     const newEvent = T.mergeObjects(event, { data: encodedData })
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(newEvent, { timezoneOffset }) === true)) {
       const ser = JSON.stringify(newEvent)
+      if (printDebugInfo === true) {
+        console.log(`DEBUG | ce successfully serialized as: ${ser}`)
+      }
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ser
       else throw new Error('Unable to return a serialized CloudEvent bigger than 64 KB.')
     } else throw new Error('Unable to serialize a not valid CloudEvent.')
@@ -568,6 +579,7 @@ class CloudEvent {
    *        - decodedData (string, no default) already decoded data (but consistency with the datacontenttype is not checked),
    *        - onlyValid (boolean, default false) to deserialize only if it's a valid instance,
    *        - onlyIfLessThan64KB (boolean, default false) to return the deserialized string only if it's less than 64 KB,
+   *        - printDebugInfo (boolean, default false) to print some debug info to the console,
    *        - timezoneOffset (number, default 0) to apply a different timezone offset
    * @return {object} the deserialized event as a CloudEvent instance
    * @throws {Error} if ser is undefined or null, or an option is undefined/null/wrong
@@ -576,10 +588,14 @@ class CloudEvent {
   static deserializeEvent (ser, {
     decoder, decodedData,
     onlyValid = false, onlyIfLessThan64KB = false,
+    printDebugInfo = false,
     timezoneOffset = 0
   } = {}) {
     if (V.isUndefinedOrNull(ser)) throw new Error('Serialized CloudEvent undefined or null')
     if (!V.isStringNotEmpty(ser)) throw new Error(`Missing or wrong serialized data: '${ser}' must be a string and not a: '${typeof ser}'.`)
+    if (printDebugInfo === true) {
+      console.log(`DEBUG | trying to deserialize as ce: ${ser}`)
+    }
     // deserialize standard attributes, always in JSON format
     const parsed = JSON.parse(ser)
     // ensure it's an object (single), and not a string neither a collection or an array
@@ -607,6 +623,9 @@ class CloudEvent {
     // depending on the datacontenttype, decode the data attribute (the payload)
     if (parsed.datacontenttype === CloudEvent.datacontenttypeDefault()) {
       // return ce, depending on its validation option
+      if (printDebugInfo === true) {
+        console.log(`DEBUG | ce successfully deserialized as: ${JSON.stringify(ce)}`)
+      }
       if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce, { timezoneOffset }) === true)) {
         if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
         else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
@@ -629,6 +648,9 @@ class CloudEvent {
     ce.data = decodedData
     // return ce, depending on its validation option
     if ((onlyValid === false) || (onlyValid === true && CloudEvent.isValidEvent(ce, { timezoneOffset }) === true)) {
+      if (printDebugInfo === true) {
+        console.log(`DEBUG | ce successfully deserialized as: ${JSON.stringify(ce)}`)
+      }
       if ((onlyIfLessThan64KB === false) || (onlyIfLessThan64KB === true && V.getSizeInBytes(ser) < 65536)) return ce
       else throw new Error('Unable to return a deserialized CloudEvent bigger than 64 KB.')
     } else throw new Error('Unable to deserialize a not valid CloudEvent.')

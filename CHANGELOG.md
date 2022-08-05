@@ -7,6 +7,7 @@ Summary Changelog:
 - Change CloudEvent validation methods/functions: the given argument to validate/check in strict mode 
   now defaults to null, so validation/check will override the value in the event (is any) 
   only when that flag has a value in arguments
+- Add a flag in CloudEvent serialization/deserialization to simplify debugging issues
 - Small improvements in Validator functions
 - Add some Utility functions, in its own source
 - Add an example (minimal) benchmark
