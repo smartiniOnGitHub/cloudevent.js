@@ -209,13 +209,10 @@ test('ensure serialization functions works good on undefined and null arguments,
   t.end()
 })
 
-/** @test {CloudEvent} */
-test('ensure serialization functions works in the right way', (t) => {
-  const { CloudEvent, JSONBatch } = require('../src/')
-  t.ok(JSONBatch)
+function createFullTextDataBad () {
+  const { CloudEvent } = require('../src/')
 
-  // create a bad (valid but not in strict mode) instance
-  const ceFullTextDataBad = new CloudEvent('1/full',
+  return new CloudEvent('1/full',
     ceNamespace,
     ceServerUrl,
     // ceCommonData,
@@ -224,6 +221,15 @@ test('ensure serialization functions works in the right way', (t) => {
     // ceCommonExtensions
     {} // extensions as empty object, to let this ce instance have some strict validation errors
   )
+}
+
+/** @test {CloudEvent} */
+test('ensure serialization functions works in the right way', (t) => {
+  const { JSONBatch } = require('../src/')
+  t.ok(JSONBatch)
+
+  // create a bad (valid but not in strict mode) instance
+  const ceFullTextDataBad = createFullTextDataBad()
   t.ok(ceFullTextDataBad)
   t.ok(!ceFullTextDataBad.isStrict)
   t.ok(ceFullTextDataBad.isValid())

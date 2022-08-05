@@ -18,19 +18,20 @@
 const assert = require('node:assert').strict
 const test = require('tap').test
 
+// get factory for instances to test
+const ceFactory = require('../example/common-example-factory')
+
 // import some common test data
+// const ed = require('../example/common-example-data')
 const {
-  ceCommonData,
-  ceCommonExtensions,
   ceCommonOptions,
-  ceCommonOptionsStrict,
   ceNamespace,
   // ceOptionsNoStrict,
-  ceOptionsStrict,
+  // ceOptionsStrict,
   ceServerUrl,
   valOnlyValidAllInstance,
   valOnlyValidInstance,
-  // valOptionsNoOverride,
+  valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
 } = require('../example/common-example-data')
@@ -72,11 +73,7 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
 
   {
     // create an instance with only mandatory arguments (no strict mode, but doesn't matter in this case): expected success ...
-    const ceMinimal = new CloudEvent('1', // id
-      ceNamespace, // type
-      '/', // source
-      {} // data (empty) // optional, but useful the same in this sample usage
-    )
+    const ceMinimal = ceFactory.createMinimal()
     t.ok(ceMinimal)
     // console.log(`DEBUG | cloudEvent details: ceMinimal = ${JSON.stringify(ceMinimal)}`)
     // console.log(`DEBUG | cloudEvent details: ${T.dumpObject(ceMinimal, 'ceMinimal')}`)
@@ -88,12 +85,7 @@ test('ensure CloudEvent and JSONBatch class (and related Validator and Transform
 
   {
     // create an instance with only mandatory arguments but null data (and strict mode): expected success ...
-    const ceMinimalStrict = new CloudEvent('1-strict', // id
-      ceNamespace, // type
-      '/', // source
-      null, // data // optional, but useful the same in this sample usage
-      ceOptionsStrict
-    )
+    const ceMinimalStrict = ceFactory.createMinimalStrict()
     t.ok(ceMinimalStrict)
     t.ok(CloudEvent.isStrictEvent(ceMinimalStrict))
     t.ok(ceMinimalStrict.isStrict)
@@ -173,6 +165,20 @@ test('ensure isValid and validate works good on undefined and null arguments, an
   t.end()
 })
 
+function createFullTextDataBad () {
+  const { CloudEvent } = require('../src/')
+
+  return new CloudEvent('1/full',
+    ceNamespace,
+    ceServerUrl,
+    // ceCommonData,
+    'sample data', // data as string, to let this ce instance have some strict validation errors
+    ceCommonOptions,
+    // ceCommonExtensions
+    {} // extensions as empty object, to let this ce instance have some strict validation errors
+  )
+}
+
 /** @test {JSONBatch} */
 test('ensure isValid and validate works good on array and related items', (t) => {
   const { CloudEvent, JSONBatch, CloudEventValidator: V } = require('../src/')
@@ -191,32 +197,25 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidInstance, ...valOptionsStrict }).length, 0)
   t.strictSame(JSONBatch.getEvents(empty, { ...valOnlyValidAllInstance, ...valOptionsStrict }).length, 0)
 
-  const ceFull = new CloudEvent('1/full',
-    ceNamespace,
-    ceServerUrl,
-    // ceCommonData,
-    'sample data', // data as string, to let this ce instance have some strict validation errors
-    ceCommonOptions,
-    // ceCommonExtensions
-    {} // extensions as empty object, to let this ce instance have some strict validation errors
-  )
-  t.ok(ceFull)
-  t.ok(CloudEvent.isValidEvent(ceFull))
-  t.ok(CloudEvent.isValidEvent(ceFull, valOptionsNoStrict))
-  t.notOk(CloudEvent.isValidEvent(ceFull, valOptionsStrict)) // expected errors here
-  t.strictSame(CloudEvent.validateEvent(ceFull), [])
-  t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
-  t.notOk(JSONBatch.isJSONBatch(ceFull))
+  // create a bad (valid but not in strict mode) instance
+  const ceFullTextDataBad = createFullTextDataBad()
+  t.ok(ceFullTextDataBad)
+  t.ok(!ceFullTextDataBad.isStrict)
+  t.ok(ceFullTextDataBad.isValid())
+  t.notOk(ceFullTextDataBad.isValid({ ...valOptionsStrict }))
+  t.ok(CloudEvent.isValidEvent(ceFullTextDataBad))
+  t.ok(CloudEvent.isValidEvent(ceFullTextDataBad, valOptionsNoStrict))
+  t.notOk(CloudEvent.isValidEvent(ceFullTextDataBad, valOptionsStrict)) // expected errors here
+  t.strictSame(CloudEvent.validateEvent(ceFullTextDataBad), [])
+  t.strictSame(CloudEvent.validateEvent(ceFullTextDataBad).length, 0)
+  t.notOk(JSONBatch.isJSONBatch(ceFullTextDataBad))
 
-  const ceFullStrict = new CloudEvent('1/full-strict',
-    ceNamespace,
-    ceServerUrl,
-    ceCommonData,
-    ceCommonOptionsStrict,
-    ceCommonExtensions
-  )
+  // create a good and strict (valid even in strict mode) instance
+  const ceFullStrict = ceFactory.createFullStrict()
   t.ok(ceFullStrict)
-  t.ok(CloudEvent.isValidEvent(ceFull))
+  t.ok(ceFullStrict.isStrict)
+  t.ok(ceFullStrict.isValid())
+  t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsNoOverride))
   t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsNoStrict))
   t.ok(CloudEvent.isValidEvent(ceFullStrict, valOptionsStrict))
   t.strictSame(CloudEvent.validateEvent(ceFullStrict, valOptionsNoStrict).length, 0)
@@ -224,12 +223,17 @@ test('ensure isValid and validate works good on array and related items', (t) =>
   t.notOk(JSONBatch.isJSONBatch(ceFullStrict))
 
   // create a sample minimal instance good for normal validation but not for strict validation ...
-  const ceMinimalBadSource = new CloudEvent('1', ceNamespace, 'source (bad)', null)
+  const ceMinimalBadSource = ceFactory.createMinimal() // create it as a good instance
+  ceMinimalBadSource.source = 'source (bad)' // change its attribute to fail strict validation
   t.ok(ceMinimalBadSource)
+  t.ok(ceMinimalBadSource.isValid())
+  t.notOk(ceMinimalBadSource.isValid({ ...valOptionsStrict }))
 
   // create a sample minimal instance ...
-  const ceMinimal = new CloudEvent('1', ceNamespace, '/', {})
+  const ceMinimal = ceFactory.createMinimal()
   t.ok(ceMinimal)
+  t.ok(ceMinimal.isValid())
+  t.ok(ceMinimal.isValid({ ...valOptionsStrict }))
 
   // define an array containing different CloudEvent instances, and even other objects ...
   const arr = [
@@ -242,7 +246,7 @@ test('ensure isValid and validate works good on array and related items', (t) =>
     true, // bad
     ceMinimalBadSource, // good but not for strict validation
     ceMinimal,
-    ceFull, // good but not for strict validation
+    ceFullTextDataBad, // good but not for strict validation
     new Date(), // bad
     {}, // bad
     [], // bad
@@ -289,30 +293,22 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
   class CESubclass extends CloudEvent {
   }
 
-  const ceFull = new CloudEvent('1/full',
-    ceNamespace,
-    ceServerUrl,
-    // ceCommonData,
-    'sample data', // data as string, to let this ce instance have some strict validation errors
-    ceCommonOptions,
-    // ceCommonExtensions
-    {} // extensions as empty object, to let this ce instance have some strict validation errors
-  )
-  t.ok(ceFull)
+  const ceFullTextDataBad = createFullTextDataBad()
+  t.ok(ceFullTextDataBad)
   // check that created instances belongs to the right base class
-  t.ok(V.isClass(ceFull, CloudEvent))
-  t.ok(!V.isClass(ceFull, NotCESubclass))
-  t.ok(!V.isClass(ceFull, CESubclass))
-  t.ok(!V.ensureIsClass(ceFull, CloudEvent, 'ceFull')) // no error returned
-  t.ok(V.ensureIsClass(ceFull, CESubclass, 'ceFull')) // expected error returned
-  t.ok(V.isClass(V.ensureIsClass(ceFull, CESubclass, 'ceFull'), TypeError)) // expected error returned
-  t.ok(V.isClass(V.ensureIsClass(ceFull, NotCESubclass, 'ceFull'), TypeError)) // expected error returned
+  t.ok(V.isClass(ceFullTextDataBad, CloudEvent))
+  t.ok(!V.isClass(ceFullTextDataBad, NotCESubclass))
+  t.ok(!V.isClass(ceFullTextDataBad, CESubclass))
+  t.ok(!V.ensureIsClass(ceFullTextDataBad, CloudEvent, 'ceFull')) // no error returned
+  t.ok(V.ensureIsClass(ceFullTextDataBad, CESubclass, 'ceFull')) // expected error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFullTextDataBad, CESubclass, 'ceFull'), TypeError)) // expected error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFullTextDataBad, NotCESubclass, 'ceFull'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
-  t.strictSame(JSONBatch.validateBatch(ceFull).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFull, valOptionsStrict).length, 2)
-  t.notOk(JSONBatch.isJSONBatch(ceFull))
+  t.strictSame(JSONBatch.validateBatch(ceFullTextDataBad).length, 0)
+  t.strictSame(JSONBatch.validateBatch(ceFullTextDataBad, valOptionsStrict).length, 2)
+  t.notOk(JSONBatch.isJSONBatch(ceFullTextDataBad))
 
-  const ceFullSubclass = new CESubclass('1/full/subclass',
+  const ceFullTextDataBadSubclass = new CESubclass('1/full/subclass',
     ceNamespace,
     ceServerUrl,
     // ceCommonData,
@@ -321,19 +317,19 @@ test('ensure isValid and validate works good on plain object and even CloudEvent
     // ceCommonExtensions
     {} // extensions as empty object, to let this ce instance have some strict validation errors
   )
-  t.ok(ceFullSubclass)
+  t.ok(ceFullTextDataBadSubclass)
   // check that created instances belongs to the right base class
-  t.ok(V.isClass(ceFullSubclass, CloudEvent))
-  t.ok(!V.isClass(ceFullSubclass, NotCESubclass))
-  t.ok(V.isClass(ceFullSubclass, CESubclass))
-  t.ok(!V.ensureIsClass(ceFullSubclass, CloudEvent, 'ceFullSubclass')) // no error returned
-  t.ok(!V.ensureIsClass(ceFullSubclass, CESubclass, 'ceFullSubclass')) // no error returned
-  t.ok(!V.isClass(V.ensureIsClass(ceFullSubclass, CESubclass, 'ceFullSubclass'), TypeError)) // no error returned
-  t.ok(V.isClass(V.ensureIsClass(ceFullSubclass, NotCESubclass, 'ceFullSubclass'), TypeError)) // expected error returned
+  t.ok(V.isClass(ceFullTextDataBadSubclass, CloudEvent))
+  t.ok(!V.isClass(ceFullTextDataBadSubclass, NotCESubclass))
+  t.ok(V.isClass(ceFullTextDataBadSubclass, CESubclass))
+  t.ok(!V.ensureIsClass(ceFullTextDataBadSubclass, CloudEvent, 'ceFullSubclass')) // no error returned
+  t.ok(!V.ensureIsClass(ceFullTextDataBadSubclass, CESubclass, 'ceFullSubclass')) // no error returned
+  t.ok(!V.isClass(V.ensureIsClass(ceFullTextDataBadSubclass, CESubclass, 'ceFullSubclass'), TypeError)) // no error returned
+  t.ok(V.isClass(V.ensureIsClass(ceFullTextDataBadSubclass, NotCESubclass, 'ceFullSubclass'), TypeError)) // expected error returned
   // in following tests to simplify comparison of results, check only the  number of expected errors ...
-  t.strictSame(JSONBatch.validateBatch(ceFullSubclass).length, 0)
-  t.strictSame(JSONBatch.validateBatch(ceFullSubclass, valOptionsStrict).length, 2)
-  t.notOk(JSONBatch.isJSONBatch(ceFullSubclass))
+  t.strictSame(JSONBatch.validateBatch(ceFullTextDataBadSubclass).length, 0)
+  t.strictSame(JSONBatch.validateBatch(ceFullTextDataBadSubclass, valOptionsStrict).length, 2)
+  t.notOk(JSONBatch.isJSONBatch(ceFullTextDataBadSubclass))
 
   // try even with a plain object
   const plainObject = { id: '1/plainObject', data: 'sample data' }
