@@ -67,6 +67,7 @@ const {
   ceCommonOptionsWithFixedTimeStrict,
   // ceCommonOptionsWithSomeOptionalsNull,
   ceCommonOptionsWithSomeOptionalsNullStrict,
+  ceDataNested,
   ceNamespace,
   ceOptionsNoStrict,
   // ceOptionsStrict,
@@ -879,20 +880,6 @@ test('ensure the JSON Schema for a CloudEvent (static and for a normal instance)
   t.end()
 })
 
-/** create some common data with nested attributes, for better reuse in tests */
-const ceCommonNestedData = {
-  ...ceCommonData,
-  nested1: {
-    level1attribute: 'level1attributeValue',
-    nested2: {
-      level2attribute: 'level2attributeValue',
-      nested3: {
-        level3attribute: 'level3attributeValue'
-      }
-    }
-  }
-}
-
 const { CloudEventTransformer: T } = require('../src/')
 const ceNestedFullSerializedJson = `{"id":"1/full/sample-data-nested/no-strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0","source":"/test","data":{"hello":"world","year":2020,"enabled":true,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${T.timestampToString(commonEventTime)}","subject":"subject","exampleextension":"value"}`
 const ceNestedFullStrictSerializedJson = `{"id":"1/full/sample-data-nested/strict","type":"com.github.smartiniOnGitHub.cloudeventjs.testevent-v1.0.0","source":"/test","data":{"hello":"world","year":2020,"enabled":true,"nested1":{"level1attribute":"level1attributeValue","nested2":{"level2attribute":"level2attributeValue","nested3":{"level3attribute":"level3attributeValue"}}}},"specversion":"1.0","datacontenttype":"application/json","dataschema":"http://my-schema.localhost.localdomain/v1/","time":"${T.timestampToString(commonEventTime)}","subject":"subject","strictvalidation":true,"exampleextension":"value"}`
@@ -910,7 +897,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
       ceNamespace,
       ceServerUrl,
-      ceCommonNestedData, // data
+      ceDataNested, // data
       ceCommonOptionsWithFixedTime,
       ceCommonExtensions
     )
@@ -971,7 +958,7 @@ test('serialize some CloudEvent instances to JSON with nested data, and ensure t
     const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
       ceNamespace,
       ceServerUrl,
-      ceCommonNestedData, // data
+      ceDataNested, // data
       ceCommonOptionsWithFixedTimeStrict,
       ceCommonExtensions
     )
@@ -1404,7 +1391,7 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
   t.strictSame(ceBigString.length, ceBigStringLength)
 
   {
-    const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
+    const ceFull = new CloudEvent('1/full/sample-data-big-string/no-strict',
       ceNamespace,
       ceServerUrl,
       { random: ceBigString }, // data
@@ -1488,7 +1475,7 @@ test('serialize and deserialize a big CloudEvent instance (more than 64 KB)', (t
 
   {
     // the same but with strict mode enabled ...
-    const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
+    const ceFullStrict = new CloudEvent('1/full/sample-data-big-string/strict',
       ceNamespace,
       ceServerUrl,
       { random: ceBigString }, // data
@@ -1889,7 +1876,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
   t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
 
   {
-    const ceFull = new CloudEvent('1/full/sample-data-nested/no-strict',
+    const ceFull = new CloudEvent('1/full/sample-data-base64/no-strict',
       ceNamespace,
       ceServerUrl,
       null, // data
@@ -1999,7 +1986,7 @@ test('create and deserialize some CloudEvent instances with data encoded in base
 
   {
     // the same but with strict mode enabled ...
-    const ceFullStrict = new CloudEvent('1/full/sample-data-nested/strict',
+    const ceFullStrict = new CloudEvent('1/full/sample-data-base64/strict',
       ceNamespace,
       ceServerUrl,
       null, // data
@@ -2127,7 +2114,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
   t.strictSame(T.stringFromBase64(ceDataEncoded), ceDataAsString)
 
   {
-    const ceBig = new CloudEvent('1/full/sample-data-nested/no-strict',
+    const ceBig = new CloudEvent('1/full/sample-data-base64/no-strict',
       ceNamespace,
       ceServerUrl,
       null, // data
@@ -2220,7 +2207,7 @@ test('create and deserialize some CloudEvent instances with (big) data encoded i
 
   {
     // the same but with strict mode enabled ...
-    const ceBigStrict = new CloudEvent('1/full/sample-data-nested/strict',
+    const ceBigStrict = new CloudEvent('1/full/sample-data-base64/strict',
       ceNamespace,
       ceServerUrl,
       null, // data

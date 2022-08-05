@@ -64,6 +64,19 @@ const ceDataAsString = 'Hello World, 2020'
 const ceDataAsStringEncoded = 'SGVsbG8gV29ybGQsIDIwMjA='
 const ceOptionsWithDataInBase64 = { ...ceCommonOptions, datainbase64: ceDataAsStringEncoded }
 
+const ceDataNested = {
+  ...ceCommonData,
+  nested1: {
+    level1attribute: 'level1attributeValue',
+    nested2: {
+      level2attribute: 'level2attributeValue',
+      nested3: {
+        level3attribute: 'level3attributeValue'
+      }
+    }
+  }
+}
+
 // ----
 
 const ceCommonOptionsWithSomeOptionalsNull = {
@@ -116,6 +129,7 @@ module.exports = {
   ceDataAsJSONString,
   ceDataAsString,
   ceDataAsStringEncoded,
+  ceDataNested,
   ceExtensionStrict,
   ceMapData,
   ceNamespace,
