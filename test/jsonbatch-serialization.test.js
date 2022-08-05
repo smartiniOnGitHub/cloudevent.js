@@ -18,26 +18,23 @@
 const assert = require('node:assert').strict
 const test = require('tap').test
 
+// get factory for instances to test
+const ceFactory = require('../example/common-example-factory')
+
 // import some common test data
+// const ed = require('../example/common-example-data')
 const {
-  ceCommonData,
-  ceCommonExtensions,
   ceCommonOptions,
-  ceCommonOptionsStrict,
+  // ceCommonOptionsStrict,
   ceNamespace,
   // ceOptionsNoStrict,
   // ceOptionsStrict,
   ceServerUrl,
-  getRandomString,
   valOnlyValidInstance,
   // valOptionsNoOverride,
   valOptionsNoStrict,
   valOptionsStrict
 } = require('../example/common-example-data')
-
-/** create a sample string big (more than 64 KB) */
-const bigStringLength = 100000
-const bigString = getRandomString(bigStringLength) // a random string with n chars
 
 /** @test {CloudEvent} */
 test('ensure serialization functions exists (check only the static method here)', (t) => {
@@ -217,7 +214,8 @@ test('ensure serialization functions works in the right way', (t) => {
   const { CloudEvent, JSONBatch } = require('../src/')
   t.ok(JSONBatch)
 
-  const ceFull = new CloudEvent('1/full',
+  // create a bad (valid but not in strict mode) instance
+  const ceFullTextDataBad = new CloudEvent('1/full',
     ceNamespace,
     ceServerUrl,
     // ceCommonData,
@@ -226,22 +224,24 @@ test('ensure serialization functions works in the right way', (t) => {
     // ceCommonExtensions
     {} // extensions as empty object, to let this ce instance have some strict validation errors
   )
-  const ceFullStrict = new CloudEvent('1/full-strict',
-    ceNamespace,
-    ceServerUrl,
-    ceCommonData,
-    ceCommonOptionsStrict,
-    ceCommonExtensions
-  )
-  // test even when a bad (not valid) instance is inside the array
-  const ceFullBad = new CloudEvent(null,
-    ceNamespace,
-    ceServerUrl,
-    // ceCommonData, // data
-    { random: bigString }, // data
-    ceCommonOptions,
-    ceCommonExtensions
-  )
+  t.ok(ceFullTextDataBad)
+  t.ok(!ceFullTextDataBad.isStrict)
+  t.ok(ceFullTextDataBad.isValid())
+  t.notOk(ceFullTextDataBad.isValid({ ...valOptionsStrict }))
+
+  // create a good and strict (valid even in strict mode) instance
+  const ceFullStrict = ceFactory.createFullStrict()
+  t.ok(ceFullStrict)
+  t.ok(ceFullStrict.isStrict)
+  t.ok(ceFullStrict.isValid())
+
+  // create a bad (not valid) instance
+  const ceFullBadBig = ceFactory.createFullBigStringData() // create a good ce
+  ceFullBadBig.id = null // but change its data, to become bad here (change this is enough)
+  t.ok(ceFullBadBig)
+  t.notOk(ceFullBadBig.isStrict)
+  t.notOk(ceFullBadBig.isValid())
+
   // define an array containing different CloudEvent instances, and even other objects ...
   const arr = [
     undefined,
@@ -250,14 +250,14 @@ test('ensure serialization functions works in the right way', (t) => {
     1234567890,
     false,
     true,
-    ceFull,
+    ceFullTextDataBad,
     new Date(),
     {},
     [],
     ceFullStrict,
     null,
     undefined,
-    ceFullBad
+    ceFullBadBig
   ]
 
   function dumpCallback (err, data) {
