@@ -63,6 +63,10 @@ function createMinimalMandatoryUndefinedNoStrict () {
   return new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsNoStrict) // expected success
 }
 
+function createMinimalMandatoryUndefinedStrict () {
+  return new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsStrict) // expected exception
+}
+
 function createMinimalBadSource () {
   return new CloudEvent('1/minimal-bad-source', ceNamespace, 'source (bad in strict mode)', null)
 }
@@ -104,7 +108,17 @@ function createFullStrict (overrideOptions = {}) {
   )
 }
 
-function createFullStrictBadExtension () {
+function createFullBadExtension () {
+  return new CloudEvent('2/full-no-strict/bad-use-reserved-extension',
+    ceNamespace,
+    ceServerUrl,
+    ceCommonData,
+    ceCommonOptions,
+    { ...ceCommonExtensions, ...ceReservedExtensions } // use some good extensions and some with reserved names (so bad)
+  )
+}
+
+function createFullBadExtensionStrict () {
   let ce
   try {
     ce = new CloudEvent('2/full-strict/bad-use-reserved-extension',
@@ -112,7 +126,7 @@ function createFullStrictBadExtension () {
       ceServerUrl,
       ceCommonData,
       ceCommonOptionsStrict,
-      ceReservedExtensions
+      { ...ceCommonExtensions, ...ceReservedExtensions } // use some good extensions and some with reserved names (so bad)
     )
   } catch (e) {
     ce = null
@@ -283,7 +297,8 @@ module.exports = {
   createFullNestedData,
   createFullNestedDataStrict,
   createFullStrict,
-  createFullStrictBadExtension,
+  createFullBadExtension,
+  createFullBadExtensionStrict,
   createFullStrictJSONTextData,
   createFullTextData,
   createFullTextDataBadContentType,
@@ -292,5 +307,6 @@ module.exports = {
   createMinimal,
   createMinimalBadSource,
   createMinimalMandatoryUndefinedNoStrict,
+  createMinimalMandatoryUndefinedStrict,
   createMinimalStrict
 }

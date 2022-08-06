@@ -208,7 +208,7 @@ benchmarkRunner(`${benchNum++} - ce complete (good, validated using default mode
 benchmarkRunner(`${benchNum++} - ce complete (good, but validated in strict mode, serialized, deserialized)`, numRun, ceFactory.createFull, dumpCE, validateCEInStrictMode, serializeCE, deserializeCE)
 benchmarkRunner(`${benchNum++} - ce complete and strict (good, validated using default mode so strict here, serialized, deserialized)`, numRun, ceFactory.createFullStrict, dumpCE, validateCE, serializeCE, deserializeCE)
 benchmarkRunner(`${benchNum++} - ce complete and strict (good, but validated in no strict mode, serialized, deserialized)`, numRun, ceFactory.createFullStrict, dumpCE, validateCEInNoStrictMode, serializeCE, deserializeCE)
-benchmarkRunner(`${benchNum++} - ce complete with standard property in extensions (not good and not created)`, numRun, ceFactory.createFullStrictBadExtension, dumpCE, validateCE)
+benchmarkRunner(`${benchNum++} - ce complete with standard property in extensions (not good and not created)`, numRun, ceFactory.createFullBadExtensionStrict, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with text data (good)`, numRun, ceFactory.createFullTextData, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete with binary data ecoded in base64 (good)`, numRun, ceFactory.createFullBinaryData, dumpCE, validateCE)
 benchmarkRunner(`${benchNum++} - ce complete and strict with JSON data (good, but validated in no strict mode, serialized, deserialized)`, numRun, ceFactory.createFullStrictJSONTextData, dumpCE, validateCEInNoStrictMode, serializeCE, deserializeCE)

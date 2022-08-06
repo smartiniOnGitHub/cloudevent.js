@@ -47,13 +47,13 @@ test('ensure serialization functions exists (check only the static method here)'
     // optional, using some standard Node.js assert statements, as a sample
     assert(CloudEvent !== null)
     assert.strictEqual(typeof CloudEvent, 'function')
-    assert(new CloudEvent() instanceof CloudEvent)
+    assert(ceFactory.createEmpty() instanceof CloudEvent)
     assert.strictEqual(CloudEvent.mediaType(), 'application/cloudevents+json')
     assert(JSONBatch !== null)
     assert.strictEqual(typeof JSONBatch, 'function')
     assert.strictEqual(JSONBatch.mediaType(), 'application/cloudevents-batch+json')
     t.equal(typeof CloudEvent, 'function')
-    t.equal(new CloudEvent() instanceof CloudEvent, true)
+    t.equal(ceFactory.createEmpty() instanceof CloudEvent, true)
     t.equal(CloudEvent.mediaType(), 'application/cloudevents+json')
     t.equal(typeof JSONBatch, 'function')
     t.throws(function () {

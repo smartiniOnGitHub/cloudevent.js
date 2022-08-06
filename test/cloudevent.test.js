@@ -197,7 +197,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
 
   {
     // create an instance without mandatory arguments (but no strict mode): expected success ...
-    const ceEmpty = new CloudEvent()
+    const ceEmpty = ceFactory.createEmpty()
     t.ok(ceEmpty)
     t.ok(!CloudEvent.isValidEvent(ceEmpty))
     // t.strictSame(CloudEvent.validateEvent(ceEmpty), []) // temp, to see the error during development ...
@@ -216,7 +216,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     // create an instance without mandatory arguments (but with strict mode): expected failure ...
     let ceEmpty2 = null
     try {
-      ceEmpty2 = new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsStrict)
+      ceEmpty2 = ceFactory.createMinimalMandatoryUndefinedStrict()
       assert(ceEmpty2 === null) // never executed
     } catch (e) {
       t.ok(e) // expected error here
@@ -227,7 +227,7 @@ test('create some CloudEvent instances (empty, without minimal arguments set or 
     t.equal(ceEmpty2, null)
     // the same test, but in a shorter form ...
     t.throws(function () {
-      const ce = new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsStrict)
+      const ce = ceFactory.createMinimalMandatoryUndefinedStrict()
       assert(ce === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   }
@@ -284,7 +284,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
   {
     // create an instance with a mandatory argument undefined (but no strict mode): expected success ...
     // note that undefined arguments will be handled by default arguments, so all will be good the same here ...
-    const ceMinimalMandatoryUndefinedNoStrict = new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsNoStrict)
+    const ceMinimalMandatoryUndefinedNoStrict = ceFactory.createMinimalMandatoryUndefinedNoStrict()
     assert(ceMinimalMandatoryUndefinedNoStrict !== null)
     t.ok(ceMinimalMandatoryUndefinedNoStrict)
     t.ok(!CloudEvent.isValidEvent(ceMinimalMandatoryUndefinedNoStrict)) // using default strict mode in the event
@@ -299,7 +299,7 @@ test('create some CloudEvent instances (with minimal fields set) and ensure they
 
     // the same but with strict mode: expected exception ...
     t.throws(function () {
-      const ceMinimalMandatoryUndefinedStrict = new CloudEvent(undefined, undefined, undefined, undefined, ceOptionsStrict)
+      const ceMinimalMandatoryUndefinedStrict = ceFactory.createMinimalMandatoryUndefinedStrict()
       assert(ceMinimalMandatoryUndefinedStrict === null) // never executed
     }, Error, 'Expected exception when creating a CloudEvent without mandatory arguments with strict flag enabled')
   }
@@ -373,7 +373,6 @@ test('ensure extensions are managed in the right way', (t) => {
   t.ok(CloudEvent)
 
   const sampleExtensions = ceCommonExtensions
-  const sampleExtensionsWithStandardProperties = { ...sampleExtensions, id: 'myId' }
 
   t.ok(!CloudEvent.setExtensionsInEvent()) // ok but no return value
   t.ok(!CloudEvent.setExtensionsInEvent(undefined, undefined)) // ok but no return value
@@ -400,27 +399,16 @@ test('ensure extensions are managed in the right way', (t) => {
     assert(false) // never executed
   }, TypeError, 'Expected exception when getting bad extensions')
 
-  // ensure no instance will be created if extensions contains standard properties, but only in strict mode
-  const ceFull = new CloudEvent('1/full-bad-extensions-with-standard-names',
-    ceNamespace,
-    ceServerUrl,
-    ceCommonData,
-    ceCommonOptions,
-    sampleExtensionsWithStandardProperties
-  )
+  // ensure instance will be created if extensions contains standard properties, but only in no strict mode
+  const ceFull = ceFactory.createFullBadExtension()
   t.ok(ceFull)
   t.ok(CloudEvent.isValidEvent(ceFull))
   t.ok(CloudEvent.isValidEvent(ceFull, valOptionsNoStrict))
   t.strictSame(CloudEvent.validateEvent(ceFull), [])
   t.strictSame(CloudEvent.validateEvent(ceFull).length, 0)
   t.throws(function () {
-    const ceFullStrict = new CloudEvent('1/full-strict-bad-extensions-with-standard-names',
-      ceNamespace,
-      ceServerUrl,
-      ceCommonData,
-      ceCommonOptionsStrict,
-      sampleExtensionsWithStandardProperties
-    )
+    // ensure no instance will be created if extensions contains standard properties, but only in strict mode
+    const ceFullStrict = ceFactory.createFullBadExtensionStrict()
     assert(ceFullStrict === undefined) // never executed
   }, Error, 'Expected exception when creating a CloudEvent with extensions containing standard prioperties, in strict mode')
   // ensure no instance will be created if extensions are defined but empty (not valid in strict mode)
@@ -1172,7 +1160,7 @@ test('ensure a CloudEvent/subclass instance is seen as a CloudEvent instance, bu
 
   {
     // check that even an empty instance belongs to the right base class
-    const ceEmpty = new CloudEvent()
+    const ceEmpty = ceFactory.createEmpty()
     t.equal(typeof ceEmpty, 'object')
     t.equal(ceEmpty instanceof CloudEvent, true)
     t.ok(!V.isClass(ceEmpty, NotCESubclass))
@@ -1214,7 +1202,7 @@ test('ensure CloudEvent and objects are merged in the right way', (t) => {
   t.ok(V.isFunction(T.mergeObjects))
 
   {
-    const base = new CloudEvent()
+    const base = ceFactory.createEmpty()
     const obj = T.mergeObjects(base)
     t.ok(V.isObject(obj))
     t.strictSame(Object.getPrototypeOf(obj), Object.getPrototypeOf(base))
