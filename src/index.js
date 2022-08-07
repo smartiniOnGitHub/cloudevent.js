@@ -50,7 +50,8 @@ const cloudEventValidator = require('./validator')
 const cloudEventTransformer = require('./transformer')
 
 /**
- * Get a reference to cloudevent utility source.
+ * Get a reference to cloudevent utility functions.
+ * See {@link CloudEventUtilities}.
  * @private
  */
 const cloudEventUtilities = require('./utility')

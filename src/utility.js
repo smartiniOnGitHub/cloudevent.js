@@ -18,6 +18,7 @@
 /**
  * Utility:
  * this module exports some utility functions.
+ * @module utility
  */
 
 /**
@@ -32,10 +33,7 @@ const CloudEvent = require('./cloudevent')
  * See {@link Validator}.
  * @private
  */
-const CloudEventValidator = require('./validator')
-
-// get a short reference to the Validator
-const V = CloudEventValidator
+const V = require('./validator')
 
 /**
  * Create and return a CloudEvent from the given object and options.
