@@ -34,7 +34,7 @@
   "devDependencies": {
     "jsdoc": "^4.0.3",
     "standard": "^17.0.0",
-    "tap": "^18.0.0"
+    "tap": "^19.0.2"
   },
   "peerDependencies": {},
   "engines": {
