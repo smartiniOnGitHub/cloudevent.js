@@ -49,7 +49,6 @@ npm-debug.log
 
 .nyc_output
 /coverage
-*.0x/
 
 .dockerignore
 Dockerfile
