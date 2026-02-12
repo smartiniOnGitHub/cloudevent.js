@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.20.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.20.0) (2026-02-12)
+Summary Changelog:
+- Update requirements to Node.js 20 LTS (20.9.0)
+- Update all dependencies to latest
+- Ensure all is good as before
+
 ## [0.10.0](https://github.com/smartiniOnGitHub/cloudevent.js/releases/tag/0.10.0) (2022-08-07)
 Summary Changelog:
 - Update requirements to Node.js 14 LTS (14.15.0)

@@ -241,7 +241,7 @@ you can find even examples for using JSONBatch objects (array of CloudEvent inst
 
 ## Requirements
 
-Node.js 14 LTS (14.15.0) or later (anyway, recommended an active LTS version).
+Node.js 20 LTS (20.9.0) or later (anyway, recommended an active LTS version).
 
 
 ## Sources
