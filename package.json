@@ -1,9 +1,10 @@
 {
   "name": "cloudevent",
-  "version": "0.10.0",
+  "version": "0.20.0",
   "description": "JavaScript/Node.js implementation of the CloudEvents standard format",
   "main": "src/index",
   "scripts": {
+    "audit:log": "npm audit > ./temp/audit.log",
     "cache:cleanup": "npm cache clean --force",
     "cache:verify": "npm cache verify",
     "clean:install": "rm -rf ./package-lock.json ./node_modules/",
@@ -22,23 +23,24 @@
     "lint:log": "npm run lint > ./temp/lint-standard.log",
     "lint:standard": "standard --verbose",
     "lint": "npm run lint:standard",
-    "test:clean": "rm -rf .nyc_output/* ./coverage/*",
-    "test:coverage:all": "npm run test:unit --  --cov",
-    "test:coverage": "npm run test:unit -- --cov --coverage-report=html",
-    "test:unit:debug": "tap -T --node-arg=--inspect-brk test/*.test.js",
-    "test:unit:dev": "tap --watch --cov test/*.test.js",
-    "test:unit": "tap test/*.test.js",
+    "test:clean": "rm -rf .nyc_output/* .tap/* ./coverage/*",
+    "test:coverage:all": "npm run test:unit --  --coverage-report=text",
+    "test:coverage": "npm run test:unit -- --coverage-report=html",
+    "test:unit:debug": "tap -T --node-arg=--inspect-brk",
+    "test:unit:dev": "tap --watch --coverage-report=none",
+    "test:unit": "tap --allow-incomplete-coverage",
     "test": "npm run lint && npm run test:unit"
   },
   "dependencies": {},
   "devDependencies": {
-    "jsdoc": "^4.0.3",
-    "standard": "^17.0.0",
-    "tap": "^18.0.0"
+    "jsdoc": "^4.0.5",
+    "standard": "^17.1.2",
+    "tap": "^21.5.1"
   },
   "peerDependencies": {},
+  "type": "commonjs",
   "engines": {
-    "node": ">=14.15.0"
+    "node": ">=20.9.0"
   },
   "homepage": "https://github.com/smartiniOnGitHub/cloudevent.js#readme",
   "repository": {
